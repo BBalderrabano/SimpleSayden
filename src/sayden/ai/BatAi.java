@@ -10,6 +10,5 @@ public class BatAi extends CreatureAi {
 
 	public void onUpdate(){
 		wander();
-		wander();
 	}
 }

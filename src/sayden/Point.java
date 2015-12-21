@@ -43,6 +43,22 @@ public class Point {
 		return true;
 	}
 
+	public List<Point> neighbors(int radio){
+		List<Point> points = new ArrayList<Point>();
+		
+		for (int ox = -radio; ox < radio+1; ox++){
+			for (int oy = -radio; oy < radio+1; oy++){
+				if (ox == 0 && oy == 0)
+					continue;
+				
+				points.add(new Point(x+ox, y+oy, z));
+			}
+		}
+
+		Collections.shuffle(points);
+		return points;
+	}
+	
 	public List<Point> neighbors8(){
 		List<Point> points = new ArrayList<Point>();
 		
@@ -57,5 +73,21 @@ public class Point {
 
 		Collections.shuffle(points);
 		return points;
+	}
+	
+	public List<Point> neighbors4(){
+		List<Point> points = new ArrayList<Point>();
+		
+		points.add(new Point(x, y+1, z));
+		points.add(new Point(x, y-1, z));
+		points.add(new Point(x+1, y, z));
+		points.add(new Point(x-1, y, z));
+
+		Collections.shuffle(points);
+		return points;
+	}
+
+	public double distance(Point position) {
+		return Math.sqrt((position.x*x)+(position.y*y));
 	}
 }

@@ -16,6 +16,7 @@ public class PlayerAi extends CreatureAi {
 		super(creature);
 		this.messages = messages;
 		this.fov = fov;
+		this.setWeakSpot("NONE");
 	}
 
 	public void onEnter(int x, int y, int z, Tile tile){
@@ -27,10 +28,15 @@ public class PlayerAi extends CreatureAi {
 			Item item = creature.item(creature.x, creature.y, creature.z);
 			if (item != null)
 				creature.notify("Hay " + item.nameUnUna() + " aqui.");
-			
 		} else if (tile.isDiggable()) {
 			creature.dig(x, y, z);
 		}
+		creature.world().modifyActionPoints(creature.getMovementSpeed());
+	}
+	
+	public void onAttack(int x, int y, int z, Creature other){
+		creature.world().modifyActionPoints(creature.getAttackSpeed());
+		creature.meleeAttack(other);
 	}
 	
 	public void onNotify(String message){

@@ -9,6 +9,10 @@ public class Item extends Thing{
 	private char glyph;
 	public char glyph() { return glyph; }
 	
+	private float bloodModifyer;
+	public float bloodModifyer() { return bloodModifyer; }
+	public void modifyBloodModifyer(float amount) { this.bloodModifyer += amount; }
+	
 	private Color color;
 	public Color color() { return color; }
 
@@ -56,6 +60,7 @@ public class Item extends Thing{
 		this.appearance = appearance == null ? name : appearance;
 		this.thrownAttackValue = 1;
 		this.writtenSpells = new ArrayList<Spell>();
+		this.bloodModifyer = 0.5f;
 	}
 	
 	public String details() {

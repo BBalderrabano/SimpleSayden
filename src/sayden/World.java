@@ -7,6 +7,8 @@ import java.util.List;
 public class World {
 	private Tile[][][] tiles;
 	private Item[][][] items;
+	private float[][][] blood;
+	private float[][][] water;	//TODO: Implement water
 	
 	private int width;
 	public int width() { return width; }
@@ -26,6 +28,8 @@ public class World {
 		this.depth = tiles[0][0].length;
 		this.creatures = new ArrayList<Creature>();
 		this.items = new Item[width][height][depth];
+		this.blood = new float[width][height][depth];
+		this.water = new float[width][height][depth];
 	}
 
 	public void modifyActionPoints(int amount){
@@ -44,11 +48,41 @@ public class World {
 		return null;
 	}
 	
+	public boolean isOutBounds(int x, int y, int z){
+		return (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth);
+	}
+	
 	public Tile tile(int x, int y, int z){
 		if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth)
 			return Tile.BOUNDS;
 		else
 			return tiles[x][y][z];
+	}
+	
+	public void fillTile(int x, int y, int z, float amount, String fluidType){
+		Point tile = new Point(x,y,z);
+		
+		//Blood is additive, when a tile is about to be filled with more blood than it
+		//can sustain its spread to adjacent tiles
+		if(fluidType == Constants.BLOOD_FLUID){
+			if(blood[x][y][z] + amount < 100f){
+				blood[x][y][z] += amount;
+			}else{
+				for(Point t : tile.neighbors8()){
+					if(isOutBounds(t.x, t.y, t.z)){
+						continue;
+					}
+					if(blood[t.x][t.y][t.z] <= 100f){
+						blood[t.x][t.y][t.z] += amount;
+						if(blood[t.x][t.y][t.z] > 100f){
+							fillTile(x,y,z, blood[t.x][t.y][t.z] - 100f, fluidType);
+							blood[t.x][t.y][t.z] = 100f;
+						}
+						return;
+					}
+				}
+			}
+		}
 	}
 	
 	public char glyph(int x, int y, int z){
@@ -72,6 +106,19 @@ public class World {
 		
 		return tile(x, y, z).color();
 	}
+	
+	public Color backgroundColor(int x, int y, int z){
+		float bloodAmount = blood[x][y][z];
+		
+		if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth)
+			return Tile.BOUNDS.backgroundColor();
+					
+		if(bloodAmount > 0f){
+			return new Color(Math.min((bloodAmount / 100f), 1f),0,0);
+		}
+		
+		return tile(x, y, z).backgroundColor();
+	}
 
 	public void dig(int x, int y, int z) {
 		if (tile(x, y, z).isDiggable())
@@ -94,13 +141,6 @@ public class World {
 		creatures.add(creature);
 	}
 	
-	public void update(){
-		List<Creature> toUpdate = new ArrayList<Creature>(creatures);
-		for (Creature creature : toUpdate){
-			creature.update();
-		}
-	}
-	
 	public void updateFloor(int z){
 		List<Creature> toUpdate = new ArrayList<Creature>(creatures);
 		for (Creature creature : toUpdate){
@@ -108,6 +148,12 @@ public class World {
 				continue;
 			creature.update();
 		}
+		for (int x = 0; x < width; x++){
+			for (int y = 0; y < height; y++){
+				if(blood[x][y][z] > Constants.MIN_FLUID_AMOUNT)
+					blood[x][y][z] -= 1f;
+			}	
+		}	
 	}
 
 	public void remove(Creature other) {

@@ -3,16 +3,16 @@ package sayden;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-
 import sayden.ai.CreatureAi;
-
 
 public class Creature extends Thing{
 	private World world;
+	public World world() { return world; }
 	
 	public int x;
 	public int y;
 	public int z;
+	public Point position() { return new Point(x,y,z); }
 	
 	private int timeUnsync;
 	public void addTime(){ timeUnsync++; }
@@ -33,6 +33,10 @@ public class Creature extends Thing{
 	private int hp;
 	public int hp() { return hp; }
 	
+	private float blood;
+	public float blood() { return blood; }
+	public void modifyBlood(float value) { blood += value; }
+	
 	private int attackValue;
 	public void modifyAttackValue(int value) { attackValue += value; }
 	public int attackValue() { 
@@ -49,20 +53,20 @@ public class Creature extends Thing{
 	public int getActionPoints() { return actionPoints;	}
 	public void modifyActionPoints(int actionPoints) {	this.actionPoints += actionPoints; }
 
-	private int attackSpeed;
+	private Speed attackSpeed;
 	public int getAttackSpeed() {
-		return attackSpeed;
+		return attackSpeed.velocity();
 	}
-	public void modifyAttackSpeed(int attackSpeed) {
-		this.attackSpeed += attackSpeed;
+	public void modifyAttackSpeed(Speed attackSpeed) {
+		this.attackSpeed = attackSpeed;
 	}
 	
-	private int movementSpeed;
+	private Speed movementSpeed;
 	public int getMovementSpeed() {
-		return movementSpeed;
+		return movementSpeed.velocity();
 	}
-	public void modifyMovementSpeed(int movementSpeed) {
-		this.movementSpeed += movementSpeed;
+	public void modifyMovementSpeed(Speed movementSpeed) {
+		this.movementSpeed = movementSpeed;
 	}
 	
 	private int visionRadius;
@@ -134,12 +138,16 @@ public class Creature extends Thing{
 	
 	public Creature(World world, char glyph, char gender, Color color, String name, int maxHp, int attack, int defense){
 		super();
+		this.movementSpeed = Speed.NORMAL;
+		this.attackSpeed = Speed.NORMAL;
+		this.actionPoints = 0;
 		this.world = world;
 		this.glyph = glyph;
 		this.gender = gender;
 		this.color = color;
 		this.maxHp = maxHp;
 		this.hp = maxHp;
+		this.blood = maxHp * 10;
 		this.attackValue = attack;
 		this.defenseValue = defense;
 		this.visionRadius = 9;
@@ -156,9 +164,15 @@ public class Creature extends Thing{
 	}
 	
 	public void moveBy(int mx, int my, int mz){
-		if (mx==0 && my==0 && mz==0)
+		if (mx==0 && my==0 && mz==0){
+			if(isPlayer()){
+				world.modifyActionPoints( Math.max(1, movementSpeed.velocity() - 1));
+			}else{
+				world.modifyActionPoints(-Math.max(1, movementSpeed.velocity() - 1));
+			}
 			return;
-		
+		}
+
 		Tile tile = world.tile(x+mx, y+my, z+mz);
 		
 		if (mz == -1){
@@ -189,57 +203,92 @@ public class Creature extends Thing{
 		
 		modifyFood(-1);
 		
-		if (other == null)
+		if (other == null){
 			ai.onEnter(x+mx, y+my, z+mz, tile);
-		else
-			meleeAttack(other);
+		}else{
+			ai.onAttack(x+mx, y+my, z+mz, other);
+		}
 	}
 
 	public void meleeAttack(Creature other){
-		commonAttack(other, attackValue(), "ataca al %s por %d de daño", other.name);
+		commonAttack(other, weapon(), "ataca al %s por %s de daño", other.name);
 	}
 
 	private void throwAttack(Item item, Creature other) {
-		commonAttack(other, attackValue / 2 + item.thrownAttackValue(), "arroja %s %s efectuando %d puntos de daño", item.nameUnUna(), other.nameAlALa());
+		commonAttack(other, item, "arroja %s %s efectuando %d puntos de daño", item.nameUnUna(), other.nameAlALa());
 		other.addEffect(item.quaffEffect());
 	}
 	
 	public void rangedWeaponAttack(Creature other){
-		commonAttack(other, attackValue / 2 + weapon.rangedAttackValue(), "dispara %s %s efectuando %d puntos de daño", weapon.nameUnUna(), other.nameAlALa());
+		commonAttack(other, weapon(), "dispara %s %s efectuando %d puntos de daño", weapon.nameUnUna(), other.nameAlALa());
 	}
 	
-	private void commonAttack(Creature other, int attack, String action, Object ... params) {
+	private void commonAttack(Creature other, Item object, String action, Object ... params) {
 		modifyFood(-2);
 		
+		int attack = attackValue();	//Start adding the inherit damage of the creature
 		Item defending_item = null;
-		int amount = Math.max(0, attack - other.defenseValue());
-		amount = (int)(Math.random() * amount) + 1;
 		
+		if(object != null){
+			attack += object.attackValue();	//If its attacking with a weapon lets add its damage
+		}
+		
+		int amount = Math.max(1, attack - other.defenseValue()); //Lets substract the defending creature's inherit defense
+				
 		Object[] params2 = new Object[params.length+1];
 		for (int i = 0; i < params.length; i++){
 			params2[i] = params[i];
 		}
-		params2[params2.length - 1] = amount;
 		
-		doAction(action, params2);
+		String notification_pos = "";
 		
+		//Get the defending item and check for weak spots
 		if(x < other.x && y >= other.y){
 			defending_item = other.armor();
+			notification_pos = " ("+(other.getStringData(Constants.CHEST_POS) == null ? "pecho" : other.getStringData(Constants.CHEST_POS)) + ")";
+			if(other.ai.getWeakSpot() == Constants.CHEST_POS){
+				amount += other.defenseValue();
+			}
 		}else if(y < other.y && x <= other.x){
 			defending_item = other.helment();
+			notification_pos = " ("+(other.getStringData(Constants.HEAD_POS) == null ? "cabeza" : other.getStringData(Constants.HEAD_POS)) + ")";
+			if(other.ai.getWeakSpot() == Constants.HEAD_POS){
+				amount += other.defenseValue();
+			}
 		}else if(x > other.x && y <= other.y){
-			//ARMS
 			defending_item = other.shield() == null ? (other.weapon() != null && other.weapon().defenseValue() > 0 ? other.weapon() : other.armor()) : other.shield();
+			notification_pos = " ("+(other.getStringData(Constants.ARM_POS) == null ? "brazos" : other.getStringData(Constants.ARM_POS)) + ")";
+			if(other.ai.getWeakSpot() == Constants.ARM_POS){
+				amount += other.defenseValue();
+			}
 		}else if(y > other.y && x >= other.x){
-			//LEGS
 			defending_item = other.shield() == null ? (other.weapon() != null && other.weapon().defenseValue() > 0 ? other.weapon() : other.armor()) : other.shield();
+			notification_pos = " ("+(other.getStringData(Constants.LEG_POS) == null ? "piernas" : other.getStringData(Constants.LEG_POS)) + ")";
+			if(other.ai.getWeakSpot() == Constants.LEG_POS){
+				amount += other.defenseValue();
+			}
 		}
 		
-		int item_amount = Math.max(0, ((weapon() == null ? 0 : weapon().attackValue()) - (defending_item == null ? 0 : defending_item.defenseValue())));
+		amount -= Math.min(defending_item == null ? 0 : defending_item.defenseValue(), 1);	//Substract the defense of the item, cant go below 1
 		
-		amount += item_amount;
+		params2[params2.length - 1] = amount;
+		
+		doAction(action + "" + notification_pos, params2);
 		
 		other.modifyHp(-amount, "Matado por " + nameUnUna());
+	
+		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
+		
+		other.modifyBlood(-drained_blood);
+		world.fillTile(other.x, other.y, other.z, drained_blood, Constants.BLOOD_FLUID);
+		
+		if(Constants.DEBUG_MODE){
+			System.out.println("[ATTACK_LOG] " + name() + " al " + other.name());
+			if(object != null) System.out.println("-> " + object.name() + " [ARMA]");
+			if(defending_item != null) System.out.println("-> " + defending_item.name() + " [ARMADURA]");
+			System.out.println("-> " + amount + " [DAMAGE]");
+			System.out.println("-> " + drained_blood + " [BLOOD]");
+		}
 		
 		if (other.hp < 1)
 			gainXp(other);
@@ -259,6 +308,9 @@ public class Creature extends Thing{
 		hp += amount;
 		this.causeOfDeath = causeOfDeath;
 		
+		if(amount > 0){
+			blood += amount * (Constants.BLOOD_AMOUNT_MULTIPLIER * 0.5f);
+		}
 		if (hp > maxHp) {
 			hp = maxHp;
 		} else if (hp < 1) {
@@ -281,15 +333,17 @@ public class Creature extends Thing{
 	public void dig(int wx, int wy, int wz) {
 		modifyFood(-10);
 		world.dig(wx, wy, wz);
-		doAction("dig");
+		doAction("derrumba la pared");
 	}
 	
 	public void update(){
-		modifyFood(-1);
-		regenerateHealth();
-		regenerateMana();
-		updateEffects();
-		ai.onUpdate();
+		while(ai.canTakeAction()){
+			modifyFood(-1);
+			regenerateHealth();
+			regenerateMana();
+			updateEffects();
+			ai.onUpdate();
+		}
 	}
 	
 	private void updateEffects(){
@@ -445,7 +499,7 @@ public class Creature extends Thing{
 	
 	public void drop(Item item){
 		if (world.addAtEmptySpace(item, x, y, z)){
-			doAction("suelta " + item.nameElLa());
+			doAction("suelta " + item.nameUnUna());
 			inventory.remove(item);
 			unequip(item);
 		} else {
@@ -455,6 +509,12 @@ public class Creature extends Thing{
 	
 	public void modifyFood(int amount) { 
 		food += amount;
+		
+		if(blood < 1){
+			doAction("ha perdido mucha sangre");
+			modifyMaxHp(-1);
+			blood = Constants.MIN_FLUID_AMOUNT;
+		}
 		
 		if (food > maxFood) {
 			maxFood = (maxFood + food) / 2;
@@ -532,6 +592,18 @@ public class Creature extends Thing{
 		}
 	}
 	
+	public void pickup(Item item){
+		if (!inventory.contains(item)) {
+			if (inventory.isFull()) {
+				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLa());
+				return;
+			} else {
+				world.remove(item);
+				inventory.add(item);
+			}
+		}
+	}
+	
 	public void equip(Item item){
 		if (!inventory.contains(item)) {
 			if (inventory.isFull()) {
@@ -546,19 +618,19 @@ public class Creature extends Thing{
 		if (item.attackValue() == 0 && item.rangedAttackValue() == 0 && item.defenseValue() == 0)
 			return;
 		
-		if (item.getBooleanData("IsWeapon")){
+		if (item.getBooleanData(Constants.CHECK_WEAPON)){
 			unequip(weapon);
 			doAction("empuña " + item.nameUnUna());
 			weapon = item;
-		} else if (item.getBooleanData("IsArmor")){
+		} else if (item.getBooleanData(Constants.CHECK_ARMOR)){
 			unequip(armor);
 			doAction("viste " + item.nameUnUna());
 			armor = item;
-		} else if (item.getBooleanData("IsHelment")){
+		} else if (item.getBooleanData(Constants.CHECK_HELMENT)){
 			unequip(helment);
 			doAction("calza " + item.nameUnUna());
 			helment = item;
-		} else if (item.getBooleanData("IsShield")){
+		} else if (item.getBooleanData(Constants.CHECK_SHIELD)){
 			unequip(shield);
 			doAction("alza " + item.nameUnUna());
 			shield = item;

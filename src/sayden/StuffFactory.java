@@ -13,6 +13,7 @@ import sayden.ai.BatAi;
 import sayden.ai.FungusAi;
 import sayden.ai.GoblinAi;
 import sayden.ai.PlayerAi;
+import sayden.ai.RockBugAi;
 import sayden.ai.ZombieAi;
 
 public class StuffFactory {
@@ -43,7 +44,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newPlayer(List<String> messages, FieldOfView fov){
-		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 100, 5, 5);
+		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 100, 1, 1);
 		world.addAtEmptyLocation(player, 0);
 		new PlayerAi(player, messages, fov);
 		return player;
@@ -57,23 +58,42 @@ public class StuffFactory {
 	}
 	
 	public Creature newBat(int depth){
-		Creature bat = new Creature(world, 'b', 'M', AsciiPanel.brightYellow, "murcielago", 15, 5, 0);
+		Creature bat = new Creature(world, 'b', 'M', AsciiPanel.brightYellow, "murcielago", 15, 2, 0);
 		world.addAtEmptyLocation(bat, depth);
+		bat.setData(Constants.ARM_POS, "alas");
+		bat.setData(Constants.LEG_POS, "patas");
 		new BatAi(bat);
 		return bat;
 	}
 	
 	public Creature newZombie(int depth, Creature player){
-		Creature zombie = new Creature(world, 'z', 'M', AsciiPanel.white, "zombie", 50, 5, 10);
+		Creature zombie = new Creature(world, 'z', 'M', AsciiPanel.white, "zombie", 50, 5, 0);
 		world.addAtEmptyLocation(zombie, depth);
 		new ZombieAi(zombie, player);
 		return zombie;
 	}
+	
+	public Creature newRockBug(int depth, Creature player){
+		Creature rockBug = new Creature(world, 'c', 'M', AsciiPanel.yellow, "comepiedras", 15, 2, 5);
+		rockBug.modifyVisionRadius(-6);
+		rockBug.modifyMovementSpeed(Speed.SLOW);
+		rockBug.modifyAttackSpeed(Speed.SLOW);
+				
+		if(Math.random() > 0.2f){
+			rockBug.pickup(newRockBugHelm(depth));
+		}
+		
+		world.addAtEmptyLocation(rockBug, depth);
+		rockBug.x = player.x -1 ;
+		rockBug.y = player.y;
+		new RockBugAi(rockBug, player);
+		return rockBug;
+	}
 
 	public Creature newGoblin(int depth, Creature player){
-		Creature goblin = new Creature(world, 'g', 'M', AsciiPanel.brightGreen, "goblin", 66, 8, 5);
+		Creature goblin = new Creature(world, 'g', 'M', AsciiPanel.brightGreen, "goblin", 50, 5, 0);
 		new GoblinAi(goblin, player);
-		goblin.equip(randomWeapon(depth));
+		goblin.equip(randomWeapon(depth));		
 		goblin.equip(randomArmor(depth));
 		world.addAtEmptyLocation(goblin, depth);
 		return goblin;
@@ -84,6 +104,14 @@ public class StuffFactory {
 		rock.modifyThrownAttackValue(5);
 		world.addAtEmptyLocation(rock, depth);
 		return rock;
+	}
+	
+	public Item newRockBugHelm(int depth){
+		Item rockBugHelm = new Item('^', 'M', AsciiPanel.yellow, "caparazon de comepiedra", null);
+		rockBugHelm.modifyDefenseValue(2);
+		rockBugHelm.setData(Constants.CHECK_HELMENT, true);
+		world.addAtEmptyLocation(rockBugHelm, depth);
+		return rockBugHelm;
 	}
 	
 	public Item newVictoryItem(int depth){
@@ -110,6 +138,7 @@ public class StuffFactory {
 		Item item = new Item(')', 'F', AsciiPanel.white, "daga", null);
 		item.modifyAttackValue(5);
 		item.modifyThrownAttackValue(5);
+		item.modifyBloodModifyer(0.8f);
 		item.setData("IsWeapon", true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -119,6 +148,7 @@ public class StuffFactory {
 		Item item = new Item(')', 'F', AsciiPanel.brightWhite, "espada", null);
 		item.modifyAttackValue(10);
 		item.modifyThrownAttackValue(3);
+		item.modifyBloodModifyer(0.6f);
 		item.setData("IsWeapon", true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -129,6 +159,7 @@ public class StuffFactory {
 		item.modifyAttackValue(5);
 		item.modifyDefenseValue(3);
 		item.modifyThrownAttackValue(3);
+		item.modifyBloodModifyer(0.1f);
 		item.setData("IsWeapon", true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -138,6 +169,7 @@ public class StuffFactory {
 		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco", null);
 		item.modifyAttackValue(1);
 		item.modifyRangedAttackValue(5);
+		item.modifyBloodModifyer(1f);
 		item.setData("IsWeapon", true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
@@ -147,6 +179,7 @@ public class StuffFactory {
 		Item item = new Item(')', 'F', AsciiPanel.yellow, "baguette", null);
 		item.modifyAttackValue(3);
 		item.modifyFoodValue(100);
+		item.modifyBloodModifyer(0.1f);
 		item.setData("IsWeapon", true);
 		world.addAtEmptyLocation(item, depth);
 		return item;

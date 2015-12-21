@@ -16,6 +16,9 @@ public enum Tile {
 	
 	private Color color;
 	public Color color() { return color; }
+	
+	private Color backgroundColor;
+	public Color backgroundColor() { return backgroundColor; }
 
 	private String description;
 	public String details(){ return description; }
@@ -24,6 +27,7 @@ public enum Tile {
 		this.glyph = glyph;
 		this.color = color;
 		this.description = description;
+		this.backgroundColor = Color.BLACK;
 	}
 
 	public boolean isGround() {

@@ -26,6 +26,7 @@ public class Thing {
 	
 	public boolean getBooleanData(String key) { return data.get(key) == null ? false : (Boolean) data.get(key); }
 	public int getIntegerData(String key) { return data.get(key) == null ? 0 : (Integer) data.get(key); }
+	public String getStringData(String key) { return data.get(key) == null ? null : data.get(key).toString(); }
 	
 	public Thing(){
 		data = new HashMap<String, Object>();

@@ -37,19 +37,19 @@ public class PlayScreen implements Screen {
 
 	private void createCreatures(StuffFactory factory){
 		player = factory.newPlayer(messages, fov);
-		
-		for (int z = 0; z < world.depth(); z++){
+		factory.newRockBug(player.z, player);
+		/*for (int z = 0; z < world.depth(); z++){
 			for (int i = 0; i < 4; i++){
 				factory.newFungus(z);
 			}
-			for (int i = 0; i < 10; i++){
-				factory.newBat(z);
+			for (int i = 0; i < 15; i++){
+				factory.newRockBug(z, player);
 			}
 			for (int i = 0; i < z * 2 + 1; i++){
 				factory.newZombie(z, player);
 				factory.newGoblin(z, player);
 			}
-		}
+		}*/
 	}
 
 	private void createItems(StuffFactory factory) {
@@ -110,17 +110,24 @@ public class PlayScreen implements Screen {
 		else
 			return "";
 	}
+	
+	private List<String> checkDuplicateMessages(List<String> messages){
+		//TODO: implement for real
+		return messages;
+	}
 
 	private void displayMessages(AsciiPanel terminal, List<String> messages) {
-		int top = screenHeight - messages.size();
+		messages = checkDuplicateMessages(messages);
 		
 		for (int i = 0; i < messages.size(); i++){
 			if(messages.get(i).length() >= screenWidth){
-				ArrayList<String> toAdd = splitPhraseByLimit(messages.get(i), screenWidth);
+				ArrayList<String> toAdd = splitPhraseByLimit(messages.get(i), screenWidth - 1);
 				messages.remove(i);
 				messages.addAll(i, toAdd);
 			}
 		}
+		
+		int top = screenHeight - messages.size();
 		
 		for (int i = 0; i < messages.size(); i++){
 			String nTildeFix = messages.get(i).replace('ñ', (char)164).replace('Ñ', (char)165);
@@ -154,9 +161,9 @@ public class PlayScreen implements Screen {
 				int wy = y + top;
 
 				if (player.canSee(wx, wy, player.z))
-					terminal.write(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z));
+					terminal.write(world.glyph(wx, wy, player.z), x, y, world.color(wx, wy, player.z), world.backgroundColor(wx, wy, player.z));
 				else
-					terminal.write(fov.tile(wx, wy, player.z).glyph(), x, y, Color.darkGray);
+					terminal.write(fov.tile(wx, wy, player.z).glyph(), x, y, Color.darkGray, Color.BLACK);
 			}
 		}
 	}
@@ -169,6 +176,8 @@ public class PlayScreen implements Screen {
 			subscreen = subscreen.respondToUserInput(key);
 		} else {
 			switch (key.getKeyCode()){
+			case KeyEvent.VK_SPACE:
+								player.moveBy(0, 0, 0); break;
 			case KeyEvent.VK_LEFT:
 			case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
 			case KeyEvent.VK_RIGHT:
