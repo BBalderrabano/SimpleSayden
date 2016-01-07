@@ -1,7 +1,7 @@
 package sayden;
 
 public class Constants {
-	public static  String CHEST_POS = "CHEST";
+	public static String CHEST_POS = "CHEST";
 	public static String ARM_POS = "ARMS";
 	public static String LEG_POS = "LEGS";
 	public static String HEAD_POS = "HEAD";
@@ -15,6 +15,7 @@ public class Constants {
 	public static String CHECK_WEAPON = "IsWeapon";
 	public static String CHECK_ARMOR = "IsArmor";
 	public static String CHECK_SHIELD = "IsShield";
+	public static String CHECK_CONSUMABLE = "IsEdible";
 	
 	public static boolean DEBUG_MODE = false;
 }

@@ -88,6 +88,8 @@ public class Point {
 	}
 
 	public double distance(Point position) {
-		return Math.sqrt((position.x*x)+(position.y*y));
+		double dx = this.x - position.x;
+        double dy = this.y - position.y;
+        return Math.sqrt(dx*dx + dy*dy);
 	}
 }

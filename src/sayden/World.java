@@ -8,7 +8,9 @@ public class World {
 	private Tile[][][] tiles;
 	private Item[][][] items;
 	private float[][][] blood;
-	private float[][][] water;	//TODO: Implement water
+	//private float[][][] water;	//TODO: Implement water
+	
+	private boolean[][][] visited;
 	
 	private int width;
 	public int width() { return width; }
@@ -29,7 +31,8 @@ public class World {
 		this.creatures = new ArrayList<Creature>();
 		this.items = new Item[width][height][depth];
 		this.blood = new float[width][height][depth];
-		this.water = new float[width][height][depth];
+		this.visited = new boolean[width][height][depth];
+		//this.water = new float[width][height][depth];
 	}
 
 	public void modifyActionPoints(int amount){
@@ -174,6 +177,8 @@ public class World {
 	}
 	
 	public Item item(int x, int y, int z){
+		if(x < 0 || y < 0 || x >= width || y >= height)
+			return null;
 		return items[x][y][z];
 	}
 	
@@ -194,6 +199,36 @@ public class World {
 		items[x][y][z] = null;
 	}
 
+	public boolean addAtEmptySpace(Creature creature, int x, int y, int z){
+		if (creature == null)
+			return true;
+		
+		List<Point> points = new ArrayList<Point>();
+		List<Point> checked = new ArrayList<Point>();
+		
+		points.add(new Point(x, y, z));
+		
+		while (!points.isEmpty()){
+			Point p = points.remove(0);
+			checked.add(p);
+			
+			if (!tile(p.x, p.y, p.z).isGround())
+				continue;
+			if (creature(p.x, p.y, p.z) == null){
+				creature.x = p.x;
+				creature.y = p.y;
+				creature.z = p.z;
+				creatures.add(creature);
+				return true;
+			} else {
+				List<Point> neighbors = p.neighbors8();
+				neighbors.removeAll(checked);
+				points.addAll(neighbors);
+			}
+		}
+		return false;
+	}
+	
 	public boolean addAtEmptySpace(Item item, int x, int y, int z){
 		if (item == null)
 			return true;
@@ -214,7 +249,7 @@ public class World {
 				items[p.x][p.y][p.z] = item;
 				Creature c = this.creature(p.x, p.y, p.z);
 				if (c != null)
-					c.notify("%s cae a tus pies.", item.nameUnUna());
+					c.notify("%s cae a tus pies.", item.nameUnUna().substring(0, 1).toUpperCase() + item.nameUnUna().substring(1));
 				return true;
 			} else {
 				List<Point> neighbors = p.neighbors8();
@@ -227,5 +262,13 @@ public class World {
 
 	public void add(Creature pet) {
 		creatures.add(pet);
+	}
+
+	public float getCost(Creature mover, int sx, int sy, int tx, int ty) {
+		//We can change the cost of moving to different tiles
+		return 1;
+	}
+	public void pathFinderVisited(int x, int y, int z) {
+		visited[x][y][z] = true;
 	}
 }

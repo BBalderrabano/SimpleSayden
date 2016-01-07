@@ -31,11 +31,14 @@ public class PlayerAi extends CreatureAi {
 		} else if (tile.isDiggable()) {
 			creature.dig(x, y, z);
 		}
-		creature.world().modifyActionPoints(creature.getMovementSpeed());
+		creature.world().modifyActionPoints(creature.getMovementSpeed().velocity());
+	}
+	
+	public void onUpdate(){
 	}
 	
 	public void onAttack(int x, int y, int z, Creature other){
-		creature.world().modifyActionPoints(creature.getAttackSpeed());
+		creature.world().modifyActionPoints(creature.getAttackSpeed().velocity());
 		creature.meleeAttack(other);
 	}
 	

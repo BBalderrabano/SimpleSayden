@@ -12,6 +12,8 @@ import asciiPanel.AsciiPanel;
 import sayden.ai.BatAi;
 import sayden.ai.FungusAi;
 import sayden.ai.GoblinAi;
+import sayden.ai.PaseacuevasAi;
+import sayden.ai.PaseacuevasMaleAi;
 import sayden.ai.PlayerAi;
 import sayden.ai.RockBugAi;
 import sayden.ai.ZombieAi;
@@ -43,13 +45,22 @@ public class StuffFactory {
 		Collections.shuffle(potionAppearances);
 	}
 	
+	/* ########################################################################################
+	 * ########################################################################################
+	 * ########################################################################################
+	 */
+	
 	public Creature newPlayer(List<String> messages, FieldOfView fov){
-		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 100, 1, 1);
+		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 50, 1, 1);
+		player.setStartingMovementSpeed(Speed.VERY_FAST);
+		player.setStartingAttackSpeed(Speed.VERY_FAST);
+		player.inventory().add(newSword(player.z));
+		player.inventory().add(newDagger(player.z));
 		world.addAtEmptyLocation(player, 0);
 		new PlayerAi(player, messages, fov);
 		return player;
 	}
-	
+
 	public Creature newFungus(int depth){
 		Creature fungus = new Creature(world, 'f', 'M', AsciiPanel.green, "hongo", 10, 0, 0);
 		world.addAtEmptyLocation(fungus, depth);
@@ -60,8 +71,6 @@ public class StuffFactory {
 	public Creature newBat(int depth){
 		Creature bat = new Creature(world, 'b', 'M', AsciiPanel.brightYellow, "murcielago", 15, 2, 0);
 		world.addAtEmptyLocation(bat, depth);
-		bat.setData(Constants.ARM_POS, "alas");
-		bat.setData(Constants.LEG_POS, "patas");
 		new BatAi(bat);
 		return bat;
 	}
@@ -73,20 +82,46 @@ public class StuffFactory {
 		return zombie;
 	}
 	
+	public Creature newCaveBrute(int depth, Creature player){
+		Creature caveBrute = new Creature(world, 'P', 'F', AsciiPanel.green, "paseacuevas", 80, 10, 5);
+		caveBrute.setStartingAttackSpeed(Speed.VERY_SLOW);
+		caveBrute.setStartingMovementSpeed(Speed.SLOW);
+		caveBrute.setVisionRadius(4);
+		
+		world.addAtEmptyLocation(caveBrute, depth);
+		PaseacuevasAi ai = new PaseacuevasAi(caveBrute, player);
+		
+		for(int i = 0; i < Math.random() * 2; i++){
+			ai.addMale(newCaveSmall(depth, player, caveBrute));
+		}
+		
+		return caveBrute;
+	}
+	
+	public Creature newCaveSmall(int depth, Creature player, Creature female){
+		Creature caveSmall = new Creature(world, 'p', 'M', AsciiPanel.brightGreen, "paseacuevas", 10, 2, 0);
+		caveSmall.setStartingAttackSpeed(Speed.NORMAL);
+		caveSmall.setStartingMovementSpeed(Speed.VERY_FAST);
+		caveSmall.setVisionRadius(8);
+		
+		world.addAtEmptySpace(caveSmall, female.x, female.y, female.z);
+		new PaseacuevasMaleAi(caveSmall, player, female);
+		return caveSmall;
+	}
+	
 	public Creature newRockBug(int depth, Creature player){
-		Creature rockBug = new Creature(world, 'c', 'M', AsciiPanel.yellow, "comepiedras", 15, 2, 5);
-		rockBug.modifyVisionRadius(-6);
-		rockBug.modifyMovementSpeed(Speed.SLOW);
-		rockBug.modifyAttackSpeed(Speed.SLOW);
-				
+		Creature rockBug = new Creature(world, 'c', 'M', AsciiPanel.yellow, "comepiedras", 15, 3, 5);
+		
+		rockBug.setStartingMovementSpeed(Speed.FAST);
+		rockBug.setStartingAttackSpeed(Speed.NORMAL);
+		rockBug.setVisionRadius(4);
+		
 		if(Math.random() > 0.2f){
 			rockBug.pickup(newRockBugHelm(depth));
 		}
 		
 		world.addAtEmptyLocation(rockBug, depth);
-		rockBug.x = player.x -1 ;
-		rockBug.y = player.y;
-		new RockBugAi(rockBug, player);
+		new RockBugAi(rockBug, player, this);
 		return rockBug;
 	}
 
@@ -98,6 +133,11 @@ public class StuffFactory {
 		world.addAtEmptyLocation(goblin, depth);
 		return goblin;
 	}
+
+	/* ########################################################################################
+	 * ########################################################################################
+	 * ########################################################################################
+	 */
 	
 	public Item newRock(int depth){
 		Item rock = new Item(',', 'F', AsciiPanel.yellow, "roca", null);
@@ -122,14 +162,14 @@ public class StuffFactory {
 	
 	public Item newBread(int depth){
 		Item item = new Item('%', 'M', AsciiPanel.yellow, "pan", null);
-		item.modifyFoodValue(400);
+		item.setData(Constants.CHECK_CONSUMABLE, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 	
 	public Item newFruit(int depth){
 		Item item = new Item('%', 'F', AsciiPanel.brightRed, "manzana", null);
-		item.modifyFoodValue(100);
+		item.setData(Constants.CHECK_CONSUMABLE, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -139,7 +179,8 @@ public class StuffFactory {
 		item.modifyAttackValue(5);
 		item.modifyThrownAttackValue(5);
 		item.modifyBloodModifyer(0.8f);
-		item.setData("IsWeapon", true);
+		item.setData(Constants.CHECK_WEAPON, true);
+		item.modifyAttackSpeed(Speed.FAST);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -149,7 +190,8 @@ public class StuffFactory {
 		item.modifyAttackValue(10);
 		item.modifyThrownAttackValue(3);
 		item.modifyBloodModifyer(0.6f);
-		item.setData("IsWeapon", true);
+		item.setData(Constants.CHECK_WEAPON, true);
+		item.modifyAttackSpeed(Speed.NORMAL);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -160,7 +202,7 @@ public class StuffFactory {
 		item.modifyDefenseValue(3);
 		item.modifyThrownAttackValue(3);
 		item.modifyBloodModifyer(0.1f);
-		item.setData("IsWeapon", true);
+		item.setData(Constants.CHECK_WEAPON, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -170,7 +212,7 @@ public class StuffFactory {
 		item.modifyAttackValue(1);
 		item.modifyRangedAttackValue(5);
 		item.modifyBloodModifyer(1f);
-		item.setData("IsWeapon", true);
+		item.setData(Constants.CHECK_WEAPON, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -178,9 +220,9 @@ public class StuffFactory {
 	public Item newEdibleWeapon(int depth){
 		Item item = new Item(')', 'F', AsciiPanel.yellow, "baguette", null);
 		item.modifyAttackValue(3);
-		item.modifyFoodValue(100);
 		item.modifyBloodModifyer(0.1f);
-		item.setData("IsWeapon", true);
+		item.setData(Constants.CHECK_WEAPON, true);
+		item.setData(Constants.CHECK_CONSUMABLE, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -188,7 +230,7 @@ public class StuffFactory {
 	public Item newLightArmor(int depth){
 		Item item = new Item('[', 'F', AsciiPanel.green, "tunica", null);
 		item.modifyDefenseValue(2);
-		item.setData("IsArmor", true);
+		item.setData(Constants.CHECK_ARMOR, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -196,7 +238,7 @@ public class StuffFactory {
 	public Item newMediumArmor(int depth){
 		Item item = new Item('[', 'F', AsciiPanel.white, "cota de malla", null);
 		item.modifyDefenseValue(4);
-		item.setData("IsArmor", true);
+		item.setData(Constants.CHECK_ARMOR, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -204,7 +246,7 @@ public class StuffFactory {
 	public Item newHeavyArmor(int depth){
 		Item item = new Item('[', 'F', AsciiPanel.brightWhite, "armadura de placa", null);
 		item.modifyDefenseValue(6);
-		item.setData("IsArmor", true);
+		item.setData(Constants.CHECK_ARMOR, true);
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
@@ -226,12 +268,17 @@ public class StuffFactory {
 		}
 	}
 	
+	/* ########################################################################################
+	 * ########################################################################################
+	 * ########################################################################################
+	 */
+	
 	public Item newPotionOfHealth(int depth){
 		String appearance = potionAppearances.get(0);
 		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de vida", appearance);
 		item.setQuaffEffect(new Effect(1){
 			public void start(Creature creature){
-				if (creature.hp() == creature.maxHp())
+				if (creature.hp() == creature.totalMaxHp())
 					return;
 				
 				creature.modifyHp(15, "Killed by a health potion?");
@@ -248,10 +295,8 @@ public class StuffFactory {
 		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de mana", appearance);
 		item.setQuaffEffect(new Effect(1){
 			public void start(Creature creature){
-				if (creature.mana() == creature.maxMana())
-					return;
+			
 				
-				creature.modifyMana(10);
 				creature.doAction(item, "look restored");
 			}
 		});
@@ -333,20 +378,6 @@ public class StuffFactory {
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
-
-	public Item newPotionOfExperience(int depth){
-		String appearance = potionAppearances.get(6);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de experiencia", appearance);
-		item.setQuaffEffect(new Effect(20){
-			public void start(Creature creature){
-				creature.doAction(item, "look more experienced");
-				creature.modifyXp(creature.level() * 5);
-			}
-		});
-		
-		world.addAtEmptyLocation(item, depth);
-		return item;
-	}
 	
 	public Item randomPotion(int depth){
 		switch ((int)(Math.random() * 9)){
@@ -358,15 +389,20 @@ public class StuffFactory {
 		case 5: return newPotionOfPoison(depth);
 		case 6: return newPotionOfWarrior(depth);
 		case 7: return newPotionOfArcher(depth);
-		default: return newPotionOfExperience(depth);
+		default: return newPotionOfArcher(depth);
 		}
 	}
+	
+	/* ########################################################################################
+	 * ########################################################################################
+	 * ########################################################################################
+	 */
 	
 	public Item newWhiteMagesSpellbook(int depth) {
 		Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro blanco", null);
 		item.addWrittenSpell("minor heal", 4, new Effect(1){
 			public void start(Creature creature){
-				if (creature.hp() == creature.maxHp())
+				if (creature.hp() == creature.totalMaxHp())
 					return;
 				
 				creature.modifyHp(20, "Killed by a minor heal spell?");
@@ -376,7 +412,7 @@ public class StuffFactory {
 		
 		item.addWrittenSpell("major heal", 8, new Effect(1){
 			public void start(Creature creature){
-				if (creature.hp() == creature.maxHp())
+				if (creature.hp() == creature.totalMaxHp())
 					return;
 				
 				creature.modifyHp(50, "Killed by a major heal spell?");
@@ -397,7 +433,6 @@ public class StuffFactory {
 				creature.modifyDefenseValue(2);
 				creature.modifyVisionRadius(1);
 				creature.modifyRegenHpPer1000(10);
-				creature.modifyRegenManaPer1000(-10);
 				creature.doAction("seem to glow with inner strength");
 			}
 			public void update(Creature creature){
@@ -410,7 +445,6 @@ public class StuffFactory {
 				creature.modifyDefenseValue(-2);
 				creature.modifyVisionRadius(-1);
 				creature.modifyRegenHpPer1000(-10);
-				creature.modifyRegenManaPer1000(10);
 			}
 		});
 		
@@ -420,14 +454,6 @@ public class StuffFactory {
 	
 	public Item newBlueMagesSpellbook(int depth) {
 		Item item = new Item('+', 'M', AsciiPanel.brightBlue, "libro azul", null);
-
-		item.addWrittenSpell("blood to mana", 1, new Effect(1){
-			public void start(Creature creature){
-				int amount = Math.min(creature.hp() - 1, creature.maxMana() - creature.mana());
-				creature.modifyHp(-amount, "Killed by a blood to mana spell.");
-				creature.modifyMana(amount);
-			}
-		});
 		
 		item.addWrittenSpell("blink", 6, new Effect(1){
 			public void start(Creature creature){

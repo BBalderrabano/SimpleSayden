@@ -7,7 +7,6 @@ import java.util.Map;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Item;
-import sayden.LevelUpController;
 import sayden.Line;
 import sayden.Path;
 import sayden.Point;
@@ -38,17 +37,22 @@ public class CreatureAi {
 	}
 	
 	public boolean canTakeAction(){
-		return creature.getActionPoints() > 0 && 
-				(creature.getActionPoints() > creature.getMovementSpeed() 
-				//|| creature.getActionPoints() > creature.getAttackSpeed());	//Dont handle attacks through here
-				);
+		return (creature.getActionPoints() > 0 && 
+				(creature.getActionPoints() >= creature.getMovementSpeed().velocity() 
+				|| creature.getActionPoints() >= creature.getAttackSpeed().velocity()));
+	}
+	
+	public void onDecease(Item corpse) {	
 	}
 	
 	public void onEnter(int x, int y, int z, Tile tile){
-		if(creature.getActionPoints() < creature.getMovementSpeed() && !creature.isPlayer()){
+		if(creature.queAttack() != null)
+			return;
+		
+		if(creature.getActionPoints() < creature.getMovementSpeed().velocity() && !creature.isPlayer()){
 			return;	//There are not enough action points to perform a movement action, return
 		}else if(!creature.isPlayer()){
-			creature.modifyActionPoints(-creature.getMovementSpeed());	//We can move, and we are not a player, substract movement speed
+			creature.modifyActionPoints(-creature.getMovementSpeed().velocity());	//We can move, and we are not a player, substract movement speed
 		}
 		if (tile.isGround()){
 			creature.x = x;
@@ -60,23 +64,40 @@ public class CreatureAi {
 	}
 	
 	public void onAttack(int x, int y, int z, Creature other){
-		if(creature.getActionPoints() < creature.getAttackSpeed() && !creature.isPlayer()){
+		if(creature.getData("Race") == other.getData("Race"))
+			return;
+		
+		if(creature.getActionPoints() < creature.getAttackSpeed().velocity() && !creature.isPlayer()){
 			if(other.isPlayer()){
-				if(creature.getAttackSpeed() < other.getAttackSpeed()){
-					System.out.println("CONTRAATAQUE");
-				}
-				if(creature.getAttackSpeed() < other.getMovementSpeed()){
-					System.out.println("DODGE");
+				if(creature.getAttackSpeed().modifySpeed(3).velocity() > other.getMovementSpeed().velocity()
+						&& creature.queAttack() == null){
+					creature.setQueAttack(other.position());
 				}
 			}
 			return;	//There are not enough action points to perform an attack, queue attack
 		}else if(!creature.isPlayer()){
-			creature.modifyActionPoints(-creature.getAttackSpeed());
+			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
 		}
 		creature.meleeAttack(other);
 	}
 	
 	public void onUpdate(){
+		if(creature.queAttack() != null && 
+				creature.getActionPoints() >= creature.getAttackSpeed().velocity()){
+			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
+			
+			Creature c = creature.world().creature(creature.queAttack().x, creature.queAttack().y, creature.queAttack().z);
+			
+			if(c == null){
+				creature.x = creature.queAttack().x;
+				creature.y = creature.queAttack().y;
+				creature.z = creature.queAttack().z;
+				creature.doAction("falla el ataque!");
+			}else{
+				creature.meleeAttack(c);
+			}			
+			creature.setQueAttack(null);
+		}
 	}
 	
 	public void onNotify(String message){
@@ -98,30 +119,6 @@ public class CreatureAi {
 		
 		return true;
 	}
-	
-	public void wander(){
-		int mx = (int)(Math.random() * 3) - 1;
-		int my = (int)(Math.random() * 3) - 1;
-		
-		if(mx != 0 && my != 0){	//Elimina combate en diagonal
-			if(Math.random() > .5f)
-				mx = 0;
-			else
-				my = 0;
-		}
-		
-		Creature other = creature.creature(creature.x + mx, creature.y + my, creature.z);
-		
-		if (other != null && other.name().equals(creature.name()) 
-				|| !creature.tile(creature.x+mx, creature.y+my, creature.z).isGround())
-			return;
-		else
-			creature.moveBy(mx, my, 0);
-	}
-
-	public void onGainLevel() {
-		new LevelUpController().autoLevelUp(creature);
-	}
 
 	public Tile rememberedTile(int wx, int wy, int wz) {
 		return Tile.UNKNOWN;
@@ -136,16 +133,17 @@ public class CreatureAi {
 		Item toThrow = null;
 		
 		for (Item item : creature.inventory().getItems()){
-			if (item == null || creature.weapon() == item || creature.armor() == item)
+			if (item == null || creature.weapon() == item || creature.armor() == item ||
+					creature.helment() == item || creature.shield() == item)
 				continue;
 			
-			if (toThrow == null || item.thrownAttackValue() > toThrow.attackValue())
+			if (toThrow == null || item.thrownAttackValue() > 0)
 				toThrow = item;
 		}
 		
 		return toThrow;
 	}
-
+	
 	protected boolean canRangedWeaponAttack(Creature other) {
 		return creature.weapon() != null
 		    && creature.weapon().rangedAttackValue() > 0
@@ -157,8 +155,36 @@ public class CreatureAi {
 			&& !creature.inventory().isFull();
 	}
 	
-	public void move(int x, int y, int z){
-		List<Point> points = new Path(creature, x, y).points();
+	protected boolean canMove(int mx, int my){
+		Creature other = creature.creature(creature.x + mx, creature.y + my, creature.z);
+		
+		if (other != null && (other.getStringData("Race") == creature.getStringData("Race")) 
+				|| !creature.tile(creature.x+mx, creature.y+my, creature.z).isGround()){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	public void wander(){
+		int mx = (int)(Math.random() * 3) - 1;
+		int my = (int)(Math.random() * 3) - 1;
+		
+		if(mx != 0 && my != 0){	//Elimina combate en diagonal
+			if(Math.random() > .5f)
+				mx = 0;
+			else
+				my = 0;
+		}
+		
+		if (!canMove(mx, my))
+			return;
+		else
+			creature.moveBy(mx, my, 0);
+	}
+	
+	public void hunt(Creature target) {
+		List<Point> points = new Path(creature, target.x, target.y).points();
 		
 		if(points == null || points.isEmpty())
 			return;
@@ -167,7 +193,14 @@ public class CreatureAi {
 		int my = points.get(0).y - creature.y;
 		
 		if(mx != 0 && my != 0){	//Elimina combate en diagonal
-			if(Math.random() > .5f)
+			int x_distance = Math.abs(creature.x - target.x);
+			int y_distance = Math.abs(creature.y - target.y);
+			
+			if(canMove(mx, 0) && x_distance > y_distance)
+				my = 0;
+			else if(canMove(0, my) && y_distance >= x_distance)
+				mx = 0;
+			else if(Math.random() > .5f)
 				mx = 0;
 			else
 				my = 0;
@@ -175,19 +208,27 @@ public class CreatureAi {
 		
 		creature.moveBy(mx, my, 0);
 	}
-
-	public void hunt(Creature target) {
+	
+	public void hunt(Point target) {
 		List<Point> points = new Path(creature, target.x, target.y).points();
+		
+		if(points == null || creature == null || points.isEmpty())
+			return;
 		
 		int mx = points.get(0).x - creature.x;
 		int my = points.get(0).y - creature.y;
 		
-		if(mx != 0 && my != 0){	//Elimina combate en diagonal
-			if(Math.random() > .5f)
-				mx = 0;
-			else
-				my = 0;
-		}
+		int x_distance = Math.abs(creature.x - target.x);
+		int y_distance = Math.abs(creature.y - target.y);
+		
+		if(canMove(mx, 0) && x_distance > y_distance)
+			my = 0;
+		else if(canMove(0, my) && y_distance >= x_distance)
+			mx = 0;
+		else if(Math.random() > .5f)
+			mx = 0;
+		else
+			my = 0;
 		
 		creature.moveBy(mx, my, 0);
 	}

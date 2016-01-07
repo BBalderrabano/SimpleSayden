@@ -3,6 +3,8 @@ package sayden;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+
+import asciiPanel.AsciiPanel;
 import sayden.ai.CreatureAi;
 
 public class Creature extends Thing{
@@ -14,6 +16,10 @@ public class Creature extends Thing{
 	public int z;
 	public Point position() { return new Point(x,y,z); }
 	
+	private Point queAttack;
+	public Point queAttack(){ return queAttack; }
+	public void setQueAttack(Point p) { this.queAttack = p; }
+	
 	private int timeUnsync;
 	public void addTime(){ timeUnsync++; }
 	
@@ -21,13 +27,24 @@ public class Creature extends Thing{
 	public char glyph() { return glyph; }
 	
 	private Color color;
-	public Color color() { return color; }
+	public Color color() { return queAttack != null ? AsciiPanel.brightBlue : color; }
+	public void changeColor(Color color) { this.color = color; }
+	
+	private Color originalColor;
+	public Color originalColor() { return originalColor; }
 
 	private CreatureAi ai;
+	public CreatureAi ai() { return ai; }
 	public void setCreatureAi(CreatureAi ai) { this.ai = ai; }
 	
 	private int maxHp;
 	public int maxHp() { return maxHp; }
+	public int totalMaxHp() { return maxHp
+			+ (armor == null ? 0 : armor.bonusMaxHp())
+			+ (weapon == null ? 0 : weapon.bonusMaxHp())
+			+ (helment == null ? 0 : helment.bonusMaxHp())
+			+ (shield == null ? 0 : shield.bonusMaxHp()); }
+	
 	public void modifyMaxHp(int amount) { maxHp += amount; }
 	
 	private int hp;
@@ -42,28 +59,89 @@ public class Creature extends Thing{
 	public int attackValue() { 
 		return attackValue;
 	}
+	public int attackValueTotal(){
+		return attackValue
+				+ (armor == null ? 0 : armor.attackValue())
+				+ (weapon == null ? 0 : weapon.attackValue())
+				+ (helment == null ? 0 : helment.attackValue())
+				+ (shield == null ? 0 : shield.attackValue());
+	}
 
 	private int defenseValue;
 	public void modifyDefenseValue(int value) { defenseValue += value; }
 	public int defenseValue() { 
 		return defenseValue;
 	}
+	public int defenseValueTotal(){
+		return defenseValue
+				+ (armor == null ? 0 : armor.defenseValue())
+				+ (weapon == null ? 0 : weapon.defenseValue())
+				+ (helment == null ? 0 : helment.defenseValue())
+				+ (shield == null ? 0 : shield.defenseValue());
+	}
 
 	private int actionPoints;
 	public int getActionPoints() { return actionPoints;	}
 	public void modifyActionPoints(int actionPoints) {	this.actionPoints += actionPoints; }
 
+	private Speed getSlowestAttackSpeed(){
+		Speed slowest = attackSpeed;
+		if(helment != null && helment.attackSpeed() != null &&
+				helment.attackSpeed().velocity() > slowest.velocity())
+			slowest =  helment.attackSpeed();
+		if(armor != null && armor.attackSpeed() != null &&
+				armor.attackSpeed().velocity() > slowest.velocity())
+			slowest =  armor.attackSpeed();
+		if(shield != null && shield.attackSpeed() != null &&
+				shield.attackSpeed().velocity() > slowest.velocity())
+			slowest =  shield.attackSpeed();
+		if(weapon != null && weapon.attackSpeed() != null && 
+				weapon.attackSpeed().velocity() > slowest.velocity())
+			slowest =  weapon.attackSpeed();
+		
+		return slowest;
+	}
+	private Speed startingAttackSpeed;
+	public Speed startingAttackSpeed(){ return startingAttackSpeed; }
+	public void setStartingAttackSpeed(Speed attackSpeed) {
+		this.startingAttackSpeed = attackSpeed;
+		this.attackSpeed = attackSpeed;
+	}
 	private Speed attackSpeed;
-	public int getAttackSpeed() {
-		return attackSpeed.velocity();
+	public Speed getAttackSpeed() {
+		return getSlowestAttackSpeed();
 	}
 	public void modifyAttackSpeed(Speed attackSpeed) {
 		this.attackSpeed = attackSpeed;
 	}
 	
+	private Speed getSlowestMovementSpeed(){
+		Speed slowest = movementSpeed;
+		if(helment != null && helment.movementSpeed() != null &&
+				helment.movementSpeed().velocity() > slowest.velocity())
+			slowest =  helment.movementSpeed();
+		if(armor != null && armor.movementSpeed() != null &&
+				armor.movementSpeed().velocity() > slowest.velocity())
+			slowest =  armor.movementSpeed();
+		if(shield != null && shield.movementSpeed() != null &&
+				shield.movementSpeed().velocity() > slowest.velocity())
+			slowest =  shield.movementSpeed();
+		if(weapon != null && weapon.movementSpeed() != null && 
+				weapon.movementSpeed().velocity() > slowest.velocity())
+			slowest =  weapon.movementSpeed();
+		
+		return slowest;
+	}
+	private Speed startingMovementSpeed;
+	public Speed startingMovementSpeed(){ return startingMovementSpeed; }
+	public void setStartingMovementSpeed(Speed movementSpeed) {
+		this.startingMovementSpeed = movementSpeed;
+		this.movementSpeed = movementSpeed;
+	}
+	
 	private Speed movementSpeed;
-	public int getMovementSpeed() {
-		return movementSpeed.velocity();
+	public Speed getMovementSpeed() {
+		return getSlowestMovementSpeed();
 	}
 	public void modifyMovementSpeed(Speed movementSpeed) {
 		this.movementSpeed = movementSpeed;
@@ -71,18 +149,18 @@ public class Creature extends Thing{
 	
 	private int visionRadius;
 	public void modifyVisionRadius(int value) { visionRadius += value; }
+	public void setVisionRadius(int value) { visionRadius = value; }
 	public int visionRadius() { return visionRadius; }
 
 	public String name() { return name; }
 
 	private Inventory inventory;
 	public Inventory inventory() { return inventory; }
-
-	private int maxFood;
-	public int maxFood() { return maxFood; }
 	
-	private int food;
-	public int food() { return food; }
+	public boolean hasEquipped(Item check){
+		return check == weapon || check == shield
+				|| check == armor || check == helment;
+	}
 	
 	private Item weapon;
 	public Item weapon() { return weapon; }
@@ -96,42 +174,12 @@ public class Creature extends Thing{
 	private Item helment;
 	public Item helment() { return helment; }
 	
-	private int xp;
-	public int xp() { return xp; }
-	public void modifyXp(int amount) { 
-		xp += amount;
-		
-		notify("%s %d xp.", amount < 0 ? "Pierdes" : "Ganas", amount);
-		
-		while (xp > (int)(Math.pow(level, 1.75) * 25)) {
-			level++;
-			doAction("sube al nivel %d!", level);
-			ai.onGainLevel();
-			modifyHp(level * 2, "Muerto por tener nivel negativo?");
-		}
-	}
-	
-	private int level;
-	public int level() { return level; }
-	
 	private int regenHpCooldown;
 	private int regenHpPer1000;
 	public void modifyRegenHpPer1000(int amount) { regenHpPer1000 += amount; }
 	
 	private List<Effect> effects;
 	public List<Effect> effects(){ return effects; }
-	
-	private int maxMana;
-	public int maxMana() { return maxMana; }
-	public void modifyMaxMana(int amount) { maxMana += amount; }
-	
-	private int mana;
-	public int mana() { return mana; }
-	public void modifyMana(int amount) { mana = Math.max(0, Math.min(mana+amount, maxMana)); }
-	
-	private int regenManaCooldown;
-	private int regenManaPer1000;
-	public void modifyRegenManaPer1000(int amount) { regenManaPer1000 += amount; }
 	
 	private String causeOfDeath;
 	public String causeOfDeath() { return causeOfDeath; }
@@ -145,6 +193,7 @@ public class Creature extends Thing{
 		this.glyph = glyph;
 		this.gender = gender;
 		this.color = color;
+		this.originalColor = color;
 		this.maxHp = maxHp;
 		this.hp = maxHp;
 		this.blood = maxHp * 10;
@@ -153,14 +202,8 @@ public class Creature extends Thing{
 		this.visionRadius = 9;
 		this.name = name;
 		this.inventory = new Inventory(20);
-		this.maxFood = 1000;
-		this.food = maxFood / 3 * 2;
-		this.level = 1;
 		this.regenHpPer1000 = 10;
 		this.effects = new ArrayList<Effect>();
-		this.maxMana = 5;
-		this.mana = maxMana;
-		this.regenManaPer1000 = 20;
 	}
 	
 	public void moveBy(int mx, int my, int mz){
@@ -168,11 +211,11 @@ public class Creature extends Thing{
 			if(isPlayer()){
 				world.modifyActionPoints( Math.max(1, movementSpeed.velocity() - 1));
 			}else{
-				world.modifyActionPoints(-Math.max(1, movementSpeed.velocity() - 1));
+				modifyActionPoints(-Math.max(1, movementSpeed.velocity()));
 			}
 			return;
 		}
-
+		
 		Tile tile = world.tile(x+mx, y+my, z+mz);
 		
 		if (mz == -1){
@@ -201,8 +244,6 @@ public class Creature extends Thing{
 		
 		Creature other = world.creature(x+mx, y+my, z+mz);
 		
-		modifyFood(-1);
-		
 		if (other == null){
 			ai.onEnter(x+mx, y+my, z+mz, tile);
 		}else{
@@ -224,56 +265,57 @@ public class Creature extends Thing{
 	}
 	
 	private void commonAttack(Creature other, Item object, String action, Object ... params) {
-		modifyFood(-2);
-		
 		int attack = attackValue();	//Start adding the inherit damage of the creature
 		Item defending_item = null;
+		boolean weakSpotHit = false;
 		
 		if(object != null){
 			attack += object.attackValue();	//If its attacking with a weapon lets add its damage
 		}
 		
-		int amount = Math.max(1, attack - other.defenseValue()); //Lets substract the defending creature's inherit defense
-				
+		//Get the defending item and check for weak spots
+		if(x < other.x && y >= other.y){
+			defending_item = other.armor();
+			if(other.ai.getWeakSpot() == Constants.CHEST_POS){
+				weakSpotHit = true;
+			}
+		}else if(y < other.y && x <= other.x){
+			defending_item = other.helment();
+			if(other.ai.getWeakSpot() == Constants.HEAD_POS){
+				weakSpotHit = true;
+			}
+		}else if(x > other.x && y <= other.y){
+			defending_item = other.shield() == null ? (other.weapon() != null && other.weapon().defenseValue() > 0 ? other.weapon() : other.armor()) : other.shield();
+			if(other.ai.getWeakSpot() == Constants.ARM_POS){
+				weakSpotHit = true;
+			}
+		}else if(y > other.y && x >= other.x){
+			defending_item = other.shield() == null ? (other.weapon() != null && other.weapon().defenseValue() > 0 ? other.weapon() : other.armor()) : other.shield();
+			if(other.ai.getWeakSpot() == Constants.LEG_POS){
+				weakSpotHit = true;
+			}
+		}
+		
+		int amount = attack;
+		
+		if(other.isPlayer()){
+			amount -= other.defenseValueTotal();									//Substract the total defense
+		}else{
+			//If we are hitting a creature substract the defending item and the inherit defense unless we get a weakSpot
+			amount -= (defending_item == null ? 0 : defending_item.defenseValue()) + 
+					(weakSpotHit ? 0 : other.defenseValue());
+		}
+		
 		Object[] params2 = new Object[params.length+1];
 		for (int i = 0; i < params.length; i++){
 			params2[i] = params[i];
 		}
 		
-		String notification_pos = "";
-		
-		//Get the defending item and check for weak spots
-		if(x < other.x && y >= other.y){
-			defending_item = other.armor();
-			notification_pos = " ("+(other.getStringData(Constants.CHEST_POS) == null ? "pecho" : other.getStringData(Constants.CHEST_POS)) + ")";
-			if(other.ai.getWeakSpot() == Constants.CHEST_POS){
-				amount += other.defenseValue();
-			}
-		}else if(y < other.y && x <= other.x){
-			defending_item = other.helment();
-			notification_pos = " ("+(other.getStringData(Constants.HEAD_POS) == null ? "cabeza" : other.getStringData(Constants.HEAD_POS)) + ")";
-			if(other.ai.getWeakSpot() == Constants.HEAD_POS){
-				amount += other.defenseValue();
-			}
-		}else if(x > other.x && y <= other.y){
-			defending_item = other.shield() == null ? (other.weapon() != null && other.weapon().defenseValue() > 0 ? other.weapon() : other.armor()) : other.shield();
-			notification_pos = " ("+(other.getStringData(Constants.ARM_POS) == null ? "brazos" : other.getStringData(Constants.ARM_POS)) + ")";
-			if(other.ai.getWeakSpot() == Constants.ARM_POS){
-				amount += other.defenseValue();
-			}
-		}else if(y > other.y && x >= other.x){
-			defending_item = other.shield() == null ? (other.weapon() != null && other.weapon().defenseValue() > 0 ? other.weapon() : other.armor()) : other.shield();
-			notification_pos = " ("+(other.getStringData(Constants.LEG_POS) == null ? "piernas" : other.getStringData(Constants.LEG_POS)) + ")";
-			if(other.ai.getWeakSpot() == Constants.LEG_POS){
-				amount += other.defenseValue();
-			}
-		}
-		
-		amount -= Math.min(defending_item == null ? 0 : defending_item.defenseValue(), 1);	//Substract the defense of the item, cant go below 1
+		amount = Math.max(1, amount);
 		
 		params2[params2.length - 1] = amount;
 		
-		doAction(action + "" + notification_pos, params2);
+		doAction(action, params2);
 		
 		other.modifyHp(-amount, "Matado por " + nameUnUna());
 	
@@ -281,27 +323,6 @@ public class Creature extends Thing{
 		
 		other.modifyBlood(-drained_blood);
 		world.fillTile(other.x, other.y, other.z, drained_blood, Constants.BLOOD_FLUID);
-		
-		if(Constants.DEBUG_MODE){
-			System.out.println("[ATTACK_LOG] " + name() + " al " + other.name());
-			if(object != null) System.out.println("-> " + object.name() + " [ARMA]");
-			if(defending_item != null) System.out.println("-> " + defending_item.name() + " [ARMADURA]");
-			System.out.println("-> " + amount + " [DAMAGE]");
-			System.out.println("-> " + drained_blood + " [BLOOD]");
-		}
-		
-		if (other.hp < 1)
-			gainXp(other);
-	}
-	
-	public void gainXp(Creature other){
-		int amount = other.maxHp 
-			+ other.attackValue() 
-			+ other.defenseValue()
-			- level;
-		
-		if (amount > 0)
-			modifyXp(amount);
 	}
 
 	public void modifyHp(int amount, String causeOfDeath) { 
@@ -315,35 +336,30 @@ public class Creature extends Thing{
 			hp = maxHp;
 		} else if (hp < 1) {
 			doAction("muere");
-			leaveCorpse();
+			ai.onDecease(leaveCorpse());
 			world.remove(this);
 		}
 	}
 	
-	private void leaveCorpse(){
+	private Item leaveCorpse(){
 		Item corpse = new Item('%', 'M', color, "cadaver " + nameDelDeLa(), null);
-		corpse.modifyFoodValue(maxHp * 5);
 		world.addAtEmptySpace(corpse, x, y, z);
 		for (Item item : inventory.getItems()){
 			if (item != null)
 				drop(item);
 		}
+		return corpse;
 	}
 	
 	public void dig(int wx, int wy, int wz) {
-		modifyFood(-10);
 		world.dig(wx, wy, wz);
 		doAction("derrumba la pared");
 	}
 	
 	public void update(){
-		while(ai.canTakeAction()){
-			modifyFood(-1);
-			regenerateHealth();
-			regenerateMana();
-			updateEffects();
-			ai.onUpdate();
-		}
+		regenerateHealth();
+		updateEffects();
+		ai.onUpdate();
 	}
 	
 	private void updateEffects(){
@@ -365,20 +381,13 @@ public class Creature extends Thing{
 		if (regenHpCooldown < 0){
 			if (hp < maxHp){
 				modifyHp(1, "Muerto por regenrarse vida?");
-				modifyFood(-1);
+			}
+			if(blood < 1){
+				doAction("ha perdido mucha sangre");
+				modifyMaxHp(-1);
+				blood = Constants.MIN_FLUID_AMOUNT;
 			}
 			regenHpCooldown += 1000;
-		}
-	}
-
-	private void regenerateMana(){
-		regenManaCooldown -= regenManaPer1000;
-		if (regenManaCooldown < 0){
-			if (mana < maxMana) {
-				modifyMana(1);
-				modifyFood(-1);
-			}
-			regenManaCooldown += 1000;
 		}
 	}
 	
@@ -507,25 +516,6 @@ public class Creature extends Thing{
 		}
 	}
 	
-	public void modifyFood(int amount) { 
-		food += amount;
-		
-		if(blood < 1){
-			doAction("ha perdido mucha sangre");
-			modifyMaxHp(-1);
-			blood = Constants.MIN_FLUID_AMOUNT;
-		}
-		
-		if (food > maxFood) {
-			maxFood = (maxFood + food) / 2;
-			food = maxFood;
-			notify("No puedes creer que tu estomago aguante tanta comida!");
-			modifyHp(-1, "Muerto por comer demasiado.");
-		} else if (food < 1 && isPlayer()) {
-			//modifyHp(-1000, "Starved to death.");
-		}
-	}
-	
 	public boolean isPlayer(){
 		return glyph == '@';
 	}
@@ -541,16 +531,11 @@ public class Creature extends Thing{
 	}
 	
 	private void consume(Item item){
-		if (item.foodValue() < 0)
-			notify("Desagradable!");
-		
 		addEffect(item.quaffEffect());
-		
-		modifyFood(item.foodValue());
 		getRidOf(item);
 	}
 	
-	private void addEffect(Effect effect){
+	public void addEffect(Effect effect){
 		if (effect == null)
 			return;
 		
@@ -604,6 +589,14 @@ public class Creature extends Thing{
 		}
 	}
 	
+	public void give(Item item, Creature target){
+		if(inventory.contains(item) && !target.inventory().isFull()){
+			doAction("entrega %s %s", item.nameElLa(), target.nameAlALa());
+			target.inventory().add(item);
+			inventory.remove(item);
+		}		
+	}
+	
 	public void equip(Item item){
 		if (!inventory.contains(item)) {
 			if (inventory.isFull()) {
@@ -645,7 +638,7 @@ public class Creature extends Thing{
 	}
 	
 	public String details() {
-		return String.format("  level:%d  attack:%d  defense:%d  hp:%d", level, attackValue(), defenseValue(), hp);
+		return String.format(" attack:%d  defense:%d  hp:%d", attackValue(), defenseValue(), hp);
 	}
 	
 	public void throwItem(Item item, int wx, int wy, int wz) {
@@ -683,16 +676,16 @@ public class Creature extends Thing{
 	public void castSpell(Spell spell, int x2, int y2) {
 		Creature other = creature(x2, y2, z);
 		
-		if (spell.manaCost() > mana){
+		/*if (spell.manaCost() > mana){
 			doAction("murmura a la nada");
 			return;
 		} else if (other == null) {
 			doAction("point and mumble at nothing");
 			return;
-		}
+		}*/
 		
 		other.addEffect(spell.effect());
-		modifyMana(-spell.manaCost());
+		//modifyMana(-spell.manaCost());
 	}
 	
 	public void learnName(Item item){

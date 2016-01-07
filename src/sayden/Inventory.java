@@ -5,6 +5,7 @@ public class Inventory {
 	private Item[] items;
 	public Item[] getItems() { return items; }
 	public Item get(int i) { return items[i]; }
+	public int size() { return items.length; }
 	
 	public Inventory(int max){
 		items = new Item[max];

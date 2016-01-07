@@ -21,6 +21,7 @@ public class ApplicationMain extends JFrame implements KeyListener {
 		pack();
 		screen = new StartScreen();
 		addKeyListener(this);
+		setFocusTraversalKeysEnabled(false);
 		repaint();
 	}
 	
@@ -32,13 +33,13 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void keyReleased(KeyEvent e) {
 		screen = screen.respondToUserInput(e);
 		repaint();
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) { }
+	public void keyPressed(KeyEvent e) { }
 
 	@Override
 	public void keyTyped(KeyEvent e) { }

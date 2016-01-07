@@ -19,11 +19,11 @@ public class Item extends Thing{
 	public String name() { return name; }
 
 	public String appearance() { return appearance; }
-	
-	private int foodValue;
-	public int foodValue() { return foodValue; }
-	public void modifyFoodValue(int amount) { foodValue += amount; }
 
+	private int bonusMaxHp;
+	public int bonusMaxHp() { return bonusMaxHp; }
+	public void modifyBonusMaxHp(int amount) { bonusMaxHp += amount; }
+	
 	private int attackValue;
 	public int attackValue() { return attackValue; }
 	public void modifyAttackValue(int amount) { attackValue += amount; }
@@ -47,6 +47,14 @@ public class Item extends Thing{
 	private List<Spell> writtenSpells;
 	public List<Spell> writtenSpells() { return writtenSpells; }
 	
+	private Speed attackSpeed;
+	public Speed attackSpeed() { return attackSpeed; }
+	public void modifyAttackSpeed(Speed speed) { this.attackSpeed = speed; } 
+	
+	private Speed movementSpeed;
+	public Speed movementSpeed() { return movementSpeed; }
+	public void modifyMovementSpeed(Speed speed) { this.movementSpeed = speed; } 
+	
 	public void addWrittenSpell(String name, int manaCost, Effect effect){
 		writtenSpells.add(new Spell(name, manaCost, effect));
 	}
@@ -66,20 +74,31 @@ public class Item extends Thing{
 	public String details() {
 		String details = "";
 		
-		if (attackValue != 0)
-			details += "  attack:" + attackValue;
+		details += nameUnUna() + ".";
+		details = details.substring(0, 1).toUpperCase()
+				+ details.substring(1);
 
-		if (thrownAttackValue != 1)
-			details += "  thrown:" + thrownAttackValue;
+		if(getBooleanData(Constants.CHECK_ARMOR)){
+			details += " Puede ser usado de armadura.";
+		}
+		if(getBooleanData(Constants.CHECK_HELMENT)){
+			details += " Puede ser usado como casco.";
+		}
+		if(getBooleanData(Constants.CHECK_SHIELD)){
+			details += " Puede ser usado como escudo.";
+		}
+		if(getBooleanData(Constants.CHECK_WEAPON)){
+			details += " Puede ser usado como arma.";
+		}
+		
+		if (attackValue != 0)
+			details += "  ataque:" + attackValue;
 		
 		if (rangedAttackValue > 0)
-			details += "  ranged:" + rangedAttackValue;
+			details += "  rango:" + rangedAttackValue;
 		
 		if (defenseValue != 0)
-			details += "  defense:" + defenseValue;
-
-		if (foodValue != 0)
-			details += "  food:" + foodValue;
+			details += "  defensa:" + defenseValue;
 		
 		return details;
 	}

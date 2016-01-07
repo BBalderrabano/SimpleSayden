@@ -37,19 +37,16 @@ public class PlayScreen implements Screen {
 
 	private void createCreatures(StuffFactory factory){
 		player = factory.newPlayer(messages, fov);
-		factory.newRockBug(player.z, player);
-		/*for (int z = 0; z < world.depth(); z++){
-			for (int i = 0; i < 4; i++){
-				factory.newFungus(z);
-			}
+			
+		for(int i = 0; i < 1; i++){
+			factory.newCaveBrute(player.z, player);
+		}
+		
+		for (int z = 0; z < world.depth(); z++){
 			for (int i = 0; i < 15; i++){
 				factory.newRockBug(z, player);
 			}
-			for (int i = 0; i < z * 2 + 1; i++){
-				factory.newZombie(z, player);
-				factory.newGoblin(z, player);
-			}
-		}*/
+		}
 	}
 
 	private void createItems(StuffFactory factory) {
@@ -91,24 +88,11 @@ public class PlayScreen implements Screen {
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
 		
-		String stats = String.format(" %3d/%3d hp   %d/%d mana   %8s", player.hp(), player.maxHp(), player.mana(), player.maxMana(), hunger());
+		String stats = String.format(" %3d/%3d hp", player.hp(), player.totalMaxHp());
 		terminal.write(stats, 1, 23);
 		
 		if (subscreen != null)
 			subscreen.displayOutput(terminal);
-	}
-	
-	private String hunger(){
-		if (player.food() < player.maxFood() * 0.10)
-			return "Famelico";
-		else if (player.food() < player.maxFood() * 0.25)
-			return "Hambriento";
-		else if (player.food() > player.maxFood() * 0.90)
-			return "Satisfecho";
-		else if (player.food() > player.maxFood() * 0.75)
-			return "Lleno";
-		else
-			return "";
 	}
 	
 	private List<String> checkDuplicateMessages(List<String> messages){
@@ -170,52 +154,40 @@ public class PlayScreen implements Screen {
 	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
-		int level = player.level();
-		
 		if (subscreen != null) {
 			subscreen = subscreen.respondToUserInput(key);
 		} else {
 			switch (key.getKeyCode()){
+			case KeyEvent.VK_TAB:
+			case KeyEvent.VK_I:
+								subscreen = new MenuScreen(player, player.x - getScrollX(), 
+										player.y - getScrollY()); break;
 			case KeyEvent.VK_SPACE:
 								player.moveBy(0, 0, 0); break;
 			case KeyEvent.VK_LEFT:
-			case KeyEvent.VK_H: player.moveBy(-1, 0, 0); break;
+			case KeyEvent.VK_A: player.moveBy(-1, 0, 0); break;
 			case KeyEvent.VK_RIGHT:
-			case KeyEvent.VK_L: player.moveBy( 1, 0, 0); break;
+			case KeyEvent.VK_D: player.moveBy( 1, 0, 0); break;
 			case KeyEvent.VK_UP:
-			case KeyEvent.VK_K: player.moveBy( 0,-1, 0); break;
+			case KeyEvent.VK_W: player.moveBy( 0,-1, 0); break;
 			case KeyEvent.VK_DOWN:
-			case KeyEvent.VK_J: player.moveBy( 0, 1, 0); break;
-			case KeyEvent.VK_Y: player.moveBy(-1,-1, 0); break;
-			case KeyEvent.VK_U: player.moveBy( 1,-1, 0); break;
-			case KeyEvent.VK_B: player.moveBy(-1, 1, 0); break;
-			case KeyEvent.VK_N: player.moveBy( 1, 1, 0); break;
-			case KeyEvent.VK_D: subscreen = new DropScreen(player); break;
-			case KeyEvent.VK_E: subscreen = new EatScreen(player); break;
-			case KeyEvent.VK_W: subscreen = new EquipScreen(player); break;
-			case KeyEvent.VK_X: subscreen = new ExamineScreen(player); break;
-			case KeyEvent.VK_SEMICOLON: subscreen = new LookScreen(player, "Looking", 
-					player.x - getScrollX(), 
-					player.y - getScrollY()); break;
-			case KeyEvent.VK_T: subscreen = new ThrowScreen(player,
+			case KeyEvent.VK_S: player.moveBy( 0, 1, 0); break;
+			case KeyEvent.VK_R: subscreen = new LookScreen(player, "Observando", 
 					player.x - getScrollX(), 
 					player.y - getScrollY()); break;
 			case KeyEvent.VK_F: 
 				if (player.weapon() == null || player.weapon().rangedAttackValue() == 0)
-					player.notify("You don't have a ranged weapon equiped.");
+					player.notify("No tienes un arma de rango equipada.");
 				else
 					subscreen = new FireWeaponScreen(player,
 						player.x - getScrollX(), 
 						player.y - getScrollY()); break;
-			case KeyEvent.VK_Q: subscreen = new QuaffScreen(player); break;
-			case KeyEvent.VK_R: subscreen = new ReadScreen(player,
-						player.x - getScrollX(), 
-						player.y - getScrollY()); break;
+			case KeyEvent.VK_G:
+			case KeyEvent.VK_E:
+					player.pickup(); break;
 			}
 			
 			switch (key.getKeyChar()){
-			case 'g':
-			case ',': player.pickup(); break;
 			case '<': 
 				if (userIsTryingToExit())
 					return userExits();
@@ -225,9 +197,6 @@ public class PlayScreen implements Screen {
 			case '?': subscreen = new HelpScreen(); break;
 			}
 		}
-
-		if (player.level() > level)
-			subscreen = new LevelUpScreen(player, player.level() - level);
 		
 		if (subscreen == null){
 			world.updateFloor(player.z);
