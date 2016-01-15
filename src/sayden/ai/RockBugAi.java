@@ -2,6 +2,7 @@ package sayden.ai;
 
 import sayden.Constants;
 import sayden.Creature;
+import sayden.DamageType;
 import sayden.Effect;
 import sayden.Item;
 import sayden.Point;
@@ -25,14 +26,15 @@ public class RockBugAi extends CreatureAi {
 		this.factory = factory;
 		
 		this.setWeakSpot(Constants.LEG_POS);
-		creature.setData("Race", "comepiedras");
+		creature.setData(Constants.RACE, "comepiedras");
 	}
 
 	public void onDecease(Item corpse){
-		corpse.setQuaffEffect(new Effect(4){
+		corpse.unsetData(Constants.CHECK_CORPSE);
+		corpse.setConsumeEffect(new Effect(7){
 			public void start(Creature creature){
-				creature.notify("La carne es sorprendentemente tierna...");
-				creature.modifyHp(3, "Indigestion de carne de comepiedra");
+				creature.notify("Las viceras del comepiedras saben horripilante!");
+				creature.modifyHp(-3, "Indigestion de carne de comepiedra");
 			}
 			public void update(Creature creature){
 				super.update(creature);
@@ -47,7 +49,7 @@ public class RockBugAi extends CreatureAi {
 		}else{
 			Item rockCheck = creature.item(creature.x, creature.y, creature.z);
 			
-			if(rockCheck != null && rockCheck.name().equals("roca")){
+			if(rockCheck != null && rockCheck.getName().equals("roca")){
 				creature.pickup();
 				creature.doAction("consume la roca recuperando fuerzas");
 				creature.modifyHp(healthBonus, "Indigestion rocosa");
@@ -89,10 +91,10 @@ public class RockBugAi extends CreatureAi {
 	void addBonusDamage(){
 		creature.addEffect(new Effect(attackBonusDuration){
 			public void start(Creature creature){
-				creature.modifyAttackValue(6);
+				creature.modifyAttackValue(DamageType.BLUNT, 6);
 			}
 			public void end(Creature creature){
-				creature.modifyAttackValue(-6);
+				creature.modifyAttackValue(DamageType.BLUNT, -6);
 			}
 		});
 	}

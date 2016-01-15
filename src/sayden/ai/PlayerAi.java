@@ -2,6 +2,7 @@ package sayden.ai;
 
 import java.util.List;
 
+import sayden.Constants;
 import sayden.Creature;
 import sayden.FieldOfView;
 import sayden.Item;
@@ -16,7 +17,8 @@ public class PlayerAi extends CreatureAi {
 		super(creature);
 		this.messages = messages;
 		this.fov = fov;
-		this.setWeakSpot("NONE");
+		
+		creature.setData(Constants.RACE, "human");
 	}
 
 	public void onEnter(int x, int y, int z, Tile tile){

@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
+import asciiPanel.AsciiPanel;
+
 public class World {
 	private Tile[][][] tiles;
 	private Item[][][] items;
@@ -22,6 +24,7 @@ public class World {
 	public int depth() { return depth; }
 	
 	private List<Creature> creatures;
+	private List<Projectile> projectiles;
 	
 	public World(Tile[][][] tiles){
 		this.tiles = tiles;
@@ -29,6 +32,7 @@ public class World {
 		this.height = tiles[0].length;
 		this.depth = tiles[0][0].length;
 		this.creatures = new ArrayList<Creature>();
+		this.projectiles = new ArrayList<Projectile>();
 		this.items = new Item[width][height][depth];
 		this.blood = new float[width][height][depth];
 		this.visited = new boolean[width][height][depth];
@@ -41,6 +45,17 @@ public class World {
 				continue;
 			c.modifyActionPoints(amount);
 		}
+		for(Projectile p : projectiles){
+			p.modifyActionPoints(amount);
+		}
+	}
+	
+	public Projectile projectile(int x, int y, int z){
+		for (Projectile p : projectiles){
+			if (p.x == x && p.y == y && p.z == z)
+				return p;
+		}
+		return null;
 	}
 	
 	public Creature creature(int x, int y, int z){
@@ -90,6 +105,11 @@ public class World {
 	
 	public char glyph(int x, int y, int z){
 		Creature creature = creature(x, y, z);
+		Projectile projectile = projectile(x, y, z);
+		
+		if(projectile != null)
+			return projectile.projectile().glyph();
+		
 		if (creature != null)
 			return creature.glyph();
 		
@@ -100,7 +120,12 @@ public class World {
 	}
 	
 	public Color color(int x, int y, int z){
-		Creature creature = creature(x, y, z);
+		Creature creature = creature(x, y, z);	
+		Projectile projectile = projectile(x, y, z);
+		
+		if(projectile != null)
+			return projectile.projectile().color();
+		
 		if (creature != null)
 			return creature.color();
 		
@@ -112,7 +137,11 @@ public class World {
 	
 	public Color backgroundColor(int x, int y, int z){
 		float bloodAmount = blood[x][y][z];
+		Projectile projectile = projectile(x, y, z);
 		
+		if(projectile != null)
+			return AsciiPanel.cyan;
+			
 		if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth)
 			return Tile.BOUNDS.backgroundColor();
 					
@@ -144,13 +173,31 @@ public class World {
 		creatures.add(creature);
 	}
 	
+	private void updateProjectiles(){
+		List<Projectile> done = new ArrayList<Projectile>();
+		
+		for (Projectile projectile : projectiles){
+			projectile.update();
+			if (projectile.isDone()) {
+				projectile.end();
+				done.add(projectile);
+			}
+		}
+		
+		projectiles.removeAll(done);
+	}
+	
 	public void updateFloor(int z){
 		List<Creature> toUpdate = new ArrayList<Creature>(creatures);
+				
 		for (Creature creature : toUpdate){
 			if(creature.z != z)
 				continue;
 			creature.update();
 		}
+		
+		updateProjectiles();
+		
 		for (int x = 0; x < width; x++){
 			for (int y = 0; y < height; y++){
 				if(blood[x][y][z] > Constants.MIN_FLUID_AMOUNT)
@@ -186,6 +233,10 @@ public class World {
 		int x;
 		int y;
 		
+		if(depth < 0){
+			return;
+		}
+		
 		do {
 			x = (int)(Math.random() * width);
 			y = (int)(Math.random() * height);
@@ -201,6 +252,8 @@ public class World {
 
 	public boolean addAtEmptySpace(Creature creature, int x, int y, int z){
 		if (creature == null)
+			return true;
+		if(depth < 0)
 			return true;
 		
 		List<Point> points = new ArrayList<Point>();
@@ -232,6 +285,8 @@ public class World {
 	public boolean addAtEmptySpace(Item item, int x, int y, int z){
 		if (item == null)
 			return true;
+		if(z < 0)
+			return true;
 		
 		List<Point> points = new ArrayList<Point>();
 		List<Point> checked = new ArrayList<Point>();
@@ -262,6 +317,10 @@ public class World {
 
 	public void add(Creature pet) {
 		creatures.add(pet);
+	}
+	
+	public void add(Projectile missile) {
+		projectiles.add(missile);
 	}
 
 	public float getCost(Creature mover, int sx, int sy, int tx, int ty) {

@@ -12,6 +12,15 @@ public class Inventory {
 	}
 	
 	public void add(Item item){
+		if(item.stackable() && containsimilar(item)){
+			for (int i = 0; i < items.length; i++){
+				if (items[i] != null && items[i].name().equals(item.name() ) && !items[i].stacked()){
+					items[i].modifyStacks(item.stacks);
+					break;
+				}
+			}
+			return;
+		}
 		for (int i = 0; i < items.length; i++){
 			if (items[i] == null){
 				items[i] = item;
@@ -22,7 +31,11 @@ public class Inventory {
 
 	public void remove(Item item){
 		for (int i = 0; i < items.length; i++){
-			if (items[i] == item){
+			Item temp = items[i];
+			if (temp == item){
+				if(temp.stackable() && temp.stacks > 1){
+					return;
+				}
 				items[i] = null;
 				return;
 			}
@@ -36,6 +49,14 @@ public class Inventory {
 				size++;
 		}
 		return size == items.length;
+	}
+	
+	public boolean containsimilar(Item item) {
+		for (Item i : items){
+			if (i != null && i.name == item.name)
+				return true;
+		}
+		return false;
 	}
 	
 	public boolean contains(Item item) {

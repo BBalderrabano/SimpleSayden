@@ -6,6 +6,7 @@ import java.util.Map;
 
 import sayden.Constants;
 import sayden.Creature;
+import sayden.DamageType;
 import sayden.Item;
 import sayden.Line;
 import sayden.Path;
@@ -21,11 +22,11 @@ public class CreatureAi {
 		this.creature = creature;
 		this.creature.setCreatureAi(this);
 		this.itemNames = new HashMap<String, String>();
-		this.weakSpot = Constants.HEAD_POS;
+		this.weakSpot = Constants.NO_POS;
 	}
 	
 	public void setName(Item item, String name){
-		itemNames.put(item.name(), name);
+		itemNames.put(item.getName(), name);
 	}
 	
 	public void setWeakSpot(String position){
@@ -66,11 +67,12 @@ public class CreatureAi {
 	public void onAttack(int x, int y, int z, Creature other){
 		if(creature.getData("Race") == other.getData("Race"))
 			return;
-		
+
 		if(creature.getActionPoints() < creature.getAttackSpeed().velocity() && !creature.isPlayer()){
 			if(other.isPlayer()){
-				if(creature.getAttackSpeed().modifySpeed(3).velocity() > other.getMovementSpeed().velocity()
+				if(Math.abs(creature.getAttackSpeed().velocity() - other.getMovementSpeed().velocity()) > 2
 						&& creature.queAttack() == null){
+					creature.modifyActionPoints(-creature.getActionPoints());
 					creature.setQueAttack(other.position());
 				}
 			}
@@ -137,7 +139,7 @@ public class CreatureAi {
 					creature.helment() == item || creature.shield() == item)
 				continue;
 			
-			if (toThrow == null || item.thrownAttackValue() > 0)
+			if (toThrow == null || item.totalAttackValue() > 0)
 				toThrow = item;
 		}
 		
@@ -146,13 +148,14 @@ public class CreatureAi {
 	
 	protected boolean canRangedWeaponAttack(Creature other) {
 		return creature.weapon() != null
-		    && creature.weapon().rangedAttackValue() > 0
+		    && creature.weapon().attackValue(DamageType.RANGED) > 0
 		    && creature.canSee(other.x, other.y, other.z);
 	}
 
 	protected boolean canPickup() {
 		return creature.item(creature.x, creature.y, creature.z) != null
-			&& !creature.inventory().isFull();
+			&& !creature.inventory().isFull()
+			&& !creature.item(creature.x, creature.y, creature.z).getBooleanData(Constants.CHECK_CORPSE);
 	}
 	
 	protected boolean canMove(int mx, int my){
@@ -182,6 +185,30 @@ public class CreatureAi {
 		else
 			creature.moveBy(mx, my, 0);
 	}
+	
+	public void flee(Creature target){
+		List<Point> points = new Path(creature, target.x, target.y).points();
+		
+		int mx = points.get(0).x - creature.x;
+		int my = points.get(0).y - creature.y;
+		
+		if(mx != 0 && my != 0){	//Elimina combate en diagonal
+			int x_distance = Math.abs(creature.x - target.x);
+			int y_distance = Math.abs(creature.y - target.y);
+			
+			if(canMove(mx, 0) && x_distance > y_distance)
+				my = 0;
+			else if(canMove(0, my) && y_distance >= x_distance)
+				mx = 0;
+			else if(Math.random() > .5f)
+				mx = 0;
+			else
+				my = 0;
+		}
+		
+		creature.moveBy(-mx, -my, 0);
+	}
+	
 	
 	public void hunt(Creature target) {
 		List<Point> points = new Path(creature, target.x, target.y).points();
@@ -234,17 +261,17 @@ public class CreatureAi {
 	}
 
 	protected boolean canUseBetterEquipment() {
-		int currentWeaponRating = creature.weapon() == null ? 0 : creature.weapon().attackValue() + creature.weapon().rangedAttackValue();
-		int currentArmorRating = creature.armor() == null ? 0 : creature.armor().defenseValue();
+		int currentWeaponRating = creature.weapon() == null ? 0 : creature.weapon().totalAttackValue();
+		int currentArmorRating = creature.armor() == null ? 0 : creature.armor().totalDefenseValue();
 		
 		for (Item item : creature.inventory().getItems()){
 			if (item == null)
 				continue;
 			
-			boolean isArmor = item.attackValue() + item.rangedAttackValue() < item.defenseValue();
+			boolean isArmor = !item.getBooleanData(Constants.CHECK_WEAPON);
 			
-			if (item.attackValue() + item.rangedAttackValue() > currentWeaponRating
-					|| isArmor && item.defenseValue() > currentArmorRating)
+			if (item.totalAttackValue() > currentWeaponRating
+					|| isArmor && item.totalDefenseValue() > currentArmorRating)
 				return true;
 		}
 		
@@ -252,17 +279,17 @@ public class CreatureAi {
 	}
 
 	protected void useBetterEquipment() {
-		int currentWeaponRating = creature.weapon() == null ? 0 : creature.weapon().attackValue() + creature.weapon().rangedAttackValue();
-		int currentArmorRating = creature.armor() == null ? 0 : creature.armor().defenseValue();
+		int currentWeaponRating = creature.weapon() == null ? 0 : creature.weapon().totalAttackValue();
+		int currentArmorRating = creature.armor() == null ? 0 : creature.armor().totalDefenseValue();
 		
 		for (Item item : creature.inventory().getItems()){
 			if (item == null)
 				continue;
 			
-			boolean isArmor = item.attackValue() + item.rangedAttackValue() < item.defenseValue();
+			boolean isArmor = !item.getBooleanData(Constants.CHECK_WEAPON);
 			
-			if (item.attackValue() + item.rangedAttackValue() > currentWeaponRating
-					|| isArmor && item.defenseValue() > currentArmorRating) {
+			if (item.totalAttackValue() > currentWeaponRating
+					|| isArmor && item.totalDefenseValue() > currentArmorRating) {
 				creature.equip(item);
 			}
 		}

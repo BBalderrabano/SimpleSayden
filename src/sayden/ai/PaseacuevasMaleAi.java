@@ -15,7 +15,7 @@ public class PaseacuevasMaleAi extends CreatureAi {
 		this.player = player;
 		this.female = female;
 		
-		creature.setData("Race", "paseacuevas");
+		creature.setData(Constants.RACE, "paseacuevas");
 	}
 
 	public void onUpdate(){
@@ -45,7 +45,7 @@ public class PaseacuevasMaleAi extends CreatureAi {
 			});
 			return;
 		}
-		if (canThrowAt(player) && female.hp() < female.totalMaxHp()){
+		if (canThrowAt(player) && female.hp() < female.totalMaxHp() && Math.random() > 0.3f){
 			creature.throwItem(getWeaponToThrow(), player.x, player.y, player.z);
 		}
 		if(creature.position().distance(female.position()) >= 8){

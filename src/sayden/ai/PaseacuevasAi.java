@@ -3,6 +3,7 @@ package sayden.ai;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
+import sayden.Constants;
 import sayden.Creature;
 import sayden.Effect;
 import sayden.Point;
@@ -18,7 +19,7 @@ public class PaseacuevasAi extends CreatureAi {
 		super(creature);
 		this.player = player;
 		
-		creature.setData("Race", "paseacuevas");
+		creature.setData(Constants.RACE, "paseacuevas");
 	}
 
 	public void onUpdate(){
@@ -51,6 +52,9 @@ public class PaseacuevasAi extends CreatureAi {
 			
 			creature.setData("SeenPlayer", true);
 			return;
+		}else if(canSee(player.x, player.y, player.z)){
+			hunt(player);
+			return;
 		}
 		
 		Point checkPoint = (Point) creature.getData("checkPoint");
@@ -78,7 +82,7 @@ public class PaseacuevasAi extends CreatureAi {
 		creature.addEffect(new Effect(10){
 			public void start(Creature creature){
 				creature.modifyMovementSpeed(creature.getMovementSpeed().modifySpeed(2));
-				creature.changeColor(AsciiPanel.red);
+				creature.changeColor(AsciiPanel.brightRed);
 			}
 			public void end(Creature creature){
 				creature.modifyMovementSpeed(creature.startingMovementSpeed());

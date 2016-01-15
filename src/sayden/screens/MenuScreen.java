@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import asciiPanel.AsciiPanel;
 import sayden.Constants;
 import sayden.Creature;
+import sayden.DamageType;
 import sayden.Item;
 
 public class MenuScreen extends InventoryBasedScreen {
@@ -97,40 +98,71 @@ public class MenuScreen extends InventoryBasedScreen {
 		Item compareItem = null;
 		
 		Color hpColor = AsciiPanel.white;
-		Color defColor = AsciiPanel.white;
-		Color atkColor = AsciiPanel.white;
 		Color aspdColor = AsciiPanel.white;
 		Color mspdColor = AsciiPanel.white;
 		
+		Color sliceColor = AsciiPanel.white;
+		Color bluntColor = AsciiPanel.white;
+		Color piercingColor = AsciiPanel.white;
+		
+		Color sliceDefColor = AsciiPanel.white;
+		Color bluntDefColor = AsciiPanel.white;
+		Color piercingDefColor = AsciiPanel.white;
+		
 		String hpValue = player.hp() + "/" + player.totalMaxHp();
-		String atkValue = player.attackValueTotal()+"";
-		String defValue = player.defenseValueTotal()+"";
 		String atkSpeed = player.getAttackSpeed().getName();
 		String mspSpeed = player.getMovementSpeed().getName();
+		
+		String sliceDamageValue = player.attackValue(DamageType.SLICE) + " ";
+		String bluntDamageValue = player.attackValue(DamageType.BLUNT) + " ";
+		String piercingDamageValue = player.attackValue(DamageType.PIERCING) + " ";
+		
+		String sliceDefenseValue = player.defenseValue(DamageType.SLICE) + " ";
+		String bluntDefenseValue = player.defenseValue(DamageType.BLUNT) + " ";
+		String piercingDefenseValue = player.defenseValue(DamageType.PIERCING) + " ";
 		
 		drawBox(offset_x, offset_y, width , display_stat_amount + 1, terminal);
 		
 		if(interactingItem != null){
-			if(interactingItem.getBooleanData(Constants.CHECK_ARMOR)){ compareItem = player.armor(); }
-			if(interactingItem.getBooleanData(Constants.CHECK_WEAPON)){ compareItem = player.weapon(); }
-			if(interactingItem.getBooleanData(Constants.CHECK_HELMENT)){ compareItem = player.helment(); }
-			if(interactingItem.getBooleanData(Constants.CHECK_SHIELD)){ compareItem = player.shield(); }
-				
-			if(!player.hasEquipped(interactingItem)){
+			boolean canEquip = false;
+			if(interactingItem.getBooleanData(Constants.CHECK_ARMOR)){ canEquip = true; compareItem = player.armor(); }
+			if(interactingItem.getBooleanData(Constants.CHECK_WEAPON)){ canEquip = true; compareItem = player.weapon(); }
+			if(interactingItem.getBooleanData(Constants.CHECK_HELMENT)){ canEquip = true; compareItem = player.helment(); }
+			if(interactingItem.getBooleanData(Constants.CHECK_SHIELD)){ canEquip = true; compareItem = player.shield(); }
+			
+			if(!player.hasEquipped(interactingItem) && canEquip){
 				if(compareItem == null){
 					if(interactingItem.bonusMaxHp() > 0){
 						hpValue = player.hp() + "/" + (player.totalMaxHp() + interactingItem.bonusMaxHp());
 						hpColor = AsciiPanel.green;
 					}
-					if(interactingItem.attackValue() > 0){
-						atkValue = (player.attackValueTotal() + interactingItem.attackValue()) + "";
-						atkColor = AsciiPanel.green;
+					//ATTACKS
+					if(interactingItem.attackValue(DamageType.SLICE) > 0){
+						sliceDamageValue = player.attackValue(DamageType.SLICE) + interactingItem.attackValue(DamageType.SLICE) + " ";
+						sliceColor = AsciiPanel.green;
 					}
-					if(interactingItem.defenseValue() > 0){
-						defValue = (player.defenseValueTotal() + interactingItem.defenseValue()) + "";
-						defColor = AsciiPanel.green;
+					if(interactingItem.attackValue(DamageType.BLUNT) > 0){
+						bluntDamageValue = player.attackValue(DamageType.BLUNT) + interactingItem.attackValue(DamageType.BLUNT) + " ";
+						bluntDefColor = AsciiPanel.green;
 					}
-				}else{
+					if(interactingItem.attackValue(DamageType.PIERCING) > 0){
+						piercingDamageValue = player.attackValue(DamageType.PIERCING) + interactingItem.attackValue(DamageType.PIERCING) + " ";
+						piercingColor = AsciiPanel.green;
+					}
+					//DEFENSES
+					if(interactingItem.defenseValue(DamageType.SLICE) > 0){
+						sliceDefenseValue = player.defenseValue(DamageType.SLICE) + interactingItem.defenseValue(DamageType.SLICE) + " ";
+						sliceDefColor = AsciiPanel.green;
+					}
+					if(interactingItem.defenseValue(DamageType.BLUNT) > 0){
+						bluntDefenseValue = player.defenseValue(DamageType.BLUNT) + interactingItem.defenseValue(DamageType.BLUNT) + " ";
+						bluntDefColor = AsciiPanel.green;
+					}
+					if(interactingItem.defenseValue(DamageType.PIERCING) > 0){
+						piercingDefenseValue = player.defenseValue(DamageType.PIERCING) + interactingItem.defenseValue(DamageType.PIERCING) + " ";
+						piercingDefColor = AsciiPanel.green;
+					}
+				}else{ 
 					if(interactingItem.bonusMaxHp() > compareItem.bonusMaxHp()){
 						hpValue = player.hp()+"/"+
 								(player.totalMaxHp() - compareItem.bonusMaxHp() + interactingItem.bonusMaxHp());
@@ -140,19 +172,131 @@ public class MenuScreen extends InventoryBasedScreen {
 								(player.totalMaxHp() - compareItem.bonusMaxHp() + interactingItem.bonusMaxHp());
 						hpColor = AsciiPanel.red;
 					}
-					if(interactingItem.attackValue() > compareItem.attackValue()){
-						atkValue = "" + (player.attackValueTotal() - compareItem.attackValue() + interactingItem.attackValue());
-						atkColor = AsciiPanel.green;
-					}else if(interactingItem.attackValue() < compareItem.attackValue()){
-						atkValue = "" + (player.attackValueTotal() - compareItem.attackValue() + interactingItem.attackValue());
-						atkColor = AsciiPanel.red;
+					
+					//SLICE DAMAGE
+					if(interactingItem.attackValue(DamageType.SLICE) > compareItem.attackValue(DamageType.SLICE)){
+						sliceDamageValue = (player.attackValue(DamageType.SLICE) - compareItem.attackValue(DamageType.SLICE) 
+																				+ interactingItem.attackValue(DamageType.SLICE)) + " ";
+						sliceColor = AsciiPanel.green;
+					}else if(interactingItem.attackValue(DamageType.SLICE) < compareItem.attackValue(DamageType.SLICE)){
+						sliceDamageValue = (player.attackValue(DamageType.SLICE) - compareItem.attackValue(DamageType.SLICE)
+																				+ interactingItem.attackValue(DamageType.SLICE)) + " ";
+						sliceColor = AsciiPanel.red;
 					}
-					if(interactingItem.defenseValue() > compareItem.defenseValue()){
-						defValue = "" + (player.defenseValueTotal() - compareItem.defenseValue() + interactingItem.defenseValue());
-						defColor = AsciiPanel.green;
-					}else if(interactingItem.defenseValue() < compareItem.defenseValue()){
-						defValue = "" + (player.defenseValueTotal() - compareItem.defenseValue() + interactingItem.defenseValue());
-						defColor = AsciiPanel.red;
+					
+					if(interactingItem.defenseValue(DamageType.SLICE) > compareItem.defenseValue(DamageType.SLICE)){
+						sliceDefenseValue = (player.defenseValue(DamageType.SLICE) - compareItem.defenseValue(DamageType.SLICE) 
+																				+ interactingItem.defenseValue(DamageType.SLICE)) + " ";
+						sliceDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.SLICE) < compareItem.defenseValue(DamageType.SLICE)){
+						sliceDefenseValue = (player.defenseValue(DamageType.SLICE) - compareItem.defenseValue(DamageType.SLICE)
+																				+ interactingItem.defenseValue(DamageType.SLICE)) + " ";
+						sliceDefColor = AsciiPanel.red;
+					}
+					
+					//BLUNT DAMAGE
+					if(interactingItem.attackValue(DamageType.BLUNT) > compareItem.attackValue(DamageType.BLUNT)){
+						bluntDamageValue = (player.attackValue(DamageType.BLUNT) - compareItem.attackValue(DamageType.BLUNT) 
+																				+ interactingItem.attackValue(DamageType.BLUNT)) + " ";
+						bluntColor = AsciiPanel.green;
+					}else if(interactingItem.attackValue(DamageType.BLUNT) < compareItem.attackValue(DamageType.BLUNT)){
+						bluntDamageValue = (player.attackValue(DamageType.BLUNT) - compareItem.attackValue(DamageType.BLUNT)
+																				+ interactingItem.attackValue(DamageType.BLUNT)) + " ";
+						bluntColor = AsciiPanel.red;
+					}
+					
+					if(interactingItem.defenseValue(DamageType.BLUNT) > compareItem.defenseValue(DamageType.BLUNT)){
+						bluntDefenseValue = (player.defenseValue(DamageType.BLUNT) - compareItem.defenseValue(DamageType.BLUNT) 
+																				+ interactingItem.defenseValue(DamageType.BLUNT)) + " ";
+						bluntDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.BLUNT) < compareItem.defenseValue(DamageType.BLUNT)){
+						bluntDefenseValue = (player.defenseValue(DamageType.BLUNT) - compareItem.defenseValue(DamageType.BLUNT)
+																				+ interactingItem.defenseValue(DamageType.BLUNT)) + " ";
+						bluntDefColor = AsciiPanel.red;
+					}
+					
+					//PIERCING DAMAGE
+					if(interactingItem.attackValue(DamageType.PIERCING) > compareItem.attackValue(DamageType.PIERCING)){
+						piercingDamageValue = (player.attackValue(DamageType.PIERCING) - compareItem.attackValue(DamageType.PIERCING) 
+																				+ interactingItem.attackValue(DamageType.PIERCING)) + " ";
+						piercingColor = AsciiPanel.green;
+					}else if(interactingItem.attackValue(DamageType.PIERCING) < compareItem.attackValue(DamageType.PIERCING)){
+						piercingDamageValue = (player.attackValue(DamageType.PIERCING) - compareItem.attackValue(DamageType.PIERCING)
+																				+ interactingItem.attackValue(DamageType.PIERCING)) + " ";
+						piercingColor = AsciiPanel.red;
+					}
+					
+					if(interactingItem.defenseValue(DamageType.PIERCING) > compareItem.defenseValue(DamageType.PIERCING)){
+						piercingDefenseValue = (player.defenseValue(DamageType.PIERCING) - compareItem.defenseValue(DamageType.PIERCING) 
+																				+ interactingItem.defenseValue(DamageType.PIERCING)) + " ";
+						piercingDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.PIERCING) < compareItem.defenseValue(DamageType.PIERCING)){
+						piercingDefenseValue = (player.defenseValue(DamageType.PIERCING) - compareItem.defenseValue(DamageType.PIERCING)
+																				+ interactingItem.defenseValue(DamageType.PIERCING)) + " ";
+						piercingDefColor = AsciiPanel.red;
+					}
+					
+					//SLICE DEFENSE
+					if(interactingItem.defenseValue(DamageType.SLICE) > compareItem.defenseValue(DamageType.SLICE)){
+						sliceDefenseValue = (player.defenseValue(DamageType.SLICE) - compareItem.defenseValue(DamageType.SLICE) 
+																				+ interactingItem.defenseValue(DamageType.SLICE)) + " ";
+						sliceDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.SLICE) < compareItem.defenseValue(DamageType.SLICE)){
+						sliceDefenseValue = (player.defenseValue(DamageType.SLICE) - compareItem.defenseValue(DamageType.SLICE)
+																				+ interactingItem.defenseValue(DamageType.SLICE)) + " ";
+						sliceDefColor = AsciiPanel.red;
+					}
+					
+					if(interactingItem.defenseValue(DamageType.SLICE) > compareItem.defenseValue(DamageType.SLICE)){
+						sliceDefenseValue = (player.defenseValue(DamageType.SLICE) - compareItem.defenseValue(DamageType.SLICE) 
+																				+ interactingItem.defenseValue(DamageType.SLICE)) + " ";
+						sliceDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.SLICE) < compareItem.defenseValue(DamageType.SLICE)){
+						sliceDefenseValue = (player.defenseValue(DamageType.SLICE) - compareItem.defenseValue(DamageType.SLICE)
+																				+ interactingItem.defenseValue(DamageType.SLICE)) + " ";
+						sliceDefColor = AsciiPanel.red;
+					}
+					
+					//BLUNT DEFENSE
+					if(interactingItem.defenseValue(DamageType.BLUNT) > compareItem.defenseValue(DamageType.BLUNT)){
+						bluntDefenseValue = (player.defenseValue(DamageType.BLUNT) - compareItem.defenseValue(DamageType.BLUNT) 
+																				+ interactingItem.defenseValue(DamageType.BLUNT)) + " ";
+						bluntDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.BLUNT) < compareItem.defenseValue(DamageType.BLUNT)){
+						bluntDefenseValue = (player.defenseValue(DamageType.BLUNT) - compareItem.defenseValue(DamageType.BLUNT)
+																				+ interactingItem.defenseValue(DamageType.BLUNT)) + " ";
+						bluntDefColor = AsciiPanel.red;
+					}
+					
+					if(interactingItem.defenseValue(DamageType.BLUNT) > compareItem.defenseValue(DamageType.BLUNT)){
+						bluntDefenseValue = (player.defenseValue(DamageType.BLUNT) - compareItem.defenseValue(DamageType.BLUNT) 
+																				+ interactingItem.defenseValue(DamageType.BLUNT)) + " ";
+						bluntDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.BLUNT) < compareItem.defenseValue(DamageType.BLUNT)){
+						bluntDefenseValue = (player.defenseValue(DamageType.BLUNT) - compareItem.defenseValue(DamageType.BLUNT)
+																				+ interactingItem.defenseValue(DamageType.BLUNT)) + " ";
+						bluntDefColor = AsciiPanel.red;
+					}
+					
+					//PIERCING DEFENSE
+					if(interactingItem.defenseValue(DamageType.PIERCING) > compareItem.defenseValue(DamageType.PIERCING)){
+						piercingDefenseValue = (player.defenseValue(DamageType.PIERCING) - compareItem.defenseValue(DamageType.PIERCING) 
+																				+ interactingItem.defenseValue(DamageType.PIERCING)) + " ";
+						piercingDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.PIERCING) < compareItem.defenseValue(DamageType.PIERCING)){
+						piercingDefenseValue = (player.defenseValue(DamageType.PIERCING) - compareItem.defenseValue(DamageType.PIERCING)
+																				+ interactingItem.defenseValue(DamageType.PIERCING)) + " ";
+						piercingDefColor = AsciiPanel.red;
+					}
+					
+					if(interactingItem.defenseValue(DamageType.PIERCING) > compareItem.defenseValue(DamageType.PIERCING)){
+						piercingDefenseValue = (player.defenseValue(DamageType.PIERCING) - compareItem.defenseValue(DamageType.PIERCING) 
+																				+ interactingItem.defenseValue(DamageType.PIERCING)) + " ";
+						piercingDefColor = AsciiPanel.green;
+					}else if(interactingItem.defenseValue(DamageType.PIERCING) < compareItem.defenseValue(DamageType.PIERCING)){
+						piercingDefenseValue = (player.defenseValue(DamageType.PIERCING) - compareItem.defenseValue(DamageType.PIERCING)
+																				+ interactingItem.defenseValue(DamageType.PIERCING)) + " ";
+						piercingDefColor = AsciiPanel.red;
 					}
 				}
 				
@@ -183,16 +327,27 @@ public class MenuScreen extends InventoryBasedScreen {
 			}
 		}
 		
-		printStat("SALUD", hpValue, text_offset_x, offset_y + 1, hpColor, terminal);
-		printStat("ATAQUE", atkValue, text_offset_x, offset_y + 2, atkColor, terminal);
-		printStat("DEFENSA", defValue, text_offset_x, offset_y + 3, defColor, terminal);
-		printStat("V.ATQ", atkSpeed, text_offset_x, offset_y + 4, aspdColor, terminal);
-		printStat("V.MOV", mspSpeed, text_offset_x, offset_y + 5, mspdColor, terminal);
-	}
-	
-	private void printStat(String stat_name, String value, int offset_x, int offset_y, Color color, AsciiPanel terminal){
-		terminal.write(" "+stat_name+": " + value, offset_x, offset_y, color);
-		terminal.write(" "+stat_name+": ", offset_x, offset_y);
+		terminal.write("SALUD: ", text_offset_x, offset_y + 1);
+		terminal.write(hpValue, terminal.getCursorX(), offset_y + 1, hpColor);
+		
+		terminal.write("ATAQUE:  ", text_offset_x, offset_y + 2);
+		terminal.write(sliceDamageValue+"", terminal.getCursorX(), offset_y + 2, sliceColor);
+		terminal.write(bluntDamageValue+"", terminal.getCursorX(), offset_y + 2, bluntColor);
+		terminal.write(piercingDamageValue+"", terminal.getCursorX(), offset_y + 2, piercingColor);
+		
+		terminal.write("DEFENSA: ", text_offset_x, offset_y + 3);
+		terminal.write(sliceDefenseValue+"", terminal.getCursorX(), offset_y + 3, sliceDefColor);
+		terminal.write(bluntDefenseValue+"", terminal.getCursorX(), offset_y + 3, bluntDefColor);
+		terminal.write(piercingDefenseValue+"", terminal.getCursorX(), offset_y + 3, piercingDefColor);
+		
+//		printStat("ATAQUE", atkValue, text_offset_x, offset_y + 2, atkColor, terminal);
+//		printStat("DEFENSA", defValue, text_offset_x, offset_y + 3, defColor, terminal);
+		
+		terminal.write("V.ATQ: ", text_offset_x, offset_y + 4);
+		terminal.write(atkSpeed, terminal.getCursorX(), offset_y + 4, aspdColor);
+		
+		terminal.write("V.MOV: ", text_offset_x, offset_y + 5);
+		terminal.write(mspSpeed, terminal.getCursorX(), offset_y + 5, mspdColor);
 	}
 	
 	private void drawItemBox(int offset_x, int offset_y, int width, int height, AsciiPanel terminal){
@@ -202,8 +357,8 @@ public class MenuScreen extends InventoryBasedScreen {
 			terminal.write((char)202, offset_x + width, offset_y + height);
 			
 			//We draw the item name
-			int title_lenght = Math.min(interactingItem.name().length(), width - 2);
-			String shorten_title = interactingItem.name().substring(0, title_lenght);
+			int title_lenght = Math.min(interactingItem.getName().length(), width - 2);
+			String shorten_title = interactingItem.getName().substring(0, title_lenght);
 			terminal.write(shorten_title.toUpperCase(), offset_x + 1, offset_y);
 			
 			//We draw the item description
@@ -264,8 +419,8 @@ public class MenuScreen extends InventoryBasedScreen {
 			//Show item name and glyph, if equipped change color
 			if(displayItem == player.weapon() || displayItem == player.armor()
 					|| displayItem == player.helment() || displayItem == player.shield()){
-				terminal.write("  " +proccesed_line, startWidth, realHeight, AsciiPanel.blue);
 				terminal.write(displayItem.glyph(), startWidth, realHeight, displayItem.color());
+				terminal.write("[" +proccesed_line+"]", terminal.getCursorX(), realHeight, AsciiPanel.cyan);
 			}else{
 				terminal.write("  " + proccesed_line, startWidth, realHeight);
 				terminal.write(displayItem.glyph(), startWidth, realHeight, displayItem.color());
@@ -295,9 +450,6 @@ public class MenuScreen extends InventoryBasedScreen {
 		
 		offset_x++;
 		
-		options.add("soltar");
-		options.add("arrojar");
-		
 		if(item.getBooleanData(Constants.CHECK_ARMOR) 
 				|| item.getBooleanData(Constants.CHECK_HELMENT)
 				|| item.getBooleanData(Constants.CHECK_SHIELD)
@@ -315,6 +467,8 @@ public class MenuScreen extends InventoryBasedScreen {
 		if(item.quaffEffect() != null || item.getBooleanData(Constants.CHECK_CONSUMABLE)){
 			options.add("consumir");
 		}
+		options.add("arrojar");
+		options.add("soltar");
 		
 		max_text = longest_word(options).length() + 1;
 		
@@ -390,7 +544,7 @@ public class MenuScreen extends InventoryBasedScreen {
 			}else{
 				if(selectedInteraction == null)
 					return this;
-				if(selectedInteraction == "desequipar"){ player.unequip(interactingItem);	}
+				if(selectedInteraction == "desequipar"){ player.unequip(interactingItem, true);	}
 				if(selectedInteraction == "equipar"){	 player.equip(interactingItem);	}
 				if(selectedInteraction == "soltar"){	 player.drop(interactingItem);	}
 				if(selectedInteraction == "consumir"){	 player.eat(interactingItem);	}

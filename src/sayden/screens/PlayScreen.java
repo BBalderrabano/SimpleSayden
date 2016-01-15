@@ -7,6 +7,7 @@ import java.util.List;
 
 import asciiPanel.AsciiPanel;
 import sayden.Creature;
+import sayden.DamageType;
 import sayden.FieldOfView;
 import sayden.Item;
 import sayden.StuffFactory;
@@ -38,8 +39,12 @@ public class PlayScreen implements Screen {
 	private void createCreatures(StuffFactory factory){
 		player = factory.newPlayer(messages, fov);
 			
-		for(int i = 0; i < 1; i++){
+		for(int i = 0; i < 2; i++){
 			factory.newCaveBrute(player.z, player);
+		}
+		
+		for(int i = 0; i < 6; i++){
+			factory.newMarauder(player.z, player);
 		}
 		
 		for (int z = 0; z < world.depth(); z++){
@@ -176,7 +181,7 @@ public class PlayScreen implements Screen {
 					player.x - getScrollX(), 
 					player.y - getScrollY()); break;
 			case KeyEvent.VK_F: 
-				if (player.weapon() == null || player.weapon().rangedAttackValue() == 0)
+				if (player.weapon() == null || player.weapon().attackValue(DamageType.RANGED) <= 0)
 					player.notify("No tienes un arma de rango equipada.");
 				else
 					subscreen = new FireWeaponScreen(player,
@@ -215,7 +220,7 @@ public class PlayScreen implements Screen {
 	
 	private Screen userExits(){
 		for (Item item : player.inventory().getItems()){
-			if (item != null && item.name().equals("teddy bear"))
+			if (item != null && item.getName().equals("teddy bear"))
 				return new WinScreen();
 		}
 		player.modifyHp(0, "Died while cowardly fleeing the caves.");
