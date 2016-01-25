@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import asciiPanel.AsciiPanel;
+import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
 import sayden.FieldOfView;
 import sayden.Item;
+import sayden.MapLoader;
 import sayden.StuffFactory;
 import sayden.Tile;
 import sayden.World;
@@ -23,40 +25,54 @@ public class PlayScreen implements Screen {
 	private List<String> messages;
 	private FieldOfView fov;
 	private Screen subscreen;
+	public Screen subscreen(){ return player != null && player.subscreen != null ? player.subscreen : subscreen; }
 	
 	public PlayScreen(){
-		screenWidth = 80;
-		screenHeight = 23;
+		MapLoader ml = new MapLoader();
+		
+		screenWidth = Constants.WORLD_WIDTH;
+		screenHeight = Constants.WORLD_HEIGHT;
 		messages = new ArrayList<String>();
 		createWorld();
-		fov = new FieldOfView(world);
 		
 		StuffFactory factory = new StuffFactory(world);
+
+		world.overrideFloor(0, ml.preBuild("Pueblo", factory));
+		fov = new FieldOfView(world);
+		
 		createCreatures(factory);
 		createItems(factory);
 	}
 
 	private void createCreatures(StuffFactory factory){
 		player = factory.newPlayer(messages, fov);
-			
-		for(int i = 0; i < 2; i++){
-			factory.newCaveBrute(player.z, player);
-		}
 		
-		for(int i = 0; i < 6; i++){
-			factory.newMarauder(player.z, player);
-		}
+		factory.newBlacksmith(player, 34, 3, 0);
 		
-		for (int z = 0; z < world.depth(); z++){
+		for (int z = 1; z < world.depth(); z++){
 			for (int i = 0; i < 15; i++){
 				factory.newRockBug(z, player);
+			}
+			
+			for(int i = 0; i < 2; i++){
+				factory.newCaveBrute(z, player);
+			}
+			
+			for(int i = 0; i < 6; i++){
+				factory.newMarauder(z, player);
 			}
 		}
 	}
 
 	private void createItems(StuffFactory factory) {
-		for (int z = 0; z < world.depth(); z++){
-			for (int i = 0; i < world.width() * world.height() / 50; i++){
+		factory.randomPotion(0);
+		factory.randomPotion(0);
+		factory.randomPotion(0);
+		factory.randomPotion(0);
+		factory.randomPotion(0);
+		factory.randomPotion(0);
+		for (int z = 1; z < world.depth(); z++){
+			for (int i = 0; i < world.width(z) * world.height(z) / 50; i++){
 				factory.newRock(z);
 			}
 
@@ -81,9 +97,9 @@ public class PlayScreen implements Screen {
 					.build();
 	}
 	
-	public int getScrollX() { return Math.max(0, Math.min(player.x - screenWidth / 2, world.width() - screenWidth)); }
+	public int getScrollX() { return Math.max(0, Math.min(player.x - screenWidth / 2, world.width(player.z) - screenWidth)); }
 	
-	public int getScrollY() { return Math.max(0, Math.min(player.y - screenHeight / 2, world.height() - screenHeight)); }
+	public int getScrollY() { return Math.max(0, Math.min(player.y - screenHeight / 2, world.height(player.z) - screenHeight)); }
 	
 	@Override
 	public void displayOutput(AsciiPanel terminal) {
@@ -96,8 +112,8 @@ public class PlayScreen implements Screen {
 		String stats = String.format(" %3d/%3d hp", player.hp(), player.totalMaxHp());
 		terminal.write(stats, 1, 23);
 		
-		if (subscreen != null)
-			subscreen.displayOutput(terminal);
+		if (subscreen() != null)
+			subscreen().displayOutput(terminal);
 	}
 	
 	private List<String> checkDuplicateMessages(List<String> messages){
@@ -116,13 +132,13 @@ public class PlayScreen implements Screen {
 			}
 		}
 		
-		int top = screenHeight - messages.size();
+		int top = screenHeight - messages.size() - 1;
 		
 		for (int i = 0; i < messages.size(); i++){
 			String nTildeFix = messages.get(i).replace('ñ', (char)164).replace('Ñ', (char)165);
 			terminal.writeCenter(nTildeFix, top + i);
 		}
-		if (subscreen == null)
+		if (subscreen() == null)
 			messages.clear();
 	}
 	
@@ -157,10 +173,17 @@ public class PlayScreen implements Screen {
 		}
 	}
 	
+	public static String replaceNTilde(String text){
+		return text.replace('ñ', (char)164).replace('Ñ', (char)165);
+	}
+	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
-		if (subscreen != null) {
-			subscreen = subscreen.respondToUserInput(key);
+		if (subscreen() != null) {
+			if(player.subscreen != null)
+				player.subscreen = subscreen().respondToUserInput(key);
+			else
+				subscreen = subscreen().respondToUserInput(key);
 		} else {
 			switch (key.getKeyCode()){
 			case KeyEvent.VK_TAB:
@@ -203,7 +226,7 @@ public class PlayScreen implements Screen {
 			}
 		}
 		
-		if (subscreen == null){
+		if (subscreen() == null){
 			world.updateFloor(player.z);
 			player.addTime();
 		}
@@ -220,7 +243,7 @@ public class PlayScreen implements Screen {
 	
 	private Screen userExits(){
 		for (Item item : player.inventory().getItems()){
-			if (item != null && item.getName().equals("teddy bear"))
+			if (item != null && item.name().equals("teddy bear"))
 				return new WinScreen();
 		}
 		player.modifyHp(0, "Died while cowardly fleeing the caves.");

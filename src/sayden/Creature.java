@@ -6,6 +6,7 @@ import java.util.List;
 
 import asciiPanel.AsciiPanel;
 import sayden.ai.CreatureAi;
+import sayden.screens.Screen;
 
 public class Creature extends Thing{
 	private World world;
@@ -193,6 +194,10 @@ public class Creature extends Thing{
 	private String causeOfDeath;
 	public String causeOfDeath() { return causeOfDeath; }
 	
+	private List<String> learNames;
+	
+	public Screen subscreen;
+	
 	public Creature(World world, char glyph, char gender, Color color, String name, int maxHp){
 		super();
 		this.movementSpeed = Speed.NORMAL;
@@ -206,7 +211,7 @@ public class Creature extends Thing{
 		this.maxHp = maxHp;
 		this.hp = maxHp;
 		this.blood = maxHp * 10;
-		this.visionRadius = 9;
+		this.visionRadius = 6;
 		this.name = name;
 		this.inventory = new Inventory(20);
 		this.regenHpPer1000 = 10;
@@ -215,6 +220,7 @@ public class Creature extends Thing{
 		this.defenseValues = new ArrayList<DamageType>();
 		this.defenseValues.addAll(DamageType.ALL_TYPES());
 		this.effects = new ArrayList<Effect>();
+		this.learNames = new ArrayList<String>();
 	}
 	
 	public void moveBy(int mx, int my, int mz){
@@ -228,6 +234,15 @@ public class Creature extends Thing{
 		}
 		
 		Tile tile = world.tile(x+mx, y+my, z+mz);
+		
+		if(world.tile(x, y, z) == Tile.DOOR_OPEN){
+			open(x, y, z);
+		}
+		
+		if(world.fire(x+mx, y+my, z+mz) > 0){
+			modifyHp(-(int)world.fire(x+mx, y+my, z+mz) / 10, "Incinerado");
+			notify("Estas siendo consumido por las llamas!");
+		}
 		
 		if (mz == -1){
 			if (tile == Tile.STAIRS_DOWN) {
@@ -278,7 +293,7 @@ public class Creature extends Thing{
 			doAction("arroja %s", thrown.nameUnUna());
 		}
 		
-		world.add(new Projectile(world, new Line(this.x, this.y, x, y), 
+		world.add(new Projectile(world, z, new Line(this.x, this.y, x, y), 
 				thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
 	}
 	
@@ -362,7 +377,7 @@ public class Creature extends Thing{
 		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
 		
 		other.modifyBlood(-drained_blood);
-		world.fillTile(other.x, other.y, other.z, drained_blood, Constants.BLOOD_FLUID);
+		world.propagate(other.x, other.y, other.z, drained_blood, Constants.BLOOD_FLUID);
 	}
 
 	public void modifyHp(int amount, String causeOfDeath) { 
@@ -396,6 +411,10 @@ public class Creature extends Thing{
 	public void dig(int wx, int wy, int wz) {
 		world.dig(wx, wy, wz);
 		doAction("derrumba la pared");
+	}
+	
+	public void open(int wx, int wy, int wz) {
+		world.open(wx, wy, wz);
 	}
 	
 	public void update(){
@@ -444,7 +463,7 @@ public class Creature extends Thing{
 	public void doAction(String message, Object ... params){
 		for (Creature other : getCreaturesWhoSeeMe()){
 			if (other == this){
-				other.notify(makeSecondPerson(message + "."), params);
+				other.notify(makeSecondPerson(message)+ ".", params);
 			} else {
 				other.notify(String.format("%s %s.", capitalize(nameElLa()), message, false), params);
 			}
@@ -457,9 +476,9 @@ public class Creature extends Thing{
 		
 		for (Creature other : getCreaturesWhoSeeMe()){
 			if (other == this){
-				other.notify(makeSecondPerson(message + "."), params);
+				other.notify("Te " + makeSecondPerson(message).toLowerCase()+ ".", params);
 			} else {
-				other.notify(String.format("%s %s.", capitalize(nameElLa()), message, false), params);
+				other.notify(String.format("%s se %s.", capitalize(nameElLa()), message, false), params);
 			}
 			other.learnName(item);
 		}
@@ -564,7 +583,6 @@ public class Creature extends Thing{
 	
 	public void eat(Item item){
 		doAction("consume " + item.nameElLa());
-		addEffect(item.consumeEffect());
 		consume(item);
 	}
 	
@@ -622,6 +640,9 @@ public class Creature extends Thing{
 				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLa());
 				return;
 			} else {
+				if(learNames.contains(item.name)){
+					item.description = null;
+				}
 				world.remove(item);
 				inventory.add(item);
 			}
@@ -666,7 +687,11 @@ public class Creature extends Thing{
 			unequip(shield, true);
 			doAction("alza " + item.nameUnUna());
 			shield = item;
+		}else{
+			return;
 		}
+		
+		learnName(item);
 	}
 	
 	public Item item(int wx, int wy, int wz) {
@@ -690,20 +715,21 @@ public class Creature extends Thing{
 	public void castSpell(Spell spell, int x2, int y2) {
 		Creature other = creature(x2, y2, z);
 		
-		/*if (spell.manaCost() > mana){
-			doAction("murmura a la nada");
-			return;
-		} else if (other == null) {
-			doAction("point and mumble at nothing");
-			return;
-		}*/
+		spell.effect().start(x2, y2, z);
 		
+		if(other == null)
+			return;
+		System.out.println("Encontro criatura");
 		other.addEffect(spell.effect());
 		//modifyMana(-spell.manaCost());
 	}
-	
+
 	public void learnName(Item item){
-		notify(capitalize(item.appearanceElLa()) + " es realmente " + item.nameUnUna() + "!");
-		ai.setName(item, item.getName());
+		if(item.appearance != null){
+			if(item.name != item.appearance){	notify(capitalize(item.appearance) + " es realmente " + item.realNameUnUna() + "!"); }
+			item.appearance = null;
+			if(isPlayer())
+				learNames.add(item.name);
+		}
 	}
 }

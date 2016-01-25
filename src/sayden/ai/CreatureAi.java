@@ -1,9 +1,6 @@
 package sayden.ai;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
@@ -16,17 +13,15 @@ import sayden.Tile;
 public class CreatureAi {
 	private String weakSpot;
 	protected Creature creature;
-	private Map<String, String> itemNames;
+	
+	private Point checkPoint;
+	public Point checkPoint() { return checkPoint; }
+	public void setCheckPoint(Point p) { this.checkPoint = p; }
 	
 	public CreatureAi(Creature creature){
 		this.creature = creature;
 		this.creature.setCreatureAi(this);
-		this.itemNames = new HashMap<String, String>();
 		this.weakSpot = Constants.NO_POS;
-	}
-	
-	public void setName(Item item, String name){
-		itemNames.put(item.getName(), name);
 	}
 	
 	public void setWeakSpot(String position){
@@ -82,6 +77,8 @@ public class CreatureAi {
 		}
 		creature.meleeAttack(other);
 	}
+	
+	public void onTalk(Creature other) { }
 	
 	public void onUpdate(){
 		if(creature.queAttack() != null && 

@@ -10,6 +10,7 @@ public class Projectile {
 	private int step = 0;
 	
 	protected World world;
+	protected Point start;
 	protected Line path;
 	protected Speed speed;
 	
@@ -25,13 +26,15 @@ public class Projectile {
 	private boolean isDone = false;
 	public boolean isDone() { return isDone || this.step >= path.getPoints().size(); }
 	
-	public Projectile(World world, Line line, Speed velocity, Item projectile, Creature creature){
+	public Projectile(World world, int depth, Line line, Speed velocity, Item projectile, Creature creature){
 		this.world = world;
 		this.path = line;
 		this.speed = velocity;
 		this.projectile = projectile;
 		this.actionPoints += speed.velocity();
 		this.origin = creature;
+		this.start = creature.position();
+		this.z = depth;
 		step++;
 	}
 	
@@ -79,14 +82,18 @@ public class Projectile {
 				totalDamage += Math.max(0, (projectile.attackValue(d) - target.defenseValue(d)));
 			}
 			
+			totalDamage = Math.max(1, totalDamage);	//Always deals at least 1 damage (ignores shields?)
+			
 			target.doAction("recibe el impacto de %s por %s", projectile.nameUnUna(), totalDamage+"!");
 	
-			if(projectile.quaffEffect() != null){
+			if(projectile.quaffEffect() != null && projectile.quaffEffect().quaffable){
 				target.addEffect(projectile.quaffEffect());
+				projectile.quaffEffect().start(x, y, z);
 			}else{
 				world.addAtEmptySpace(projectile, x, y, z);
 			}
 			
+			target.ai().setCheckPoint(start);
 			target.modifyHp(-totalDamage, "Impactado por " + name);
 		}else{
 			world.addAtEmptySpace(projectile, x, y, z);

@@ -31,7 +31,7 @@ public class RockBugAi extends CreatureAi {
 
 	public void onDecease(Item corpse){
 		corpse.unsetData(Constants.CHECK_CORPSE);
-		corpse.setConsumeEffect(new Effect(7){
+		corpse.setQuaffEffect(new Effect(7, false){
 			public void start(Creature creature){
 				creature.notify("Las viceras del comepiedras saben horripilante!");
 				creature.modifyHp(-3, "Indigestion de carne de comepiedra");
@@ -49,7 +49,7 @@ public class RockBugAi extends CreatureAi {
 		}else{
 			Item rockCheck = creature.item(creature.x, creature.y, creature.z);
 			
-			if(rockCheck != null && rockCheck.getName().equals("roca")){
+			if(rockCheck != null && rockCheck.name().equals("roca")){
 				creature.pickup();
 				creature.doAction("consume la roca recuperando fuerzas");
 				creature.modifyHp(healthBonus, "Indigestion rocosa");

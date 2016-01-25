@@ -18,7 +18,7 @@ public class MarauderAi extends CreatureAi {
 	}
 	
 	public void onDecease(Item corpse){
-		corpse.setConsumeEffect(new Effect(6){
+		corpse.setQuaffEffect(new Effect(6, false){
 			public void start(Creature creature){
 				creature.notify("El cadaver del merodeador esta empapado de veneno!");
 			}

@@ -2,6 +2,7 @@ package sayden;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import asciiPanel.AsciiPanel;
@@ -10,15 +11,15 @@ public class World {
 	private Tile[][][] tiles;
 	private Item[][][] items;
 	private float[][][] blood;
-	//private float[][][] water;	//TODO: Implement water
+	private float[][][] fire;
 	
 	private boolean[][][] visited;
 	
-	private int width;
-	public int width() { return width; }
+	private int[] width;
+	public int width(int z) { return width[z]; }
 	
-	private int height;
-	public int height() { return height; }
+	private int[] height;
+	public int height(int z) { return height[z]; }
 
 	private int depth;
 	public int depth() { return depth; }
@@ -26,17 +27,41 @@ public class World {
 	private List<Creature> creatures;
 	private List<Projectile> projectiles;
 	
+	public float fire(int x, int y, int z) { return fire[x][y][z]; }
+	
 	public World(Tile[][][] tiles){
 		this.tiles = tiles;
-		this.width = tiles.length;
-		this.height = tiles[0].length;
 		this.depth = tiles[0][0].length;
+		this.width = new int[depth];
+		this.height = new int[depth];
+
+		Arrays.fill(width, tiles.length);
+		Arrays.fill(height, tiles[0].length);
+		
 		this.creatures = new ArrayList<Creature>();
 		this.projectiles = new ArrayList<Projectile>();
-		this.items = new Item[width][height][depth];
-		this.blood = new float[width][height][depth];
-		this.visited = new boolean[width][height][depth];
-		//this.water = new float[width][height][depth];
+		
+		this.items = new Item[tiles.length][tiles[0].length][depth];
+		this.blood = new float[tiles.length][tiles[0].length][depth];
+		this.fire = new float[tiles.length][tiles[0].length][depth];
+		this.visited = new boolean[tiles.length][tiles[0].length][depth];
+	}
+	
+	public void overrideFloor(int z, World newWorld){
+		int maxHeight = Math.max(height[z], newWorld.height(z));
+		int maxWidth = Math.max(width[z], newWorld.width(z));
+		
+		width[z] = newWorld.width(z);
+		height[z] = newWorld.height(z);
+		
+		for(int y = 0; y < maxHeight; y++){
+			for(int x = 0; x < maxWidth; x++){
+				tiles[x][y][z] = newWorld.tile(x, y, z);
+				if(tiles[x][y][z] == Tile.STAIRS_DOWN){
+					tiles[x][y][z+1] = Tile.STAIRS_UP;
+				}
+			}
+		}
 	}
 
 	public void modifyActionPoints(int amount){
@@ -67,18 +92,21 @@ public class World {
 	}
 	
 	public boolean isOutBounds(int x, int y, int z){
-		return (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth);
+		return (x < 0 || x >= width[z] || y < 0 || y >= height[z] || z < 0 || z >= depth);
 	}
 	
 	public Tile tile(int x, int y, int z){
-		if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth)
+		if (x < 0 || x >= width[z] || y < 0 || y >= height[z] || z < 0 || z >= depth)
 			return Tile.BOUNDS;
 		else
 			return tiles[x][y][z];
 	}
 	
-	public void fillTile(int x, int y, int z, float amount, String fluidType){
+	public void propagate(int x, int y, int z, float amount, String fluidType){
 		Point tile = new Point(x,y,z);
+		
+		if(x > width(z) || x < 0 || y > height(z) || y < 0)
+			return;
 		
 		//Blood is additive, when a tile is about to be filled with more blood than it
 		//can sustain its spread to adjacent tiles
@@ -93,11 +121,31 @@ public class World {
 					if(blood[t.x][t.y][t.z] <= 100f){
 						blood[t.x][t.y][t.z] += amount;
 						if(blood[t.x][t.y][t.z] > 100f){
-							fillTile(x,y,z, blood[t.x][t.y][t.z] - 100f, fluidType);
-							blood[t.x][t.y][t.z] = 100f;
+							propagate(x,y,z, blood[t.x][t.y][t.z] - 100f, fluidType);
+							blood[x][y][z] = 100f;
 						}
 						return;
 					}
+				}
+			}
+		}else if(fluidType == Constants.FIRE_TERRAIN){
+			amount -= tiles[x][y][z].fireResistance();
+			amount = Math.max(amount, 0);			
+			
+			fire[x][y][z] += amount;
+			
+			if(fire[x][y][z] > 100f){
+				tiles[x][y][z] = Tile.BURNT_FLOOR;
+				for(Point t : tile.neighbors4()){
+					if(isOutBounds(t.x, t.y, t.z)){
+						continue;
+					}
+					if(fire[t.x][t.y][t.z] > 0)
+						continue;
+					
+					fire[t.x][t.y][t.z] += (fire[x][y][z] - 100);
+					//fire[x][y][z] -= (fire[x][y][z] - 100);
+					return;
 				}
 			}
 		}
@@ -109,6 +157,9 @@ public class World {
 		
 		if(projectile != null)
 			return projectile.projectile().glyph();
+		
+		if(fire[x][y][z] > 0)
+			return (char)30;
 		
 		if (creature != null)
 			return creature.glyph();
@@ -129,6 +180,9 @@ public class World {
 		if (creature != null)
 			return creature.color();
 		
+		if(fire[x][y][z] > 0)
+			return Tile.getFire().color();
+		
 		if (item(x,y,z) != null)
 			return item(x,y,z).color();
 		
@@ -137,14 +191,15 @@ public class World {
 	
 	public Color backgroundColor(int x, int y, int z){
 		float bloodAmount = blood[x][y][z];
+		
 		Projectile projectile = projectile(x, y, z);
 		
 		if(projectile != null)
 			return AsciiPanel.cyan;
 			
-		if (x < 0 || x >= width || y < 0 || y >= height || z < 0 || z >= depth)
+		if (x < 0 || x >= width[z] || y < 0 || y >= height[z] || z < 0 || z >= depth)
 			return Tile.BOUNDS.backgroundColor();
-					
+		
 		if(bloodAmount > 0f){
 			return new Color(Math.min((bloodAmount / 100f), 1f),0,0);
 		}
@@ -157,13 +212,18 @@ public class World {
 			tiles[x][y][z] = Tile.FLOOR;
 	}
 	
+	public void open(int x, int y, int z) {
+		if (tile(x, y, z).isDoor())
+			tiles[x][y][z] = tile(x, y, z) == Tile.DOOR_OPEN ? Tile.DOOR_CLOSE : Tile.DOOR_OPEN;
+	}
+	
 	public void addAtEmptyLocation(Creature creature, int z){
 		int x;
 		int y;
 		
 		do {
-			x = (int)(Math.random() * width);
-			y = (int)(Math.random() * height);
+			x = (int)(Math.random() * width[z]);
+			y = (int)(Math.random() * height[z]);
 		} 
 		while (!tile(x,y,z).isGround() || creature(x,y,z) != null);
 		
@@ -198,10 +258,22 @@ public class World {
 		
 		updateProjectiles();
 		
-		for (int x = 0; x < width; x++){
-			for (int y = 0; y < height; y++){
+		for (int x = 0; x < width[z]; x++){
+			for (int y = 0; y < height[z]; y++){
 				if(blood[x][y][z] > Constants.MIN_FLUID_AMOUNT)
 					blood[x][y][z] -= 1f;
+			}	
+		}
+		for (int x = 0; x < width[z]; x++){
+			for (int y = 0; y < height[z]; y++){
+				if(fire[x][y][z] > 0)
+					fire[x][y][z] -= Constants.FIRE_DEGRADATION;
+				if(fire[x][y][z] > 80){
+					propagate(x, y, z, 30, Constants.FIRE_TERRAIN);
+					fire[x][y][z] -= Constants.FIRE_DEGRADATION;
+				}
+				if(fire[x][y][z] > 100 && tiles[x][y][z].fireResistance() < 100)
+					tiles[x][y][z] = Tile.BURNT_FLOOR;
 			}	
 		}	
 	}
@@ -211,9 +283,9 @@ public class World {
 	}
 	
 	public void remove(Item item) {
-		for (int x = 0; x < width; x++){
-			for (int y = 0; y < height; y++){
-				for (int z = 0; z < depth; z++){
+		for (int z = 0; z < depth; z++){
+			for (int x = 0; x < width[z]; x++){
+				for (int y = 0; y < height[z]; y++){
 					if (items[x][y][z] == item) {
 						items[x][y][z] = null;
 						return;
@@ -224,7 +296,7 @@ public class World {
 	}
 	
 	public Item item(int x, int y, int z){
-		if(x < 0 || y < 0 || x >= width || y >= height)
+		if(x < 0 || y < 0 || x >= width[z] || y >= height[z])
 			return null;
 		return items[x][y][z];
 	}
@@ -238,8 +310,8 @@ public class World {
 		}
 		
 		do {
-			x = (int)(Math.random() * width);
-			y = (int)(Math.random() * height);
+			x = (int)(Math.random() * width[depth]);
+			y = (int)(Math.random() * height[depth]);
 		} 
 		while (!tile(x,y,depth).isGround() || item(x,y,depth) != null);
 		
@@ -267,6 +339,7 @@ public class World {
 			
 			if (!tile(p.x, p.y, p.z).isGround())
 				continue;
+			
 			if (creature(p.x, p.y, p.z) == null){
 				creature.x = p.x;
 				creature.y = p.y;
@@ -319,14 +392,19 @@ public class World {
 		creatures.add(pet);
 	}
 	
+	public void add(List<Creature> pets) {
+		creatures.addAll(pets);
+	}
+	
 	public void add(Projectile missile) {
 		projectiles.add(missile);
 	}
-
+	
 	public float getCost(Creature mover, int sx, int sy, int tx, int ty) {
 		//We can change the cost of moving to different tiles
 		return 1;
 	}
+	
 	public void pathFinderVisited(int x, int y, int z) {
 		visited[x][y][z] = true;
 	}

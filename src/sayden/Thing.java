@@ -4,19 +4,17 @@ import java.util.HashMap;
 
 public class Thing {
 	protected String name;
-	public String name() { return appearance == null ? name : appearance; }
-	public String nameWStacks() { return name + (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
-	public String getName() { return appearance == null ? nameWStacks() : appearanceWStacks(); }
-	public String nameElLa(){ return gender == 'M' ? "el " + getName() : "la " + getName(); }
-	public String nameDelDeLa(){ return gender == 'M' ? "del " + getName() : "de la " + getName(); }
-	public String nameAlALa(){ return gender == 'M' ? "al " + getName() : "a la " + getName(); }
-	public String nameUnUna(){ return gender == 'M' ? "un " + getName() : "una " + getName(); }
-	
 	protected String appearance = null;
-	public String appearanceWStacks() { return appearance + (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
-	public String appearanceElLa(){ return gender == 'M' ? "el " + appearance : "la " + appearance; }
-	public String appearanceAlALa(){ return gender == 'M' ? "al " + appearance : "a la " + appearance; }
-	public String appearanceUnUna(){ return gender == 'M' ? "un " + appearance : "una " + appearance; }
+	protected String description = null;
+	public String name() { return (appearance == null || appearance == name ? name : appearance)
+			+ (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
+	public String nameElLa(){ return gender == 'M' ? "el " + name() : "la " + name(); }
+	public String nameDelDeLa(){ return gender == 'M' ? "del " + name() : "de la " + name(); }
+	public String nameAlALa(){ return gender == 'M' ? "al " + name() : "a la " + name(); }
+	public String nameUnUna(){ return gender == 'M' ? "un " + name() : "una " + name(); }
+	public String realNameUnUna() { return gender == 'M' ? "un " + name : "una " + name; }
+	
+	public boolean isIdentified() { return appearance == null || appearance == name; }
 	
 	protected int stacks = 1;
 	protected int maxStacks = 0;

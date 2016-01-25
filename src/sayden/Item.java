@@ -14,7 +14,7 @@ public class Item extends Thing{
 	public void modifyBloodModifyer(float amount) { this.bloodModifyer += amount; }
 	
 	private Color color;
-	public Color color() { return color; }
+	public Color color() { return appearance != null && appearance != name  && name.indexOf("pocion") == -1 ? Constants.UNIDENTIFIED_COLOR : color; }
 
 	private int bonusMaxHp;
 	public int bonusMaxHp() { return bonusMaxHp; }
@@ -70,10 +70,6 @@ public class Item extends Thing{
 	public Effect quaffEffect() { return quaffEffect; }
 	public void setQuaffEffect(Effect effect) { this.quaffEffect = effect; }
 	
-	private Effect consumeEffect;
-	public Effect consumeEffect() { return consumeEffect; }
-	public void setConsumeEffect(Effect effect) { this.consumeEffect = effect; }
-	
 	private List<Spell> writtenSpells;
 	public List<Spell> writtenSpells() { return writtenSpells; }
 	
@@ -85,9 +81,17 @@ public class Item extends Thing{
 	public Speed movementSpeed() { return movementSpeed; }
 	public void modifyMovementSpeed(Speed speed) { this.movementSpeed = speed; } 
 	
-	public void addWrittenSpell(String name, int manaCost, Effect effect){
-		writtenSpells.add(new Spell(name, manaCost, effect));
+	public Spell addWrittenSpell(String name, int manaCost, Effect effect){
+		Spell spell = new Spell(name, manaCost, effect);
+		writtenSpells.add(spell);
+		return spell;
 	}
+	
+	public boolean equippable() { return
+			getBooleanData(Constants.CHECK_ARMOR) ||
+			getBooleanData(Constants.CHECK_SHIELD) ||
+			getBooleanData(Constants.CHECK_WEAPON) ||
+			getBooleanData(Constants.CHECK_HELMENT);}
 	
 	public Item(char glyph, char gender, Color color, String name, String appearance){
 		super();
@@ -121,14 +125,18 @@ public class Item extends Thing{
 		this.stacks = 1;
 		setAllData(clone.getAllData());
 	}
-	
+
 	public String details() {
 		String details = "";
 		
 		details += nameUnUna() + ".";
 		details = details.substring(0, 1).toUpperCase()
 				+ details.substring(1);
-
+		
+		if(isIdentified()){
+			details += description == null ? "" : " " + description;
+		}
+		
 		if(getBooleanData(Constants.CHECK_ARMOR)){
 			details += " Puede ser usado de armadura.";
 		}
@@ -142,10 +150,9 @@ public class Item extends Thing{
 			details += " Puede ser usado como arma.";
 		}
 		if(stackable()){
-			details += " Puede acumularse hasta "+maxStacks+" veces.";
+			details += " Puede acumularse "+maxStacks+" veces.";
 		}
 		
-		
-		return details;
+		return details.replace('ñ', (char)164).replace('Ñ', (char)165);
 	}
 }

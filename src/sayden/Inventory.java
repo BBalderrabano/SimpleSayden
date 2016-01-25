@@ -16,10 +16,9 @@ public class Inventory {
 			for (int i = 0; i < items.length; i++){
 				if (items[i] != null && items[i].name().equals(item.name() ) && !items[i].stacked()){
 					items[i].modifyStacks(item.stacks);
-					break;
+					return;
 				}
 			}
-			return;
 		}
 		for (int i = 0; i < items.length; i++){
 			if (items[i] == null){

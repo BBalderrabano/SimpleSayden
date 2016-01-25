@@ -16,12 +16,12 @@ public class FieldOfView {
 	
 	public FieldOfView(World world){
 		this.world = world;
-		this.visible = new boolean[world.width()][world.height()];
-		this.tiles = new Tile[world.width()][world.height()][world.depth()];
+		this.visible = new boolean[100][100];
+		this.tiles = new Tile[100][100][world.depth()];
 		
-		for (int x = 0; x < world.width(); x++){
-			for (int y = 0; y < world.height(); y++){
-				for (int z = 0; z < world.depth(); z++){
+		for (int z = 0; z < world.depth(); z++){
+			for (int x = 0; x < world.width(z); x++){
+				for (int y = 0; y < world.height(z); y++){
 					tiles[x][y][z] = Tile.UNKNOWN;
 				}
 			}
@@ -30,14 +30,14 @@ public class FieldOfView {
 	
 	public void update(int wx, int wy, int wz, int r){
 		depth = wz;
-		visible = new boolean[world.width()][world.height()];
+		visible = new boolean[world.width(wz)][world.height(wz)];
 		
 		for (int x = -r; x < r; x++){
 			for (int y = -r; y < r; y++){
 				if (x*x + y*y > r*r)
 					continue;
 				
-				if (wx + x < 0 || wx + x >= world.width() || wy + y < 0 || wy + y >= world.height())
+				if (wx + x < 0 || wx + x >= world.width(wz) || wy + y < 0 || wy + y >= world.height(wz))
 					continue;
 				
 				for (Point p : new Line(wx, wy, wx + x, wy + y)){

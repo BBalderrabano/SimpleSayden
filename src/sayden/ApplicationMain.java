@@ -14,9 +14,11 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	private AsciiPanel terminal;
 	private Screen screen;
 	
+	private long lastPressProcessed = 0;
+	
 	public ApplicationMain(){
 		super();
-		terminal = new AsciiPanel();
+		terminal = new AsciiPanel(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
 		add(terminal);
 		pack();
 		screen = new StartScreen();
@@ -33,16 +35,20 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	}
 
 	@Override
-	public void keyReleased(KeyEvent e) {
-		screen = screen.respondToUserInput(e);
-		repaint();
+	public void keyReleased(KeyEvent e) {}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		//Limit press event to 25 mls
+		if(System.currentTimeMillis() - lastPressProcessed > 25) {
+			screen = screen.respondToUserInput(e);
+			repaint();
+            lastPressProcessed = System.currentTimeMillis();
+        }    
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) { }
-
-	@Override
-	public void keyTyped(KeyEvent e) { }
+	public void keyTyped(KeyEvent e) {}
 	
 	public static void main(String[] args) {
 		ApplicationMain app = new ApplicationMain();

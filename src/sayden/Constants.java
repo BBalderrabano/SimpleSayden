@@ -1,6 +1,12 @@
 package sayden;
 
+import java.awt.Color;
+import asciiPanel.AsciiPanel;
+
 public class Constants {
+	public static final int WORLD_WIDTH = 80;
+	public static final int WORLD_HEIGHT = 24;
+	
 	public static final String CHEST_POS = "CHEST";
 	public static final String ARM_POS = "ARMS";
 	public static final String LEG_POS = "LEGS";
@@ -9,6 +15,8 @@ public class Constants {
 	
 	public static final String BLOOD_FLUID = "BLOOD";
 	public static final String WATER_FLUID = "WATER";
+	public static final String FIRE_TERRAIN = "FIRE";
+	public static final float FIRE_DEGRADATION = 10f;
 	public static final float MIN_FLUID_AMOUNT = 10f;
 	public static final float BLOOD_AMOUNT_MULTIPLIER = 10f;
 	
@@ -21,37 +29,9 @@ public class Constants {
 	public static final String CHECK_CORPSE = "IsCorpse";
 	public static final String CHECK_MARAUDER_DISGUISE = "IsMarauderDisguise";
 	
+	public static final Color UNIDENTIFIED_COLOR = AsciiPanel.magenta;
+	
 	public static final String RACE = "Race";
 	
 	public static final boolean DEBUG_MODE = false;
-	
-	public static String numberToText(int iNumero){
-		// Método que dado un número me lo devuelve en texto		
-		 switch(iNumero){
-			case 1:
-				return "uno";
-			case 2:
-				return "dos";
-			case 3:
-				return "tres";
-			case 4:
-				return "cuatro";
-			case 5:
-				return "cinco";
-			case 6:
-				return "seis";
-			case 7:
-				return "siete";
-			case 8:
-				return "ocho";
-			case 9:
-				return "nueve";
-			case 10:
-				return "diez";
-			case 0:
-				return "cero";
-			default:
-				return "";
-		 }
-	}
 }

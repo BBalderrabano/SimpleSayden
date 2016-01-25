@@ -40,7 +40,8 @@ public class MenuScreen extends InventoryBasedScreen {
 								"No dudes en reportar errores o sugerencias",
 								"Usa \"F\" para disparar armas de rango",
 								"Puedes esquivar ataques lentos",
-								"Cuenta cuantos ataques puedes efectuar antes de ser golpeado"
+								"Cuenta cuantos ataques puedes efectuar antes de ser golpeado",
+								"Tandil no tiene internet"
 								};
 	private String screenTip = "";
 	
@@ -57,7 +58,7 @@ public class MenuScreen extends InventoryBasedScreen {
 		//terminal.clear();		//Uncomment if you want to erase the game background
 		int x_offset_inventory = 1;
 		int y_offset_inventory = 2;
-		int width_inventory = 20;
+		int width_inventory = 21;
 		int height_inventory = 15;
 		
 		int x_offset_item = x_offset_inventory;
@@ -88,7 +89,6 @@ public class MenuScreen extends InventoryBasedScreen {
 	}
 	
 	private void drawTips(int offset_y, AsciiPanel terminal){
-		
 		terminal.writeCenter(screenTip, offset_y);
 	}
 	
@@ -357,13 +357,13 @@ public class MenuScreen extends InventoryBasedScreen {
 			terminal.write((char)202, offset_x + width, offset_y + height);
 			
 			//We draw the item name
-			int title_lenght = Math.min(interactingItem.getName().length(), width - 2);
-			String shorten_title = interactingItem.getName().substring(0, title_lenght);
+			int title_lenght = Math.min(interactingItem.name().length(), width - 2);
+			String shorten_title = interactingItem.name().substring(0, title_lenght);
 			terminal.write(shorten_title.toUpperCase(), offset_x + 1, offset_y);
 			
 			//We draw the item description
 			ArrayList<String> descripcion =
-					PlayScreen.splitPhraseByLimit(interactingItem.details(), width);
+					PlayScreen.splitPhraseByLimit(interactingItem.details(), width - 1);
 			
 			for(int i = 0; i < descripcion.size(); i++){
 				terminal.write(descripcion.get(i), offset_x + 1, offset_y + 1 + i);
@@ -401,8 +401,8 @@ public class MenuScreen extends InventoryBasedScreen {
 			
 			Item displayItem = player.inventory().get(s);	//We grab the item in the inventory
 			
-			int permitted_lenght = Math.min(displayItem.getName().length(), width - 4);		//We cant let the name go out of the box
-			String proccesed_line = displayItem.getName().substring(0, permitted_lenght);	//so we substring if necessary
+			int permitted_lenght = Math.min(displayItem.name().length(), width - 4);		//We cant let the name go out of the box
+			String proccesed_line = displayItem.name().substring(0, permitted_lenght);	//so we substring if necessary
 			
 			//If the list of items is bigger than the inside box stop drawing and add indicators
 			if(itemIndex > inventoryDisplay){

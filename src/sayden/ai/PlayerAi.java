@@ -32,7 +32,10 @@ public class PlayerAi extends CreatureAi {
 				creature.notify("Hay " + item.nameUnUna() + " aqui.");
 		} else if (tile.isDiggable()) {
 			creature.dig(x, y, z);
+		} else if (tile.isDoor()) {
+			creature.open(x, y, z);
 		}
+		
 		creature.world().modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
@@ -40,6 +43,11 @@ public class PlayerAi extends CreatureAi {
 	}
 	
 	public void onAttack(int x, int y, int z, Creature other){
+		if(creature.getData("Race") == other.getData("Race")){
+			other.ai().onTalk(creature);
+			return;
+		}
+		
 		creature.world().modifyActionPoints(creature.getAttackSpeed().velocity());
 		creature.meleeAttack(other);
 	}
