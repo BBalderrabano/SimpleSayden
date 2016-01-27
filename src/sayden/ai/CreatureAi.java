@@ -60,7 +60,9 @@ public class CreatureAi {
 	}
 	
 	public void onAttack(int x, int y, int z, Creature other){
-		if(creature.getData("Race") == other.getData("Race"))
+		if(creature.getData("Race") == other.getData("Race") &&
+				!creature.getBooleanData(Constants.FLAG_ANGRY) &&
+				!other.getBooleanData(Constants.FLAG_ANGRY))
 			return;
 
 		if(creature.getActionPoints() < creature.getAttackSpeed().velocity() && !creature.isPlayer()){

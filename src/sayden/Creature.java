@@ -233,11 +233,10 @@ public class Creature extends Thing{
 			return;
 		}
 		
-		Tile tile = world.tile(x+mx, y+my, z+mz);
+		if(x+mx > world.width(z+mz) || x+mx < 0 || y+my < 0 || y+my > world.height(z+mz))
+			return;
 		
-		if(world.tile(x, y, z) == Tile.DOOR_OPEN){
-			open(x, y, z);
-		}
+		Tile tile = world.tile(x+mx, y+my, z+mz);
 		
 		if(world.fire(x+mx, y+my, z+mz) > 0){
 			modifyHp(-(int)world.fire(x+mx, y+my, z+mz) / 10, "Incinerado");
@@ -274,6 +273,10 @@ public class Creature extends Thing{
 			ai.onEnter(x+mx, y+my, z+mz, tile);
 		}else{
 			ai.onAttack(x+mx, y+my, z+mz, other);
+		}
+		
+		if(world.tile(x-mx, y-my, z-mz) == Tile.DOOR_OPEN){
+			open(x-mx, y-my, z-mz);
 		}
 	}
 

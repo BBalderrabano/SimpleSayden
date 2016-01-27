@@ -34,4 +34,6 @@ public class Constants {
 	public static final String RACE = "Race";
 	
 	public static final boolean DEBUG_MODE = false;
+	
+	public static final String FLAG_ANGRY = "IsAngry";
 }

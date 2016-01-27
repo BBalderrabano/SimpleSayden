@@ -1,6 +1,7 @@
 package sayden;
 
 public enum Speed {
+		PARALIZED(99999, "Inmovil"),
 		SUPER_SLOW(7, "Lentisimo"),
 		VERY_SLOW(6, "Muy lento"),
 		SLOW(5, "Lento"),
@@ -21,7 +22,7 @@ public enum Speed {
 			
 			if(returningSpeed <= 1){
 				return SUPER_FAST;
-			}else if(returningSpeed >= 5){
+			}else if(returningSpeed > 6){
 				return SUPER_SLOW;
 			}
 			

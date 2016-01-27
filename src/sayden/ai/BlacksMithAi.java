@@ -7,7 +7,7 @@ import sayden.Creature;
 import sayden.StuffFactory;
 import sayden.screens.TalkScreen;
 
-public class BlacksMithAi extends CreatureAi {
+public class BlacksMithAi extends HumanoidAi {
 	private Creature player;
 	private StuffFactory factory;
 	private ArrayList<String> messages;
@@ -19,7 +19,7 @@ public class BlacksMithAi extends CreatureAi {
 	private final String OPT_REJECT = "Rechazar el camino";
 	
 	public BlacksMithAi(Creature creature, Creature player, StuffFactory factory) {
-		super(creature);
+		super(creature, player);
 		this.player = player;
 		this.messages = new ArrayList<String>();
 		this.options = new ArrayList<String>();
@@ -29,6 +29,8 @@ public class BlacksMithAi extends CreatureAi {
 	}
 
 	public void onTalk(Creature other){
+		super.onTalk(other);
+		
 		if(creature.getBooleanData("Finished")){
 			return;
 		}
@@ -53,10 +55,13 @@ public class BlacksMithAi extends CreatureAi {
 
 					if(option.equals(OPT_ESPADA)){
 						player.pickup(factory.newShortSword(-1));
+						player.notify("Marcos te entrega una espada corta");
 					}else if(option.equals(OPT_MAZA)){
 						player.pickup(factory.newMace(-1));
+						player.notify("Marcos te entrega una maza");
 					}else if(option.equals(OPT_DAGA)){
 						player.pickup(factory.newDagger(-1));
+						player.notify("Marcos te entrega una daga");
 					}else{
 						creature.setData("Rejected", true);
 					}
@@ -86,6 +91,8 @@ public class BlacksMithAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
+		super.onUpdate();
+		
 		if(!canSee(player.x, player.y, player.z))
 			wander();
 	}

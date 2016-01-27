@@ -74,7 +74,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newBlacksmith(Creature player, int x, int y, int depth){
-		Creature blackSmith = new Creature(world, '8', 'M', AsciiPanel.brightBlue, "herrero Marcos", 50);
+		Creature blackSmith = new Creature(world, (char)234, 'M', AsciiPanel.brightBlue, "herrero Marcos", 50);
 		
 		blackSmith.setStartingMovementSpeed(Speed.NORMAL);
 		blackSmith.setStartingAttackSpeed(Speed.NORMAL);

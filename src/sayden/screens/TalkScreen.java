@@ -20,6 +20,8 @@ public class TalkScreen extends InventoryBasedScreen {
 	protected ArrayList<String> messages;
 	protected ArrayList<String> options;
 	
+	private boolean startAggression = false;
+	
 	public TalkScreen(Creature player, Creature npc, ArrayList<String> messages, ArrayList<String> options) {
 		super(player);
 		
@@ -44,8 +46,10 @@ public class TalkScreen extends InventoryBasedScreen {
 	
 	public void displayOutput(AsciiPanel terminal) {
 		int top = Constants.WORLD_HEIGHT - 3;
+		
 		String conversingText = "Conversando con " + npc.nameElLa() + " ";
 		String enterText = "ENTER";
+		String combatingText = "Presiona enter para iniciar combate";
 		
 		drawBox(0, 0, Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT, terminal);
 		
@@ -59,48 +63,59 @@ public class TalkScreen extends InventoryBasedScreen {
 		
 		terminal.write(conversingText, 2, 1);
 		
-		if(messages.isEmpty()){
-			if(!options.isEmpty()){
-				int x_offset = Constants.WORLD_WIDTH - getLargestOption() - 1;
-
-				String qNTildeFix = question.replace('ñ', (char)164).replace('Ñ', (char)165);
-				
-				terminal.writeCenter(qNTildeFix, top);
-				
-				for(int i = 0; i < options.size(); i++){
-					if(optionIndex == i){
-						terminal.write(options.get(i), x_offset, options.size() - i, AsciiPanel.cyan);
-						terminal.write("<<", terminal.getCursorX(), terminal.getCursorY());
-					}else{
-						terminal.write(options.get(i), x_offset, options.size() - i);
+		if(!startAggression){
+			if(messages.isEmpty()){
+				if(!options.isEmpty()){
+					int x_offset = Constants.WORLD_WIDTH - getLargestOption() - 1;
+	
+					String qNTildeFix = question.replace('ñ', (char)164).replace('Ñ', (char)165);
+					
+					terminal.writeCenter(qNTildeFix, top);
+					
+					for(int i = 0; i < options.size(); i++){
+						if(optionIndex == i){
+							terminal.write(options.get(i), x_offset, options.size() - i, AsciiPanel.cyan);
+							terminal.write("<<", terminal.getCursorX(), terminal.getCursorY());
+						}else{
+							terminal.write(options.get(i), x_offset, options.size() - i);
+						}
 					}
+					
+					terminal.write((char)203, x_offset - 1, 0);
+					for(int i = 0; i < options.size(); i++){
+						terminal.write(lateralBar, x_offset - 1, options.size() - i);}
+					for(int i = -1; i < Constants.WORLD_WIDTH - x_offset; i++){
+						terminal.write(topBar, x_offset + i, options.size() + 1);}
+					terminal.write((char)200, x_offset - 1, options.size() + 1);
+					terminal.write((char)185, Constants.WORLD_WIDTH - 1, options.size() + 1);
+					
+					int x_width = Constants.WORLD_WIDTH - x_offset;
+					x_width = Math.round(x_width * .5f);
+					x_width += (enterText.length() * .5f + 1);
+					
+					terminal.write(enterText, (int) (Constants.WORLD_WIDTH - x_width)
+							, options.size() + 1, AsciiPanel.cyan);
 				}
-				
-				terminal.write((char)203, x_offset - 1, 0);
-				for(int i = 0; i < options.size(); i++){
-					terminal.write(lateralBar, x_offset - 1, options.size() - i);}
-				for(int i = -1; i < Constants.WORLD_WIDTH - x_offset; i++){
-					terminal.write(topBar, x_offset + i, options.size() + 1);}
-				terminal.write((char)200, x_offset - 1, options.size() + 1);
-				terminal.write((char)185, Constants.WORLD_WIDTH - 1, options.size() + 1);
-				
-				int x_width = Constants.WORLD_WIDTH - x_offset;
-				x_width = Math.round(x_width * .5f);
-				x_width += (enterText.length() * .5f + 1);
-				
-				terminal.write(enterText, (int) (Constants.WORLD_WIDTH - x_width)
-						, options.size() + 1, AsciiPanel.cyan);
+				return;
 			}
-			return;
+			
+			ArrayList<String> trueMessages = splitPhraseByLimit(messages.get(0), Constants.WORLD_WIDTH - 1);
+			
+			for(int i = 0; i < trueMessages.size(); i++){
+				String nTildeFix = trueMessages.get(i).replace('ñ', (char)164).replace('Ñ', (char)165);
+				terminal.writeCenter(nTildeFix, top + i - (trueMessages.size() - 1));
+			}
+			messages.remove(0);
+		}else{
+			int x_width = Constants.WORLD_WIDTH;
+			x_width = Math.round(x_width * .5f);
+			x_width -= (combatingText.length() * .5f + 1);
+			
+			drawBox(x_width, 9, combatingText.length() + 1, 2, terminal);
+			
+			terminal.writeCenter(combatingText, 10, AsciiPanel.brightRed);
+			terminal.writeCenter("--"+enterText+"--", 12, AsciiPanel.brightRed);
 		}
-		
-		ArrayList<String> trueMessages = splitPhraseByLimit(messages.get(0), Constants.WORLD_WIDTH - 1);
-		
-		for(int i = 0; i < trueMessages.size(); i++){
-			String nTildeFix = trueMessages.get(i).replace('ñ', (char)164).replace('Ñ', (char)165);
-			terminal.writeCenter(nTildeFix, top + i - (trueMessages.size() - 1));
-		}
-		messages.remove(0);
 	}
 	
 	public static ArrayList<String> splitPhraseByLimit(String text, int limit){
@@ -161,6 +176,16 @@ public class TalkScreen extends InventoryBasedScreen {
 	}
 	
 	public Screen respondToUserInput(KeyEvent key) {
+		if(key.getKeyCode() == KeyEvent.VK_TAB){
+			startAggression = !startAggression;
+			return this;
+		}
+		
+		if (key.getKeyCode() == KeyEvent.VK_ENTER && startAggression){
+		 	npc.setData(Constants.FLAG_ANGRY, true);
+		 	return null;
+		}
+		
 		if(options != null){
 			if(!options.isEmpty() && messages.isEmpty()){
 				 if (key.getKeyCode() == KeyEvent.VK_UP || key.getKeyCode() == KeyEvent.VK_W){
