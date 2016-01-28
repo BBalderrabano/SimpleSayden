@@ -27,6 +27,8 @@ public class PlayScreen implements Screen {
 	private Screen subscreen;
 	public Screen subscreen(){ return player != null && player.subscreen != null ? player.subscreen : subscreen; }
 	
+	private boolean simulatingWorld = false;
+	
 	public PlayScreen(){
 		MapLoader ml = new MapLoader();
 		
@@ -47,7 +49,7 @@ public class PlayScreen implements Screen {
 	private void createCreatures(StuffFactory factory){
 		player = factory.newPlayer(messages, fov);
 		
-		factory.newBlacksmith(player, 34, 3, 0);
+//		factory.newBlacksmith(player, 34, 3, 0);
 		
 		for (int z = 1; z < world.depth(); z++){
 			for (int i = 0; i < 15; i++){
@@ -111,6 +113,11 @@ public class PlayScreen implements Screen {
 		
 		String stats = String.format(" %3d/%3d hp", player.hp(), player.totalMaxHp());
 		terminal.write(stats, 1, 23);
+		
+		if(simulatingWorld){
+			terminal.writeCenter("TIEMPO SIMULADO", 2);
+			simulatingWorld = false;
+		}
 		
 		if (subscreen() != null)
 			subscreen().displayOutput(terminal);
@@ -220,15 +227,14 @@ public class PlayScreen implements Screen {
 				if (userIsTryingToExit())
 					return userExits();
 				else
-					player.moveBy( 0, 0, -1); break;
-			case '>': player.moveBy( 0, 0, 1); break;
+					simulatingWorld = true; player.moveBy( 0, 0, -1); break;
+			case '>': simulatingWorld = true; player.moveBy( 0, 0, 1); break;
 			case '?': subscreen = new HelpScreen(); break;
 			}
 		}
-		
+
 		if (subscreen() == null){
 			world.updateFloor(player.z);
-			player.addTime();
 		}
 		
 		if (player.hp() < 1)

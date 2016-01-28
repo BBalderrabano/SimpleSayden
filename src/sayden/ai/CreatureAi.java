@@ -54,8 +54,6 @@ public class CreatureAi {
 			creature.x = x;
 			creature.y = y;
 			creature.z = z;
-		} else {
-			creature.doAction("bump into a wall");
 		}
 	}
 	
@@ -190,22 +188,12 @@ public class CreatureAi {
 		
 		int mx = points.get(0).x - creature.x;
 		int my = points.get(0).y - creature.y;
-		
-		if(mx != 0 && my != 0){	//Elimina combate en diagonal
-			int x_distance = Math.abs(creature.x - target.x);
-			int y_distance = Math.abs(creature.y - target.y);
+		int x_distance = Math.abs(creature.x - target.x);
+		int y_distance = Math.abs(creature.y - target.y);
 			
-			if(canMove(mx, 0) && x_distance > y_distance)
-				my = 0;
-			else if(canMove(0, my) && y_distance >= x_distance)
-				mx = 0;
-			else if(Math.random() > .5f)
-				mx = 0;
-			else
-				my = 0;
-		}
+		Point no_diagonal = eliminateDiagonal(mx, my, x_distance, y_distance);
 		
-		creature.moveBy(-mx, -my, 0);
+		creature.moveBy(-no_diagonal.x, -no_diagonal.y, 0);
 	}
 	
 	
@@ -217,22 +205,12 @@ public class CreatureAi {
 		
 		int mx = points.get(0).x - creature.x;
 		int my = points.get(0).y - creature.y;
+		int x_distance = Math.abs(creature.x - target.x);
+		int y_distance = Math.abs(creature.y - target.y);
 		
-		if(mx != 0 && my != 0){	//Elimina combate en diagonal
-			int x_distance = Math.abs(creature.x - target.x);
-			int y_distance = Math.abs(creature.y - target.y);
-			
-			if(canMove(mx, 0) && x_distance > y_distance)
-				my = 0;
-			else if(canMove(0, my) && y_distance >= x_distance)
-				mx = 0;
-			else if(Math.random() > .5f)
-				mx = 0;
-			else
-				my = 0;
-		}
+		Point no_diagonal = eliminateDiagonal(mx, my, x_distance, y_distance);
 		
-		creature.moveBy(mx, my, 0);
+		creature.moveBy(no_diagonal.x, no_diagonal.y, 0);
 	}
 	
 	public void hunt(Point target) {
@@ -247,30 +225,45 @@ public class CreatureAi {
 		int x_distance = Math.abs(creature.x - target.x);
 		int y_distance = Math.abs(creature.y - target.y);
 		
-		if(canMove(mx, 0) && x_distance > y_distance)
-			my = 0;
-		else if(canMove(0, my) && y_distance >= x_distance)
-			mx = 0;
-		else if(Math.random() > .5f)
-			mx = 0;
-		else
-			my = 0;
+		Point no_diagonal = eliminateDiagonal(mx, my, x_distance, y_distance);
 		
-		creature.moveBy(mx, my, 0);
+		creature.moveBy(no_diagonal.x, no_diagonal.y, 0);
+	}
+	
+	private Point eliminateDiagonal(int mx, int my, int x_distance, int y_distance){
+		if(mx != 0 && my != 0){
+			if(canMove(0, my) && y_distance > x_distance)
+				mx = 0;
+			else if(canMove(mx, 0) && x_distance > y_distance)
+				my = 0;
+			else if(Math.random() > .5f)
+				mx = 0;
+			else
+				my = 0;
+		}
+		
+		return new Point(mx, my, 0);
 	}
 
 	protected boolean canUseBetterEquipment() {
 		int currentWeaponRating = creature.weapon() == null ? 0 : creature.weapon().totalAttackValue();
 		int currentArmorRating = creature.armor() == null ? 0 : creature.armor().totalDefenseValue();
+		int currentHelmentRating = creature.helment() == null ? 0 : creature.helment().totalDefenseValue();
+		int currentShieldRating = creature.shield() == null ? 0 : creature.shield().totalDefenseValue();
 		
 		for (Item item : creature.inventory().getItems()){
 			if (item == null)
 				continue;
 			
-			boolean isArmor = !item.getBooleanData(Constants.CHECK_WEAPON);
+			boolean isWeapon = item.getBooleanData(Constants.CHECK_WEAPON);
+			boolean isArmor = item.getBooleanData(Constants.CHECK_ARMOR);
+			boolean isHelment = item.getBooleanData(Constants.CHECK_HELMENT);
+			boolean isShield = item.getBooleanData(Constants.CHECK_SHIELD);
 			
-			if (item.totalAttackValue() > currentWeaponRating
-					|| isArmor && item.totalDefenseValue() > currentArmorRating)
+			if (item.totalAttackValue() > currentWeaponRating && isWeapon
+					|| isArmor && item.totalDefenseValue() > currentArmorRating
+					|| isHelment && item.totalDefenseValue() > currentHelmentRating
+					|| isShield && item.totalDefenseValue() > currentShieldRating)
 				return true;
 		}
 		
@@ -280,15 +273,22 @@ public class CreatureAi {
 	protected void useBetterEquipment() {
 		int currentWeaponRating = creature.weapon() == null ? 0 : creature.weapon().totalAttackValue();
 		int currentArmorRating = creature.armor() == null ? 0 : creature.armor().totalDefenseValue();
+		int currentHelmentRating = creature.helment() == null ? 0 : creature.helment().totalDefenseValue();
+		int currentShieldRating = creature.shield() == null ? 0 : creature.shield().totalDefenseValue();
 		
 		for (Item item : creature.inventory().getItems()){
 			if (item == null)
 				continue;
 			
-			boolean isArmor = !item.getBooleanData(Constants.CHECK_WEAPON);
+			boolean isWeapon = item.getBooleanData(Constants.CHECK_WEAPON);
+			boolean isArmor = item.getBooleanData(Constants.CHECK_ARMOR);
+			boolean isHelment = item.getBooleanData(Constants.CHECK_HELMENT);
+			boolean isShield = item.getBooleanData(Constants.CHECK_SHIELD);
 			
-			if (item.totalAttackValue() > currentWeaponRating
-					|| isArmor && item.totalDefenseValue() > currentArmorRating) {
+			if (item.totalAttackValue() > currentWeaponRating && isWeapon
+					|| isArmor && item.totalDefenseValue() > currentArmorRating
+					|| isHelment && item.totalDefenseValue() > currentHelmentRating
+					|| isShield && item.totalDefenseValue() > currentShieldRating) {
 				creature.equip(item);
 			}
 		}

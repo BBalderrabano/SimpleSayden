@@ -64,7 +64,7 @@ public class StuffFactory {
 		Point[] startPos = {new Point(45, 2, 0),
 							new Point(36, 12, 0)};
 		int selectedStart = (int) (Math.random() * startPos.length);
-
+		
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y, 0);
 		
 		new PlayerAi(player, messages, fov);
@@ -294,7 +294,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBigSword(int depth){
-		Item bigSword = new Item(')', 'F', Color.gray, "espadon", "espadon");
+		Item bigSword = new Item(')', 'M', Color.gray, "espadon", "espadon");
 		bigSword.modifyAttackValue(DamageType.SLICE, 3);
 		bigSword.modifyAttackValue(DamageType.BLUNT, 2);
 		bigSword.modifyAttackSpeed(Speed.NORMAL);

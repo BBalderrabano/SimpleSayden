@@ -14,7 +14,7 @@ public class Inventory {
 	public void add(Item item){
 		if(item.stackable() && containsimilar(item)){
 			for (int i = 0; i < items.length; i++){
-				if (items[i] != null && items[i].name().equals(item.name() ) && !items[i].stacked()){
+				if (items[i] != null && items[i].name.equals(item.name ) && items[i].stacks + item.stacks <= items[i].maxStacks){
 					items[i].modifyStacks(item.stacks);
 					return;
 				}
@@ -28,13 +28,23 @@ public class Inventory {
 		}
 	}
 
-	public void remove(Item item){
+	public void removeStack(Item item){
 		for (int i = 0; i < items.length; i++){
 			Item temp = items[i];
 			if (temp == item){
 				if(temp.stackable() && temp.stacks > 1){
 					return;
 				}
+				items[i] = null;
+				return;
+			}
+		}
+	}
+	
+	public void remove(Item item){
+		for (int i = 0; i < items.length; i++){
+			Item temp = items[i];
+			if (temp == item){
 				items[i] = null;
 				return;
 			}

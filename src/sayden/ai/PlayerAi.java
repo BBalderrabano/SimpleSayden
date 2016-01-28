@@ -36,6 +36,7 @@ public class PlayerAi extends CreatureAi {
 			creature.open(x, y, z);
 		}
 		
+		creature.addTime(creature.getMovementSpeed().velocity());
 		creature.world().modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
@@ -48,6 +49,7 @@ public class PlayerAi extends CreatureAi {
 			return;
 		}
 		
+		creature.addTime(creature.getAttackSpeed().velocity());
 		creature.world().modifyActionPoints(creature.getAttackSpeed().velocity());
 		creature.meleeAttack(other);
 	}

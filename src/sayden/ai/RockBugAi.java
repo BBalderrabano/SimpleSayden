@@ -14,7 +14,7 @@ public class RockBugAi extends CreatureAi {
 	StuffFactory factory;
 	
 	int attackBonus = 6;
-	int attackBonusDuration = 4;
+	int attackBonusDuration = 6;
 	int healthBonus = 10;
 	float healthOnEatChance = 0.2f;
 	float destroyWallChance = 0.2f;

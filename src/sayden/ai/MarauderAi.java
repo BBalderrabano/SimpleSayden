@@ -34,9 +34,11 @@ public class MarauderAi extends CreatureAi {
 	public void onUpdate(){
 		if(canPickup()){
 			creature.pickup();
+			return;
 		}
 		if(canUseBetterEquipment()){
 			useBetterEquipment();
+			return;
 		}
 		if(canSee(player.x, player.y, player.z)){
 			if(player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
@@ -44,18 +46,23 @@ public class MarauderAi extends CreatureAi {
 						!creature.getBooleanData("SeenPlayer")){
 				return;
 			}
+			
+			creature.setData("SeenPlayer", true);
+
 			if(canThrowAt(player) && getWeaponToThrow() != null){
 				creature.throwItem(getWeaponToThrow(), player.x, player.y, player.z);
 				return;
 			}
 			if(creature.hp() >= creature.totalMaxHp() * 0.3f){
 				hunt(player);
+				return;
 			}else{
 				creature.setData("SeenPlayer", true);
 				flee(player);
+				return;
 			}
-			creature.setData("SeenPlayer", true);
-		}
-		return;
+		}	
+		
+		creature.moveBy(0, 0, 0);
 	}
 }

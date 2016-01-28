@@ -251,7 +251,7 @@ public class World {
 		List<Creature> toUpdate = new ArrayList<Creature>(creatures);
 				
 		for (Creature creature : toUpdate){
-			if(creature.z != z)
+			if(creature.z != z || creature.isPlayer())
 				continue;
 			creature.update();
 		}

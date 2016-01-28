@@ -143,7 +143,7 @@ public class MenuScreen extends InventoryBasedScreen {
 					}
 					if(interactingItem.attackValue(DamageType.BLUNT) > 0){
 						bluntDamageValue = player.attackValue(DamageType.BLUNT) + interactingItem.attackValue(DamageType.BLUNT) + " ";
-						bluntDefColor = AsciiPanel.green;
+						bluntColor = AsciiPanel.green;
 					}
 					if(interactingItem.attackValue(DamageType.PIERCING) > 0){
 						piercingDamageValue = player.attackValue(DamageType.PIERCING) + interactingItem.attackValue(DamageType.PIERCING) + " ";

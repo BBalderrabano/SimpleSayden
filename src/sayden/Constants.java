@@ -7,6 +7,8 @@ public class Constants {
 	public static final int WORLD_WIDTH = 80;
 	public static final int WORLD_HEIGHT = 24;
 	
+	public static final int MAX_SYNC_TIME = 200;
+	
 	public static final String CHEST_POS = "CHEST";
 	public static final String ARM_POS = "ARMS";
 	public static final String LEG_POS = "LEGS";

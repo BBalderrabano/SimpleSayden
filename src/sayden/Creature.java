@@ -22,7 +22,7 @@ public class Creature extends Thing{
 	public void setQueAttack(Point p) { this.queAttack = p; }
 	
 	private int timeUnsync;
-	public void addTime(){ timeUnsync++; }
+	public void addTime(int amount){ timeUnsync += amount; if(timeUnsync > Constants.MAX_SYNC_TIME) timeUnsync = Constants.MAX_SYNC_TIME; }
 	
 	private char glyph;
 	public char glyph() { return glyph; }
@@ -420,10 +420,23 @@ public class Creature extends Thing{
 		world.open(wx, wy, wz);
 	}
 	
-	public void update(){
-		regenerateHealth();
-		updateEffects();
-		ai.onUpdate();
+	public void update(){	
+		int maxTries = 0;
+		int startPoints = actionPoints;
+		int endPoints = 0;
+		
+		while(actionPoints > 0 && maxTries < 10){
+			startPoints = actionPoints;
+			
+			regenerateHealth();
+			updateEffects();
+			ai.onUpdate();
+			
+			endPoints = actionPoints;
+			
+			if(startPoints == endPoints)
+				maxTries++;
+		}
 	}
 	
 	private void updateEffects(){
@@ -608,7 +621,7 @@ public class Creature extends Thing{
 	}
 	
 	private Item getRidOf(Item item){
-		inventory.remove(item);
+		inventory.removeStack(item);
 		unequip(item, true);
 		item.modifyStacks(-1);
 		return new Item(item);

@@ -19,7 +19,6 @@ public class Thing {
 	protected int stacks = 1;
 	protected int maxStacks = 0;
 	public boolean stackable() { return maxStacks > 0; }
-	public boolean stacked() { return maxStacks == stacks; }
 	
 	public void makeStackable(int maxStacks) { this.maxStacks = maxStacks; }
 	public void modifyStacks(int amount){ this.stacks += amount; 
