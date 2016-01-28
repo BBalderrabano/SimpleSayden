@@ -191,6 +191,8 @@ public class PlayScreen implements Screen {
 				player.subscreen = subscreen().respondToUserInput(key);
 			else
 				subscreen = subscreen().respondToUserInput(key);
+			
+			return this;
 		} else {
 			switch (key.getKeyCode()){
 			case KeyEvent.VK_TAB:

@@ -421,6 +421,13 @@ public class Creature extends Thing{
 	}
 	
 	public void update(){	
+		if(isPlayer()){
+			regenerateHealth();
+			updateEffects();
+			ai.onUpdate();
+			return;
+		}
+			
 		int maxTries = 0;
 		int startPoints = actionPoints;
 		int endPoints = 0;
