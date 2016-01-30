@@ -31,8 +31,8 @@ public class ReadSpellScreen implements Screen {
 	public void displayOutput(AsciiPanel terminal) {
 		ArrayList<String> lines = getList();
 		
-		String showQuestion = "Elige un hechizo a lanzar";
-
+		String showQuestion = lines.size() > 0 ? "Elige un hechizo a lanzar" : "No recuerdas ningun hechizo";
+		
 		int y = 22 - lines.size();
 		int x = terminal.getWidthInCharacters() - showQuestion.length() - 1;
 		
@@ -126,7 +126,7 @@ public class ReadSpellScreen implements Screen {
 
 	public Screen respondToUserInput(KeyEvent key) {
 		ArrayList<String> lines = getList();
-
+		
 		if(key.getKeyCode() == KeyEvent.VK_Q){
 			if(lastCreature != null && lastSpell != null && lastCreature.hp() > 1 && hasSpell(lastSpell)){
 				player.castSpell(lastSpell, lastCreature.x, lastCreature.y);
