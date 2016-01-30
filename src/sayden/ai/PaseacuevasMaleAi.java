@@ -47,6 +47,7 @@ public class PaseacuevasMaleAi extends CreatureAi {
 		}
 		if (canThrowAt(player) && female.hp() < female.totalMaxHp() && Math.random() > 0.3f){
 			creature.throwItem(getWeaponToThrow(), player.x, player.y, player.z);
+			return;
 		}
 		if(creature.position().distance(female.position()) >= 8){
 			hunt(female);

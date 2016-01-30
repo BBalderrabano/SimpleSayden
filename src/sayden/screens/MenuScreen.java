@@ -351,7 +351,7 @@ public class MenuScreen extends InventoryBasedScreen {
 	}
 	
 	private void drawItemBox(int offset_x, int offset_y, int width, int height, AsciiPanel terminal){
-		if(scrollingInvent){
+		if(scrollingInvent && interactingItem != null){
 			drawBox(offset_x, offset_y, width, height, terminal);
 			terminal.write((char)202, offset_x, offset_y + height);
 			terminal.write((char)202, offset_x + width, offset_y + height);
@@ -420,7 +420,7 @@ public class MenuScreen extends InventoryBasedScreen {
 			if(displayItem == player.weapon() || displayItem == player.armor()
 					|| displayItem == player.helment() || displayItem == player.shield()){
 				terminal.write(displayItem.glyph(), startWidth, realHeight, displayItem.color());
-				terminal.write("[" +proccesed_line+"]", terminal.getCursorX(), realHeight, AsciiPanel.cyan);
+				terminal.write("[" +proccesed_line+"]", terminal.getCursorX(), realHeight, Constants.OVERLAY_COLOR);
 			}else{
 				terminal.write("  " + proccesed_line, startWidth, realHeight);
 				terminal.write(displayItem.glyph(), startWidth, realHeight, displayItem.color());
@@ -478,7 +478,7 @@ public class MenuScreen extends InventoryBasedScreen {
 		
 		for(int s = 0; s < options.size(); s++){
 			if(scrollInteraction == s){
-				terminal.write(options.get(s), offset_x + 1, offset_y + s + 1, AsciiPanel.cyan);
+				terminal.write(options.get(s), offset_x + 1, offset_y + s + 1, Constants.OVERLAY_COLOR);
 				selectedInteraction = options.get(s);
 			}else{
 				terminal.write(options.get(s), offset_x + 1, offset_y + s + 1);

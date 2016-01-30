@@ -65,6 +65,8 @@ public class World {
 	}
 
 	public void modifyActionPoints(int amount){
+		amount = Math.abs(amount);
+
 		for(Creature c : creatures){
 			if(c.isPlayer())
 				continue;

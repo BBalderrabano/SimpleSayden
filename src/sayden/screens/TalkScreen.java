@@ -74,7 +74,7 @@ public class TalkScreen extends InventoryBasedScreen {
 					
 					for(int i = 0; i < options.size(); i++){
 						if(optionIndex == i){
-							terminal.write(options.get(i), x_offset, options.size() - i, AsciiPanel.cyan);
+							terminal.write(options.get(i), x_offset, options.size() - i, Constants.OVERLAY_COLOR);
 							terminal.write("<<", terminal.getCursorX(), terminal.getCursorY());
 						}else{
 							terminal.write(options.get(i), x_offset, options.size() - i);
@@ -94,7 +94,7 @@ public class TalkScreen extends InventoryBasedScreen {
 					x_width += (enterText.length() * .5f + 1);
 					
 					terminal.write(enterText, (int) (Constants.WORLD_WIDTH - x_width)
-							, options.size() + 1, AsciiPanel.cyan);
+							, options.size() + 1, Constants.OVERLAY_COLOR);
 				}
 				return;
 			}
@@ -194,7 +194,7 @@ public class TalkScreen extends InventoryBasedScreen {
 				 if (key.getKeyCode() == KeyEvent.VK_DOWN || key.getKeyCode() == KeyEvent.VK_S){
 						optionIndex--;
 				 }
-				 if (key.getKeyCode() == KeyEvent.VK_ENTER){
+				 if (key.getKeyCode() == KeyEvent.VK_ENTER && optionIndex > -1 && options.get(optionIndex) != null){
 					 	onSelectOption(options.get(optionIndex));
 					 	return null;
 				 }

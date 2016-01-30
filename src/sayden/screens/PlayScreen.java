@@ -49,7 +49,8 @@ public class PlayScreen implements Screen {
 	private void createCreatures(StuffFactory factory){
 		player = factory.newPlayer(messages, fov);
 		
-//		factory.newBlacksmith(player, 34, 3, 0);
+		factory.newBlacksmith(player, 34, 3, 0);
+		factory.newPriest(player, 47, 20, 0);
 		
 		for (int z = 1; z < world.depth(); z++){
 			for (int i = 0; i < 15; i++){
@@ -187,12 +188,12 @@ public class PlayScreen implements Screen {
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
 		if (subscreen() != null) {
-			if(player.subscreen != null)
+			if(player.subscreen != null){
 				player.subscreen = subscreen().respondToUserInput(key);
-			else
+				return this;
+			}else{
 				subscreen = subscreen().respondToUserInput(key);
-			
-			return this;
+			}
 		} else {
 			switch (key.getKeyCode()){
 			case KeyEvent.VK_TAB:
@@ -222,6 +223,15 @@ public class PlayScreen implements Screen {
 			case KeyEvent.VK_G:
 			case KeyEvent.VK_E:
 					player.pickup(); break;
+			case KeyEvent.VK_Q:
+					subscreen = new ReadSpellScreen(player, player.x - getScrollX(), 
+						player.y - getScrollY(), null);
+//					Spell spell = ReadSpellScreen.lastSpell;
+//					if (spell.requiresTarget())
+//						subscreen = new CastSpellScreen(player, "Recordar " + spell.name(), player.x - getScrollX(), player.y - getScrollY(), spell);
+//					else
+//						player.castSpell(spell, player.x, player.y);
+					break;
 			}
 			
 			switch (key.getKeyChar()){

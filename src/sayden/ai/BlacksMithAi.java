@@ -13,10 +13,12 @@ public class BlacksMithAi extends HumanoidAi {
 	private ArrayList<String> messages;
 	private ArrayList<String> options;
 	
-	private final String OPT_ESPADA = "Espada corta (cortante)";
+	private final String OPT_ARMA = "Pedir un arma";
+	private final String OPT_EXCUSA = "Excusarse";
+	
+	private final String OPT_ESPADA = "Espada (cortante)";
 	private final String OPT_MAZA = "Maza (contundente)";
-	private final String OPT_DAGA = "Daga (penetrante)";
-	private final String OPT_REJECT = "Rechazar el camino";
+	private final String OPT_DAGA = "Daga (cortante)";
 	
 	public BlacksMithAi(Creature creature, Creature player, StuffFactory factory) {
 		super(creature, player);
@@ -32,22 +34,54 @@ public class BlacksMithAi extends HumanoidAi {
 		super.onTalk(other);
 		
 		if(creature.getBooleanData("Finished")){
+			messages.clear();
+			if(creature.getBooleanData("GiveWeapon"))
+				messages.add("\"Ya tienes lo que necesitabas, ahora dejame en paz\"");
+			else
+				messages.add("\"Ya ocupaste demasiado de mi tiempo, dejame en paz\"");
+			
+			other.subscreen = new TalkScreen(other, creature, messages, null);
 			return;
 		}
-		if(!creature.getBooleanData("IsIntroduced")){
+		if(!creature.getBooleanData(Constants.FLAG_INTRODUCED)){
 			messages.clear();
-			messages.add("Hola extraño, mi nombre es Marcos, mi camino es el del herrero");
-			messages.add("Existo en la medida que puedo fraguar los metales");
-			messages.add("Existo solo gracias a mi arte, solo a causa de mi arte");
-			messages.add("Mas no tengo utilidad para mis constructos");
-			messages.add("Pocas personas necesitan armas hoy en dia, y las que lo necesitan no son de fiar");
-			messages.add("Eres tu de fiar? O lo que es mas importante...");
-			messages.add("Encuentras en tu camino utilidad para un arma?");
+			messages.add("\"Hey, extraño que haces en mi herreria?\"");
 			
+			options.clear();
+			options.add(OPT_EXCUSA);
+			options.add(OPT_ARMA);
+			
+			other.subscreen = new TalkScreen(other, creature, messages, options){
+				@Override
+				public void onSelectOption(String option) {
+					super.onSelectOption(option);
+
+					if(option.equals(OPT_ARMA)){
+						creature.setData("AskWeapon", true);
+					}else if(option.equals(OPT_EXCUSA)){
+						creature.setData("Rejected", true);
+					}
+				}
+			};
+			creature.setData(Constants.FLAG_INTRODUCED, true);
+		}else if(creature.getBooleanData("Rejected")){
+			messages.clear();
+			messages.add("\"No hay problema pero no me molestes, estoy muy ocupado\"");
+			other.subscreen = new TalkScreen(other, creature, messages, null);
+			creature.setData("Finished", true);
+		}else if(creature.getBooleanData("AskWeapon")){
+			messages.clear();
+			messages.add("El herrero te fulmina con la mirada");
+			messages.add("\"Tengo algo que quizas te sirva...\"");
+			messages.add("El herrero exhala un suspiro");
+			messages.add("\"...guerrero\"");
+			
+			options.clear();
+			options.add(OPT_EXCUSA);
 			options.add(OPT_DAGA);
 			options.add(OPT_MAZA);
 			options.add(OPT_ESPADA);
-			options.add(OPT_REJECT);
+			
 			other.subscreen = new TalkScreen(other, creature, messages, options){
 				@Override
 				public void onSelectOption(String option) {
@@ -55,37 +89,20 @@ public class BlacksMithAi extends HumanoidAi {
 
 					if(option.equals(OPT_ESPADA)){
 						player.pickup(factory.newShortSword(-1));
-						player.notify("Marcos te entrega una espada corta");
+						player.notify("El herrero te entrega una espada corta");
+						creature.setData("GiveWeapon", true);
 					}else if(option.equals(OPT_MAZA)){
 						player.pickup(factory.newMace(-1));
-						player.notify("Marcos te entrega una maza");
+						player.notify("El herrero te entrega una maza");
+						creature.setData("GiveWeapon", true);
 					}else if(option.equals(OPT_DAGA)){
 						player.pickup(factory.newDagger(-1));
-						player.notify("Marcos te entrega una daga");
-					}else{
-						creature.setData("Rejected", true);
+						player.notify("El herrero te entrega una daga");
+						creature.setData("GiveWeapon", true);
 					}
 				}
 			};
-			creature.setData("IsIntroduced", true);
-		}else if(creature.getBooleanData("Rejected")){
-			messages.clear();
-			messages.add("Bien...Poco consiguen las armas y demasiado demandan de uno");
-			messages.add("El arma entrega la ilusion de poder, es un temible objeto de perdicion");
-			messages.add("Cuantos guerreros de epocas pasadas perdieron su cordura...");
-			messages.add("...su resolucion...su camino...");
-			messages.add("Yo soy Marcos y mi camino es del herrero, que tengas suerte en el tuyo, donde sea que te lleve");
-			other.subscreen = new TalkScreen(other, creature, messages, null);
-			creature.setData("Finished", true);
-		}else{
-			messages.clear();
-			messages.add("...");
-			messages.add("Un sabio guerrero sabe que del arma poco se puede esperar");
-			messages.add("Un sabio guerrero conoce sus habilidades y convierte a su arma en una extension de su persona");
-			messages.add("Un sabio guerrero sabe que el arma es su maldicion pero tambien su herramienta");
-			messages.add("...te ruego, desconocido, que si has de blandir una de mis armas hagas tuyo el camino del guerrero");
-			messages.add("Yo soy Marcos y ya conoces mi camino...ten cuidado mientras deambules por el tuyo, desconocido");
-			other.subscreen = new TalkScreen(other, creature, messages, null);
+			
 			creature.setData("Finished", true);
 		}
 	}

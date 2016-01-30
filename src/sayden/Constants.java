@@ -7,7 +7,7 @@ public class Constants {
 	public static final int WORLD_WIDTH = 80;
 	public static final int WORLD_HEIGHT = 24;
 	
-	public static final int MAX_SYNC_TIME = 200;
+	public static final int MAX_SYNC_TIME = 100;
 	
 	public static final String CHEST_POS = "CHEST";
 	public static final String ARM_POS = "ARMS";
@@ -32,10 +32,16 @@ public class Constants {
 	public static final String CHECK_MARAUDER_DISGUISE = "IsMarauderDisguise";
 	
 	public static final Color UNIDENTIFIED_COLOR = AsciiPanel.magenta;
+	public static final Color OVERLAY_COLOR = AsciiPanel.cyan;
 	
 	public static final String RACE = "Race";
 	
 	public static final boolean DEBUG_MODE = false;
 	
 	public static final String FLAG_ANGRY = "IsAngry";
+	public static final String FLAG_INTRODUCED = "IsIntroduced";
+	public static final String FLAG_DONE_TALKING = "IsDoneTalking";
+	
+	public static final String SPELL_HEAL = "Healed";
+	public static final String SPELL_PAIN = "Pain";
 }

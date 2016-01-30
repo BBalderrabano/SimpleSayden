@@ -17,6 +17,7 @@ import sayden.ai.MarauderAi;
 import sayden.ai.PaseacuevasAi;
 import sayden.ai.PaseacuevasMaleAi;
 import sayden.ai.PlayerAi;
+import sayden.ai.PriestAi;
 import sayden.ai.RockBugAi;
 import sayden.ai.ZombieAi;
 
@@ -61,9 +62,14 @@ public class StuffFactory {
 		player.setStartingMovementSpeed(Speed.VERY_FAST);
 		player.setStartingAttackSpeed(Speed.VERY_FAST);
 		
+		player.modifyAttackValue(DamageType.RANGED, 1);
+		
 		Point[] startPos = {new Point(45, 2, 0),
 							new Point(36, 12, 0)};
 		int selectedStart = (int) (Math.random() * startPos.length);
+		
+		if(Math.random() < 0.1)
+			player.inventory().add(newAlcoholBottle(-1));
 		
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y, 0);
 		
@@ -74,7 +80,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newBlacksmith(Creature player, int x, int y, int depth){
-		Creature blackSmith = new Creature(world, (char)234, 'M', AsciiPanel.brightBlue, "herrero Marcos", 50);
+		Creature blackSmith = new Creature(world, '8', 'M', Color.ORANGE, "herrero", 50);
 		
 		blackSmith.setStartingMovementSpeed(Speed.NORMAL);
 		blackSmith.setStartingAttackSpeed(Speed.NORMAL);
@@ -86,6 +92,17 @@ public class StuffFactory {
 		world.addAtEmptySpace(blackSmith, x, y, depth);
 		new BlacksMithAi(blackSmith, player, this);
 		return blackSmith;
+	}
+	
+	public Creature newPriest(Creature player, int x, int y, int depth){
+		Creature priest = new Creature(world, (char)234, 'M', AsciiPanel.brightCyan, "sacerdote", 50);
+		
+		priest.setStartingMovementSpeed(Speed.NORMAL);
+		priest.setStartingAttackSpeed(Speed.NORMAL);
+		
+		world.addAtEmptySpace(priest, x, y, depth);
+		new PriestAi(priest, player, this);
+		return priest;
 	}
 
 	public Creature newFungus(int depth){
@@ -199,11 +216,27 @@ public class StuffFactory {
 	
 	public Item newRock(int depth){
 		Item rock = new Item(',', 'F', AsciiPanel.yellow, "roca", null);
-		rock.modifyAttackValue(DamageType.BLUNT, 5);
+		rock.modifyAttackValue(DamageType.BLUNT, 3);
 		rock.makeStackable(5);
 		rock.description = "Tiene un substancial tamaño y bordes solidos, lo suficientemente liviana para llevar en cantidad";
 		world.addAtEmptyLocation(rock, depth);
 		return rock;
+	}
+	
+	public Item newAlcoholBottle(int depth){
+		final Item alcohol = new Item('¿', 'M', AsciiPanel.brightBlack, "alcohol", null);
+		alcohol.setQuaffEffect(new Effect(1, true){
+			public void start(Creature creature){
+				creature.doAction(alcohol, "bebe la botella completa");
+				if(Math.random() > .8){
+					creature.modifyHp(-3, "Alcoholismo");
+					creature.notify("El alcohol se te sube a la cabeza");
+				}
+			}
+		});
+		alcohol.makeStackable(5);
+		world.addAtEmptyLocation(alcohol, depth);
+		return alcohol;
 	}
 	
 	public Item newKnife(int depth){
@@ -522,7 +555,7 @@ public class StuffFactory {
 			
 			public void update(Creature creature){
 				super.update(creature);
-				creature.modifyHp(-1, "Muerto por envenenamiento.");
+				creature.receiveDamage(2, DamageType.POISON, "Vomitas tus viceras");
 			}
 		});
 		item.makeStackable(5);
@@ -585,7 +618,7 @@ public class StuffFactory {
 			public void update(Creature creature){
 				super.update(creature);
 				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.modifyHp(-2, "El veneno del merodeador consume tus viceras");
+					creature.receiveDamage(-2, DamageType.POISON, "El veneno del merodeador consume tus viceras");
 				}
 			}
 		});
@@ -615,116 +648,159 @@ public class StuffFactory {
 	 * ########################################################################################
 	 */
 	
-	public Item newWhiteMagesSpellbook(int depth) {
-		Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro blanco", null);
-		item.addWrittenSpell("fireball", 0, new Effect(1){
-			@Override
-			public void start(int x, int y, int z){
-				world.propagate(x, y, z, 400, Constants.FIRE_TERRAIN);
-			}			
-		});
-		item.addWrittenSpell("minor heal", 4, new Effect(1){
-			public void start(Creature creature){
-				if (creature.hp() == creature.totalMaxHp())
-					return;
-				
-				creature.modifyHp(20, "Killed by a minor heal spell?");
-				creature.doAction("look healthier");
-			}
-		});
+	public Item newLeatherSpellbook(int depth){
+		final Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro de cuero", null);
 		
-		item.addWrittenSpell("major heal", 8, new Effect(1){
+		item.addWrittenSpell("vida", new Effect(1){
 			public void start(Creature creature){
-				if (creature.hp() == creature.totalMaxHp())
+				if (creature.hp() == creature.totalMaxHp() ||
+						creature.getBooleanData("Blasfemous")){
+					creature.notify("Pronuncias la palabra de vida en vano...");
 					return;
+				}else{
+					creature.notify("Pronuncias la palabra de vida");
+				}
 				
-				creature.modifyHp(50, "Killed by a major heal spell?");
-				creature.doAction("look healthier");
+				creature.modifyHp(10, "Alcanzado por la palabra de vida");
+				creature.doAction(item, "siente mas recuperado!");
 			}
-		});
-		
-		item.addWrittenSpell("slow heal", 12, new Effect(50){
-			public void update(Creature creature){
-				super.update(creature);
-				creature.modifyHp(2, "Killed by a slow heal spell?");
-			}
-		});
-
-		item.addWrittenSpell("inner strength", 16, new Effect(50){
+		}, 10, 88, Constants.SPELL_HEAL, new Effect(20){
 			public void start(Creature creature){
-				creature.modifyAttackValue(DamageType.BLUNT, 2);
-				creature.modifyDefenseValue(DamageType.BLUNT, 2);
-				creature.modifyVisionRadius(1);
-				creature.modifyRegenHpPer1000(10);
-				creature.doAction("seem to glow with inner strength");
-			}
-			public void update(Creature creature){
-				super.update(creature);
-				if (Math.random() < 0.25)
-					creature.modifyHp(1, "Killed by inner strength spell?");
+				creature.notify("Abusas de la palabra de la vida");
+				creature.setData("Blasfemous", true);
 			}
 			public void end(Creature creature){
-				creature.modifyAttackValue(DamageType.BLUNT, -2);
-				creature.modifyDefenseValue(DamageType.BLUNT, -2);
-				creature.modifyVisionRadius(-1);
-				creature.modifyRegenHpPer1000(-10);
+				creature.unsetData("Blasfemous");
 			}
-		});
+		}, Speed.FAST, false);
+		
+		item.addWrittenSpell("dolor", new Effect(1){
+			public void start(Creature creature){
+				creature.notify("Pronuncias la palabra del dolor");
+				creature.receiveDamage(6, DamageType.MAGIC, "Se retuerce hasta la muerte");
+				creature.doAction(item, "retuerce de dolor!");
+			}
+		}, 4, 60, Constants.SPELL_PAIN,  new Effect(1){
+			public void start(Creature creature){
+				creature.notify("Sientes en tu piel el dolor que infliges");
+				creature.receiveDamage(6, DamageType.MAGIC, "Se retuerce hasta la muerte");
+			}
+		},Speed.FAST, true);
 		
 		world.addAtEmptyLocation(item, depth);
 		return item;
 	}
 	
-	public Item newBlueMagesSpellbook(int depth) {
-		Item item = new Item('+', 'M', AsciiPanel.brightBlue, "libro azul", null);
-		
-		item.addWrittenSpell("blink", 6, new Effect(1){
-			public void start(Creature creature){
-				creature.doAction("fade out");
-				
-				int mx = 0;
-				int my = 0;
-				
-				do
-				{
-					mx = (int)(Math.random() * 11) - 5;
-					my = (int)(Math.random() * 11) - 5;
-				}
-				while (!creature.canEnter(creature.x+mx, creature.y+my, creature.z)
-						&& creature.canSee(creature.x+mx, creature.y+my, creature.z));
-				
-				creature.moveBy(mx, my, 0);
-				
-				creature.doAction("fade in");
-			}
-		});
-		
-		item.addWrittenSpell("fuego", 0, new Effect(1){
-			@Override
-			public void start(int x, int y, int z){
-				//world.add(new Projectile(world, z, line, Speed.SUPER_FAST, projectile, creature));
-				world.propagate(x, y, z, 1, Constants.FIRE_TERRAIN);
-			}			
-		});
-		
-		item.addWrittenSpell("detect creatures", 16, new Effect(75){
-			public void start(Creature creature){
-				creature.doAction("look far off into the distance");
-				creature.modifyDetectCreatures(1);
-			}
-			public void end(Creature creature){
-				creature.modifyDetectCreatures(-1);
-			}
-		});
-		world.addAtEmptyLocation(item, depth);
-		return item;
-	}
+//	public Item newWhiteMagesSpellbook(int depth) {
+//		Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro blanco", null);
+//		item.addWrittenSpell("fireball", new Effect(1){
+//			@Override
+//			public void start(int x, int y, int z){
+//				world.propagate(x, y, z, 400, Constants.FIRE_TERRAIN);
+//			}			
+//		});
+//		item.addWrittenSpell("minor heal", new Effect(1){
+//			public void start(Creature creature){
+//				if (creature.hp() == creature.totalMaxHp())
+//					return;
+//				
+//				creature.modifyHp(20, "Killed by a minor heal spell?");
+//				creature.doAction("look healthier");
+//			}
+//		});
+//		
+//		item.addWrittenSpell("major heal", new Effect(1){
+//			public void start(Creature creature){
+//				if (creature.hp() == creature.totalMaxHp())
+//					return;
+//				
+//				creature.modifyHp(50, "Killed by a major heal spell?");
+//				creature.doAction("look healthier");
+//			}
+//		});
+//		
+//		item.addWrittenSpell("slow heal", new Effect(50){
+//			public void update(Creature creature){
+//				super.update(creature);
+//				creature.modifyHp(2, "Killed by a slow heal spell?");
+//			}
+//		});
+//
+//		item.addWrittenSpell("inner strength", new Effect(50){
+//			public void start(Creature creature){
+//				creature.modifyAttackValue(DamageType.BLUNT, 2);
+//				creature.modifyDefenseValue(DamageType.BLUNT, 2);
+//				creature.modifyVisionRadius(1);
+//				creature.modifyRegenHpPer1000(10);
+//				creature.doAction("seem to glow with inner strength");
+//			}
+//			public void update(Creature creature){
+//				super.update(creature);
+//				if (Math.random() < 0.25)
+//					creature.modifyHp(1, "Killed by inner strength spell?");
+//			}
+//			public void end(Creature creature){
+//				creature.modifyAttackValue(DamageType.BLUNT, -2);
+//				creature.modifyDefenseValue(DamageType.BLUNT, -2);
+//				creature.modifyVisionRadius(-1);
+//				creature.modifyRegenHpPer1000(-10);
+//			}
+//		});
+//		
+//		world.addAtEmptyLocation(item, depth);
+//		return item;
+//	}
+//	
+//	public Item newBlueMagesSpellbook(int depth) {
+//		Item item = new Item('+', 'M', AsciiPanel.brightBlue, "libro azul", null);
+//		
+//		item.addWrittenSpell("blink", new Effect(1){
+//			public void start(Creature creature){
+//				creature.doAction("fade out");
+//				
+//				int mx = 0;
+//				int my = 0;
+//				
+//				do
+//				{
+//					mx = (int)(Math.random() * 11) - 5;
+//					my = (int)(Math.random() * 11) - 5;
+//				}
+//				while (!creature.canEnter(creature.x+mx, creature.y+my, creature.z)
+//						&& creature.canSee(creature.x+mx, creature.y+my, creature.z));
+//				
+//				creature.moveBy(mx, my, 0);
+//				
+//				creature.doAction("fade in");
+//			}
+//		});
+//		
+//		item.addWrittenSpell("fuego", new Effect(1){
+//			@Override
+//			public void start(int x, int y, int z){
+//				//world.add(new Projectile(world, z, line, Speed.SUPER_FAST, projectile, creature));
+//				world.propagate(x, y, z, 1, Constants.FIRE_TERRAIN);
+//			}			
+//		});
+//		
+//		item.addWrittenSpell("detect creatures", new Effect(75){
+//			public void start(Creature creature){
+//				creature.doAction("look far off into the distance");
+//				creature.modifyDetectCreatures(1);
+//			}
+//			public void end(Creature creature){
+//				creature.modifyDetectCreatures(-1);
+//			}
+//		});
+//		world.addAtEmptyLocation(item, depth);
+//		return item;
+//	}
 	
 
 	public Item randomSpellBook(int depth){
 		switch ((int)(Math.random() * 2)){
-		case 0: return newWhiteMagesSpellbook(depth);
-		default: return newBlueMagesSpellbook(depth);
+		case 0: return newLeatherSpellbook(depth);
+		default: return newLeatherSpellbook(depth);
 		}
 	}
 	

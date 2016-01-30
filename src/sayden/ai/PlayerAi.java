@@ -37,7 +37,7 @@ public class PlayerAi extends CreatureAi {
 		}
 		
 		creature.addTime(creature.getMovementSpeed().velocity());
-		creature.world().modifyActionPoints(creature.getMovementSpeed().velocity());
+		creature.modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
 	public void onUpdate(){
@@ -50,7 +50,7 @@ public class PlayerAi extends CreatureAi {
 		}
 		
 		creature.addTime(creature.getAttackSpeed().velocity());
-		creature.world().modifyActionPoints(creature.getAttackSpeed().velocity());
+		creature.modifyActionPoints(creature.getAttackSpeed().velocity());
 		creature.meleeAttack(other);
 	}
 	

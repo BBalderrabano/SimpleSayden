@@ -35,6 +35,7 @@ public class Projectile {
 		this.origin = creature;
 		this.start = creature.position();
 		this.z = depth;
+
 		step++;
 	}
 	

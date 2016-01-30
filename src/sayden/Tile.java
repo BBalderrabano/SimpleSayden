@@ -21,7 +21,8 @@ public enum Tile {
 	FIRE_1((char)30, AsciiPanel.red, "Una columna de fuego ardiente", 100),
 	FIRE_2((char)30, Color.orange, "Una columna de fuego ardiente", 100),
 	FIRE_3((char)30, AsciiPanel.brightYellow, "Una columna de fuego ardiente", 100),
-	BURNT_FLOOR((char)175, AsciiPanel.brightBlack, "Cenizas y escombros de un fuego", 100);
+	BURNT_FLOOR((char)175, AsciiPanel.brightBlack, "Cenizas y escombros de un fuego", 100),
+	ALTAR('#', new Color(90,55,0), "Un altar de madera", 20);
 	
 	public static Tile getById(int id){
 		switch(id){
@@ -39,6 +40,7 @@ public enum Tile {
 			case 12: return	WOOD_WALL;		//C
 			case 13: return WOOD_FLOOR;
 			case 14: return CARPET;
+			case 15: return ALTAR;
 			default: return UNKNOWN;
 		}
 	}

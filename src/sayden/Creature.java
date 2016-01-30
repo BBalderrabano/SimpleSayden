@@ -6,6 +6,7 @@ import java.util.List;
 
 import asciiPanel.AsciiPanel;
 import sayden.ai.CreatureAi;
+import sayden.screens.ReadSpellScreen;
 import sayden.screens.Screen;
 
 public class Creature extends Thing{
@@ -94,7 +95,13 @@ public class Creature extends Thing{
 
 	private int actionPoints;
 	public int getActionPoints() { return actionPoints;	}
-	public void modifyActionPoints(int actionPoints) {	this.actionPoints += actionPoints; }
+	public void modifyActionPoints(int actionPoints) {	
+		if(isPlayer()){
+			world.modifyActionPoints(actionPoints);
+			return;
+		}
+		this.actionPoints += actionPoints; 	
+	}
 
 	private Speed getSlowestAttackSpeed(){
 		Speed slowest = attackSpeed;
@@ -191,6 +198,9 @@ public class Creature extends Thing{
 	private List<Effect> effects;
 	public List<Effect> effects(){ return effects; }
 	
+	private List<Spell> spells;
+	public List<Spell> learnedSpells(){ return spells; }
+	
 	private String causeOfDeath;
 	public String causeOfDeath() { return causeOfDeath; }
 	
@@ -220,16 +230,13 @@ public class Creature extends Thing{
 		this.defenseValues = new ArrayList<DamageType>();
 		this.defenseValues.addAll(DamageType.ALL_TYPES());
 		this.effects = new ArrayList<Effect>();
+		this.spells = new ArrayList<Spell>();
 		this.learNames = new ArrayList<String>();
 	}
 	
 	public void moveBy(int mx, int my, int mz){
 		if (mx==0 && my==0 && mz==0){
-			if(isPlayer()){
-				world.modifyActionPoints( Math.max(1, movementSpeed.velocity() - 1));
-			}else{
-				modifyActionPoints(-Math.max(1, movementSpeed.velocity()));
-			}
+			modifyActionPoints(-Math.max(1, movementSpeed.velocity()));
 			return;
 		}
 		
@@ -296,6 +303,8 @@ public class Creature extends Thing{
 			doAction("arroja %s", thrown.nameUnUna());
 		}
 		
+		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1).velocity() : Speed.SUPER_FAST.velocity()));
+		
 		world.add(new Projectile(world, z, new Line(this.x, this.y, x, y), 
 				thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
 	}
@@ -352,11 +361,13 @@ public class Creature extends Thing{
 			}
 		}
 		
-		int amount = Math.max(1, attack);
+		int amount = attack;
 		
 		if(weakSpotHit){
 			amount += 3;
 		}
+		
+		amount = Math.max(1, amount);
 		
 //		if(other.isPlayer()){
 //			amount -= other.defenseValueTotal();									//Substract the total defense
@@ -383,6 +394,20 @@ public class Creature extends Thing{
 		world.propagate(other.x, other.y, other.z, drained_blood, Constants.BLOOD_FLUID);
 	}
 
+	public void receiveDamage(int amount, DamageType damage, String causeOfDeath){
+		int attack = amount;
+		
+		if(damage != null){
+			for(DamageType d : DamageType.ALL_TYPES()){
+				if(d.id == DamageType.RANGED.id || d.id != damage.id)
+					continue;
+				attack -= Math.max(0, defenseValue(d));
+			}
+		}
+		
+		modifyHp(-Math.max(0, attack), causeOfDeath);
+	}
+	
 	public void modifyHp(int amount, String causeOfDeath) { 
 		hp += amount;
 		this.causeOfDeath = causeOfDeath;
@@ -403,6 +428,11 @@ public class Creature extends Thing{
 		Item corpse = new Item('%', 'M', originalColor, "cadaver " + nameDelDeLa(), null);
 		corpse.setData(Constants.CHECK_CONSUMABLE, true);
 		corpse.setData(Constants.CHECK_CORPSE, true);
+		corpse.setQuaffEffect(new Effect(1, false){
+			public void start(Creature creature){
+				creature.modifyHp((int) (maxHp * 0.5f), "Severa indigestion");
+			}
+		});
 		world.addAtEmptySpace(corpse, x, y, z);
 		for (Item item : inventory.getItems()){
 			if (item != null)
@@ -421,13 +451,18 @@ public class Creature extends Thing{
 	}
 	
 	public void update(){	
+		if(hp < 1)
+			return;
+		
 		if(isPlayer()){
 			regenerateHealth();
 			updateEffects();
 			ai.onUpdate();
 			return;
 		}
-			
+		
+		//Creatures use actionPoints until they cannot
+		
 		int maxTries = 0;
 		int startPoints = actionPoints;
 		int endPoints = 0;
@@ -742,7 +777,9 @@ public class Creature extends Thing{
 		
 		if(other == null)
 			return;
-		System.out.println("Encontro criatura");
+		
+		ReadSpellScreen.lastCreature = other;
+		spell.onCast(this, other);
 		other.addEffect(spell.effect());
 		//modifyMana(-spell.manaCost());
 	}
