@@ -23,6 +23,9 @@ public class Projectile {
 	public int actionPoints() { return actionPoints; }
 	public void modifyActionPoints(int amount) { this.actionPoints += amount; }
 	
+	private boolean interrupted = false;
+	public boolean isInterrupted() { return interrupted; }
+	
 	private boolean isDone = false;
 	public boolean isDone() { return isDone || this.step >= path.getPoints().size(); }
 	
@@ -40,21 +43,18 @@ public class Projectile {
 	}
 	
 	public void update(){
-		Creature check = world.creature(x, y, z);
-		
-		if(check != null && check != origin){
-			this.isDone = true;
-			return;
-		}else{
-			while(actionPoints >= speed.velocity()){
-				List<Point> points = path.getPoints();
-				
-				int mx = points.get(Math.min(step, points.size() - 1)).x - x;
-				int my = points.get(Math.min(step, points.size() - 1)).y - y;
-				
-				moveBy(mx, my);
-				step++;
-			}
+		while(actionPoints >= speed.velocity()){
+			List<Point> points = path.getPoints();
+			
+			int mx = points.get(Math.min(step, points.size() - 1)).x - x;
+			int my = points.get(Math.min(step, points.size() - 1)).y - y;
+			Creature c = world.creature(x, y, z);
+			
+			if(c != null && c != origin && !isDone)
+				end();
+			
+			moveBy(mx, my);
+			step++;
 		}
 	}
 	
@@ -66,6 +66,12 @@ public class Projectile {
 		if (tile.isGround()){
 			this.x = mx+x;
 			this.y = my+y;
+			
+			Creature check = world.creature(x, y, z);
+			
+			if(check != null && check != origin && !isDone){
+				end();
+			}
 		}else{
 			end();
 		}
@@ -99,5 +105,6 @@ public class Projectile {
 		}else{
 			world.addAtEmptySpace(projectile, x, y, z);
 		}
+		interrupted = true;
 	}
 }

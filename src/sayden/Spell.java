@@ -1,9 +1,6 @@
 package sayden;
 
-public class Spell extends Thing{
-
-	public String name() { return name; }
-	
+public class Spell extends Thing{	
 	private Effect effect;
 	public Effect effect() { return effect; }
 	

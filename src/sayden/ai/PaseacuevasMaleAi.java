@@ -33,7 +33,7 @@ public class PaseacuevasMaleAi extends CreatureAi {
 		if(!creature.getBooleanData("SeenPlayer") && canSee(player.x, player.y, player.z) 
 				&& Math.random() * 100 < 30 && female.getData("checkPoint") == null){
 			
-			creature.doAction("alienta a la paseacuevas con un alarido!");
+			creature.doAction("llama a su pareja con un alarido!");
 			
 			creature.setData("SeenPlayer", true);
 			female.setData("checkPoint", new Point(player.x, player.y, player.z));

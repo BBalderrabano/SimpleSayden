@@ -32,12 +32,6 @@ public class CreatureAi {
 		return weakSpot == null || weakSpot.isEmpty() ? "none" : weakSpot;
 	}
 	
-	public boolean canTakeAction(){
-		return (creature.getActionPoints() > 0 && 
-				(creature.getActionPoints() >= creature.getMovementSpeed().velocity() 
-				|| creature.getActionPoints() >= creature.getAttackSpeed().velocity()));
-	}
-	
 	public void onDecease(Item corpse) {	
 	}
 	
@@ -76,6 +70,12 @@ public class CreatureAi {
 			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
 		}
 		creature.meleeAttack(other);
+	}
+	
+	public boolean onGetAttacked(int amount, String position, Creature attacker, String action, Object[] params){
+		attacker.doAction(action, params);
+		creature.modifyHp(-amount, "Matado por " + attacker.nameUnUna());
+		return true;
 	}
 	
 	public void onTalk(Creature other) { }

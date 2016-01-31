@@ -82,7 +82,7 @@ public class PaseacuevasAi extends CreatureAi {
 		creature.addEffect(new Effect(10){
 			public void start(Creature creature){
 				creature.modifyMovementSpeed(creature.getMovementSpeed().modifySpeed(2));
-				creature.changeColor(AsciiPanel.brightRed);
+				creature.changeColor(AsciiPanel.green);
 			}
 			public void end(Creature creature){
 				creature.modifyMovementSpeed(creature.startingMovementSpeed());

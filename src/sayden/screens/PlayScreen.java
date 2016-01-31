@@ -68,6 +68,10 @@ public class PlayScreen implements Screen {
 	}
 
 	private void createItems(StuffFactory factory) {
+		factory.newHugeMarauder(0, player);
+		factory.newHugeMarauder(0, player);
+		factory.newHugeMarauder(0, player);
+
 		factory.randomPotion(0);
 		factory.randomPotion(0);
 		factory.randomPotion(0);

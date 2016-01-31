@@ -303,7 +303,7 @@ public class Creature extends Thing{
 			doAction("arroja %s", thrown.nameUnUna());
 		}
 		
-		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1).velocity() : Speed.SUPER_FAST.velocity()));
+		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()));
 		
 		world.add(new Projectile(world, z, new Line(this.x, this.y, x, y), 
 				thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
@@ -317,24 +317,29 @@ public class Creature extends Thing{
 		int attack = 0;	//Start adding the inherit damage of the creature
 		boolean weakSpotHit = false;
 		boolean shieldBlock = false;
+		String position = null;
 		
 		//Get the defending item and check for weak spots
 		if(x < other.x && y >= other.y){
 			shieldBlock = true;
+			position = Constants.CHEST_POS;
 			if(other.ai.getWeakSpot() == Constants.CHEST_POS){
 				weakSpotHit = true;
 			}
 		}else if(y < other.y && x <= other.x){
+			position = Constants.HEAD_POS;
 			//defending_item = other.helment();
 			if(other.ai.getWeakSpot() == Constants.HEAD_POS){
 				weakSpotHit = true;
 			}
 		}else if(x > other.x && y <= other.y){
 			shieldBlock = true;
+			position = Constants.ARM_POS;
 			if(other.ai.getWeakSpot() == Constants.ARM_POS){
 				weakSpotHit = true;
 			}
 		}else if(y > other.y && x >= other.x){
+			position = Constants.LEG_POS;
 			if(other.ai.getWeakSpot() == Constants.LEG_POS){
 				weakSpotHit = true;
 			}
@@ -383,19 +388,21 @@ public class Creature extends Thing{
 		}
 		
 		params2[params2.length - 1] = amount;
-		
-		doAction(action, params2);
-		
-		other.modifyHp(-amount, "Matado por " + nameUnUna());
+				
+		other.ai().onGetAttacked(amount, position, this, action, params2);
 	
 		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
 		
-		other.modifyBlood(-drained_blood);
-		world.propagate(other.x, other.y, other.z, drained_blood, Constants.BLOOD_FLUID);
+		other.makeBleed(drained_blood);
 	}
 
-	public void receiveDamage(int amount, DamageType damage, String causeOfDeath){
-		int attack = amount;
+	public void makeBleed(float amount){
+		modifyBlood(-amount);
+		world.propagate(x, y, z, amount, Constants.BLOOD_FLUID);
+	}
+	
+	public int receiveDamage(int amount, DamageType damage, String causeOfDeath){
+		int attack = Math.abs(amount);
 		
 		if(damage != null){
 			for(DamageType d : DamageType.ALL_TYPES()){
@@ -406,6 +413,8 @@ public class Creature extends Thing{
 		}
 		
 		modifyHp(-Math.max(0, attack), causeOfDeath);
+		
+		return Math.max(0, attack);
 	}
 	
 	public void modifyHp(int amount, String causeOfDeath) { 
@@ -781,7 +790,6 @@ public class Creature extends Thing{
 		ReadSpellScreen.lastCreature = other;
 		spell.onCast(this, other);
 		other.addEffect(spell.effect());
-		//modifyMana(-spell.manaCost());
 	}
 
 	public void learnName(Item item){

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import asciiPanel.AsciiPanel;
 import sayden.ai.BatAi;
+import sayden.ai.BigMarauderAi;
 import sayden.ai.BlacksMithAi;
 import sayden.ai.FungusAi;
 import sayden.ai.GoblinAi;
@@ -127,7 +128,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newCaveBrute(int depth, Creature player){
-		Creature caveBrute = new Creature(world, 'P', 'F', AsciiPanel.green, "derrumbadora", 30);
+		Creature caveBrute = new Creature(world, 'P', 'F', AsciiPanel.brightGreen, "paseacuevas", 30);
 		caveBrute.setStartingAttackSpeed(Speed.SLOW);
 		caveBrute.setStartingMovementSpeed(Speed.SLOW);
 		caveBrute.setVisionRadius(4);
@@ -141,11 +142,24 @@ public class StuffFactory {
 		world.addAtEmptyLocation(caveBrute, depth);
 		PaseacuevasAi ai = new PaseacuevasAi(caveBrute, player);
 		
-		for(int i = 0; i < Math.random() * 2; i++){
+		for(int i = 0; i < Math.random() * 3; i++){
 			ai.addMale(newCaveSmall(depth, player, caveBrute));
 		}
 		
 		return caveBrute;
+	}
+		
+	public Creature newCaveSmall(int depth, Creature player, Creature female){
+		Creature caveSmall = new Creature(world, 'p', 'M', AsciiPanel.brightGreen, "paseacuevas", 8);
+		caveSmall.setStartingAttackSpeed(Speed.NORMAL);
+		caveSmall.setStartingMovementSpeed(Speed.FAST);
+		caveSmall.setVisionRadius(8);
+		
+		caveSmall.modifyAttackValue(DamageType.BLUNT, 2);
+		
+		world.addAtEmptySpace(caveSmall, female.x, female.y, female.z);
+		new PaseacuevasMaleAi(caveSmall, player, female);
+		return caveSmall;
 	}
 	
 	public Creature newMarauder(int depth, Creature player){
@@ -168,17 +182,22 @@ public class StuffFactory {
 		return marauder;
 	}
 	
-	public Creature newCaveSmall(int depth, Creature player, Creature female){
-		Creature caveSmall = new Creature(world, 'p', 'M', AsciiPanel.brightGreen, "paseacuevas", 8);
-		caveSmall.setStartingAttackSpeed(Speed.NORMAL);
-		caveSmall.setStartingMovementSpeed(Speed.FAST);
-		caveSmall.setVisionRadius(8);
+	public Creature newHugeMarauder(int depth, Creature player){
+		Creature bigMarauder = new Creature(world, 'M', 'M', AsciiPanel.brightYellow, "merodeador gigante", 110);
 		
-		caveSmall.modifyAttackValue(DamageType.BLUNT, 2);
+		bigMarauder.setStartingAttackSpeed(Speed.VERY_SLOW);
+		bigMarauder.setStartingMovementSpeed(Speed.NORMAL);
+		bigMarauder.modifyAttackValue(DamageType.BLUNT, 8);
+
+		bigMarauder.equip(newMarauderVest(-1));
+		bigMarauder.equip(newMarauderHood(-1));
 		
-		world.addAtEmptySpace(caveSmall, female.x, female.y, female.z);
-		new PaseacuevasMaleAi(caveSmall, player, female);
-		return caveSmall;
+		for(int i = 0; i < Math.random() * 3; i++)
+			bigMarauder.inventory().add(newGiantRock(-1));
+				
+		world.addAtEmptyLocation(bigMarauder, depth);
+		new BigMarauderAi(bigMarauder, player);
+		return bigMarauder;
 	}
 	
 	public Creature newRockBug(int depth, Creature player){
@@ -219,6 +238,16 @@ public class StuffFactory {
 		rock.modifyAttackValue(DamageType.BLUNT, 3);
 		rock.makeStackable(5);
 		rock.description = "Tiene un substancial tamaño y bordes solidos, lo suficientemente liviana para llevar en cantidad";
+		world.addAtEmptyLocation(rock, depth);
+		return rock;
+	}
+	
+	public Item newGiantRock(int depth){
+		Item rock = new Item(';', 'F', AsciiPanel.yellow, "roca gigante", null);
+		rock.modifyAttackValue(DamageType.BLUNT, 8);
+		rock.modifyAttackSpeed(Speed.FAST);
+		rock.modifyMovementSpeed(Speed.FAST);
+		rock.description = "Una gigantesca roca, extremadamente pesada";
 		world.addAtEmptyLocation(rock, depth);
 		return rock;
 	}
@@ -618,7 +647,7 @@ public class StuffFactory {
 			public void update(Creature creature){
 				super.update(creature);
 				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.receiveDamage(-2, DamageType.POISON, "El veneno del merodeador consume tus viceras");
+					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras");
 				}
 			}
 		});

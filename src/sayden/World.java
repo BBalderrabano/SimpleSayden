@@ -241,7 +241,7 @@ public class World {
 		for (Projectile projectile : projectiles){
 			projectile.update();
 			if (projectile.isDone()) {
-				projectile.end();
+				if(!projectile.isInterrupted()){ projectile.end(); }
 				done.add(projectile);
 			}
 		}
