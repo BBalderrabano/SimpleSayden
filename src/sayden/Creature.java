@@ -742,6 +742,9 @@ public class Creature extends Thing{
 		
 		if (item.getBooleanData(Constants.CHECK_WEAPON)){
 			unequip(weapon, true);
+			if(item.getBooleanData(Constants.CHECK_TWO_HANDED)){
+				unequip(shield, true);
+			}
 			doAction("empuña " + item.nameUnUna());
 			weapon = item;
 		} else if (item.getBooleanData(Constants.CHECK_ARMOR)){
@@ -753,9 +756,13 @@ public class Creature extends Thing{
 			doAction("calza " + item.nameUnUna());
 			helment = item;
 		} else if (item.getBooleanData(Constants.CHECK_SHIELD)){
-			unequip(shield, true);
-			doAction("alza " + item.nameUnUna());
-			shield = item;
+			if(weapon != null && weapon.getBooleanData(Constants.CHECK_TWO_HANDED)){
+				doAction("tiene ambas manos ocupadas");
+			}else{
+				unequip(shield, true);
+				doAction("alza " + item.nameUnUna());
+				shield = item;
+			}
 		}else{
 			return;
 		}

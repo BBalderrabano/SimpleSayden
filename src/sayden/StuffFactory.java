@@ -367,6 +367,20 @@ public class StuffFactory {
 		return bigSword;
 	}
 	
+	public Item newHomongousSword(int depth){
+		Item bigSword = new Item((char)253, 'M', AsciiPanel.brightBlack, "espadon homunculo", "espadon homunculo");
+		bigSword.modifyAttackValue(DamageType.SLICE, 8);
+		bigSword.modifyAttackValue(DamageType.BLUNT, 6);
+		bigSword.modifyAttackSpeed(Speed.SLOW);
+		bigSword.modifyMovementSpeed(Speed.NORMAL);
+		bigSword.setData(Constants.CHECK_WEAPON, true);
+		bigSword.setData(Constants.CHECK_TWO_HANDED, true);
+		bigSword.modifyBloodModifyer(0.9f);
+		bigSword.description = "La espada mas grande que jamas has visto";
+		world.addAtEmptyLocation(bigSword, depth);
+		return bigSword;
+	}
+	
 	public Item newMorningStar(int depth){
 		Item morningStar = new Item((char)254, 'F', AsciiPanel.brightBlack, "estrella", "estrella");
 		morningStar.modifyAttackValue(DamageType.BLUNT, 3);
@@ -470,7 +484,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMarauderHood(int depth){
-		Item marauderHood = new Item((char)247, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador");
+		Item marauderHood = new Item((char)248, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador");
 		marauderHood.modifyDefenseValue(DamageType.PIERCING, 1);
 		marauderHood.setData(Constants.CHECK_HELMENT, true);
 		marauderHood.setData(Constants.CHECK_MARAUDER_DISGUISE, true);

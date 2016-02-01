@@ -29,6 +29,7 @@ public class Constants {
 	public static final String CHECK_CONSUMABLE = "IsEdible";
 	public static final String CHECK_STACKABLE = "IsStackable";
 	public static final String CHECK_CORPSE = "IsCorpse";
+	public static final String CHECK_TWO_HANDED = "IsDualWield";
 	public static final String CHECK_MARAUDER_DISGUISE = "IsMarauderDisguise";
 	
 	public static final Color UNIDENTIFIED_COLOR = AsciiPanel.magenta;

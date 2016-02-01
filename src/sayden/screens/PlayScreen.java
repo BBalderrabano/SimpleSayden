@@ -139,8 +139,14 @@ public class PlayScreen implements Screen {
 				messages.addAll(i, toAdd);
 			}
 		}
+
+		int top = 0;
 		
-		int top = screenHeight - messages.size() - 1;
+		if(player.y >= world.height(player.z) - (messages.size() + 2)){
+			top = 1;
+		}else{
+			top = screenHeight - messages.size() - 1;
+		}
 		
 		for (int i = 0; i < messages.size(); i++){
 			String nTildeFix = messages.get(i).replace('ñ', (char)164).replace('Ñ', (char)165);
