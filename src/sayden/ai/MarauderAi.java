@@ -26,7 +26,7 @@ public class MarauderAi extends CreatureAi {
 			public void update(Creature creature){
 				super.update(creature);
 				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras");
+					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
 				}
 			}
 		});

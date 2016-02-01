@@ -50,7 +50,7 @@ public class PlayScreen implements Screen {
 		player = factory.newPlayer(messages, fov);
 		
 		factory.newBlacksmith(player, 34, 3, 0);
-		factory.newPriest(player, 47, 20, 0);
+		factory.newPriest(player, 51, 21, 0);
 		
 		for (int z = 1; z < world.depth(); z++){
 			for (int i = 0; i < 15; i++){
@@ -68,10 +68,6 @@ public class PlayScreen implements Screen {
 	}
 
 	private void createItems(StuffFactory factory) {
-		factory.newHugeMarauder(0, player);
-		factory.newHugeMarauder(0, player);
-		factory.newHugeMarauder(0, player);
-
 		factory.randomPotion(0);
 		factory.randomPotion(0);
 		factory.randomPotion(0);

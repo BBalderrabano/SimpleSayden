@@ -269,7 +269,7 @@ public class StuffFactory {
 	}
 	
 	public Item newKnife(int depth){
-		Item knife = new Item(')', 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo");
+		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo");
 		knife.modifyAttackValue(DamageType.PIERCING, 2);
 		knife.setData(Constants.CHECK_WEAPON, true);
 		knife.modifyStacks(3);
@@ -281,9 +281,9 @@ public class StuffFactory {
 	}
 	
 	public Item newRockBugHelm(int depth){
-		Item rockBugHelm = new Item('^', 'M', AsciiPanel.yellow, "caparazon de comepiedra", null);
-		rockBugHelm.modifyDefenseValue(DamageType.SLICE, 2);
-		rockBugHelm.modifyDefenseValue(DamageType.BLUNT, 2);
+		Item rockBugHelm = new Item((char)248, 'M', AsciiPanel.yellow, "caparazon de comepiedra", null);
+		rockBugHelm.modifyDefenseValue(DamageType.SLICE, 0);
+		rockBugHelm.modifyDefenseValue(DamageType.BLUNT, 1);
 		rockBugHelm.setData(Constants.CHECK_HELMENT, true);
 		rockBugHelm.description = "Los comepiedras tienen una jugosa membrana en sus espaldas al nacer, haciendolos muy vulnerables"
 				+ ". Sin embargo con el tiempo los sedimentos que caen en su caparazon y quedan impregnados, creando una fuerte proteccion.";
@@ -324,7 +324,7 @@ public class StuffFactory {
 	}
 	
 	public Item newDagger(int depth){
-		Item item = new Item(')', 'F', AsciiPanel.white, "daga", "daga");
+		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga");
 		item.modifyAttackValue(DamageType.PIERCING, 1);
 		item.modifyAttackValue(DamageType.SLICE, 1);
 		item.setData(Constants.CHECK_WEAPON, true);
@@ -335,7 +335,7 @@ public class StuffFactory {
 	}
 	
 	public Item newShortSword(int depth){
-		Item item = new Item(')', 'F', AsciiPanel.brightWhite, "espada corta", "espada corta");
+		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada corta", "espada corta");
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyBloodModifyer(0.6f);
@@ -345,7 +345,7 @@ public class StuffFactory {
 	}
 	
 	public Item newRockMace(int depth){
-		Item rockMace = new Item(')', 'F', AsciiPanel.yellow, "estalactita", null);
+		Item rockMace = new Item((char)254, 'F', AsciiPanel.yellow, "estalactita", null);
 		rockMace.modifyAttackValue(DamageType.BLUNT, 3);
 		rockMace.setData(Constants.CHECK_WEAPON, true);
 		rockMace.modifyAttackSpeed(Speed.FAST);
@@ -356,7 +356,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBigSword(int depth){
-		Item bigSword = new Item(')', 'M', Color.gray, "espadon", "espadon");
+		Item bigSword = new Item((char)253, 'M', Color.gray, "espadon", "espadon");
 		bigSword.modifyAttackValue(DamageType.SLICE, 3);
 		bigSword.modifyAttackValue(DamageType.BLUNT, 2);
 		bigSword.modifyAttackSpeed(Speed.NORMAL);
@@ -368,7 +368,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMorningStar(int depth){
-		Item morningStar = new Item(')', 'F', AsciiPanel.brightBlack, "estrella", "estrella");
+		Item morningStar = new Item((char)254, 'F', AsciiPanel.brightBlack, "estrella", "estrella");
 		morningStar.modifyAttackValue(DamageType.BLUNT, 3);
 		morningStar.modifyAttackValue(DamageType.PIERCING, 1);
 		morningStar.modifyAttackSpeed(Speed.FAST);
@@ -380,7 +380,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMace(int depth){
-		Item item = new Item(')', 'M', Color.LIGHT_GRAY, "maza", "maza");
+		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "maza", "maza");
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyBloodModifyer(0.2f);
@@ -391,7 +391,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBigMace(int depth){
-		Item bigMace = new Item('}', 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra");
+		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra");
 		bigMace.modifyAttackValue(DamageType.BLUNT, 8);
 		bigMace.modifyAttackSpeed(Speed.NORMAL);
 		bigMace.modifyMovementSpeed(Speed.FAST);
@@ -429,7 +429,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLightArmor(int depth){
-		Item item = new Item('[', 'F', AsciiPanel.green, "tunica", "tunica");
+		Item item = new Item((char)252, 'F', AsciiPanel.green, "tunica", "tunica");
 		item.modifyDefenseValue(DamageType.SLICE, 1);
 		item.setData(Constants.CHECK_ARMOR, true);
 		item.description = "Una tunica usada, quien sabe hace cuanto tiempo...quien sabe por quien...";
@@ -438,7 +438,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMediumArmor(int depth){
-		Item item = new Item('[', 'F', AsciiPanel.white, "tunica endurecida", "tunica endurecida");
+		Item item = new Item((char)252, 'F', AsciiPanel.white, "tunica endurecida", "tunica endurecida");
 		item.modifyDefenseValue(DamageType.SLICE, 1);
 		item.modifyDefenseValue(DamageType.BLUNT, 1);
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -448,8 +448,8 @@ public class StuffFactory {
 	}
 	
 	public Item newHeavyArmor(int depth){
-		Item item = new Item('[', 'F', AsciiPanel.brightWhite, "armadura de placa", "armadura de placa");
-		item.modifyDefenseValue(DamageType.SLICE, 3);
+		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "armadura de placa", "armadura de placa");
+		item.modifyDefenseValue(DamageType.SLICE, 2);
 		item.modifyDefenseValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_ARMOR, true);
 		item.description = "Placas de metal fundidas se conectan y forman esta armadura, de todos modos carece de muchas"
@@ -459,7 +459,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLeatherArmor(int depth){
-		Item leatherArmor = new Item(']', 'F', Color.orange, "armadura de cuero", "armadura de cuero");
+		Item leatherArmor = new Item((char)252, 'F', Color.orange, "armadura de cuero", "armadura de cuero");
 		leatherArmor.modifyDefenseValue(DamageType.SLICE, 1);
 		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 1);
 		leatherArmor.setData(Constants.CHECK_ARMOR, true);
@@ -470,7 +470,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMarauderHood(int depth){
-		Item marauderHood = new Item('^', 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador");
+		Item marauderHood = new Item((char)247, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador");
 		marauderHood.modifyDefenseValue(DamageType.PIERCING, 1);
 		marauderHood.setData(Constants.CHECK_HELMENT, true);
 		marauderHood.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
@@ -481,8 +481,8 @@ public class StuffFactory {
 	}
 	
 	public Item newMarauderVest(int depth){
-		Item marauderVest = new Item(']', 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador");
-		marauderVest.modifyDefenseValue(DamageType.BLUNT, 1);
+		Item marauderVest = new Item((char)252, 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador");
+		marauderVest.modifyDefenseValue(DamageType.SLICE, 1);
 		marauderVest.setData(Constants.CHECK_ARMOR, true);
 		marauderVest.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
 		marauderVest.description = "Cubre completamente el cuerpo y esconde las mangas.";
@@ -526,7 +526,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfHealth(int depth){
 		String appearance = potionAppearances.get(0);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de vida", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de vida", appearance);
 		item.setQuaffEffect(new Effect(1){
 			public void start(Creature creature){
 				if (creature.hp() == creature.totalMaxHp())
@@ -543,7 +543,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfMana(int depth){
 		String appearance = potionAppearances.get(1);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de mana", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de mana", appearance);
 		item.setQuaffEffect(new Effect(1){
 			public void start(Creature creature){
 			
@@ -558,7 +558,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfSlowHealth(int depth){
 		String appearance = potionAppearances.get(2);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de lenta curacion", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de lenta curacion", appearance);
 		item.setQuaffEffect(new Effect(100){
 			public void start(Creature creature){
 				creature.doAction(item, "siente aliviado");
@@ -576,15 +576,15 @@ public class StuffFactory {
 	
 	public Item newPotionOfPoison(int depth){
 		String appearance = potionAppearances.get(3);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de veneno", appearance);
-		item.setQuaffEffect(new Effect(20){
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de veneno", appearance);
+		item.setQuaffEffect(new Effect(10){
 			public void start(Creature creature){
 				creature.doAction(item, "siente enfermo");
 			}
 			
 			public void update(Creature creature){
 				super.update(creature);
-				creature.receiveDamage(2, DamageType.POISON, "Vomitas tus viceras");
+				creature.receiveDamage(1, DamageType.POISON, "Vomitas tus viceras", true);
 			}
 		});
 		item.makeStackable(5);
@@ -594,7 +594,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfWarrior(int depth){
 		String appearance = potionAppearances.get(4);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion del guerrero", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion del guerrero", appearance);
 		item.setQuaffEffect(new Effect(20){
 			public void start(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, 5);
@@ -614,7 +614,7 @@ public class StuffFactory {
 
 	public Item newPotionOfArcher(int depth){
 		String appearance = potionAppearances.get(5);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de arqueria", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de arqueria", appearance);
 		item.setQuaffEffect(new Effect(20){
 			public void start(Creature creature){
 				creature.modifyVisionRadius(3);
@@ -632,8 +632,8 @@ public class StuffFactory {
 	
 	public Item newMarauderPoison(int depth){
 		String appearance = potionAppearances.get(6);
-		final Item item = new Item('!', 'F', potionColors.get(appearance), "pocion de merodeador", appearance);
-		item.setQuaffEffect(new Effect(6, true){
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de merodeador", appearance);
+		item.setQuaffEffect(new Effect(8, true){
 			public void start(Creature creature){
 				if(creature.getStringData(Constants.RACE) == "merodeador"){
 					creature.doAction("es inmune al veneno de su gente");
@@ -647,7 +647,7 @@ public class StuffFactory {
 			public void update(Creature creature){
 				super.update(creature);
 				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras");
+					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
 				}
 			}
 		});
@@ -684,7 +684,7 @@ public class StuffFactory {
 			public void start(Creature creature){
 				if (creature.hp() == creature.totalMaxHp() ||
 						creature.getBooleanData("Blasfemous")){
-					creature.notify("Pronuncias la palabra de vida en vano...");
+					creature.notify("Pronuncias la palabra de vida pero nada ocurre...");
 					return;
 				}else{
 					creature.notify("Pronuncias la palabra de vida");
@@ -693,9 +693,9 @@ public class StuffFactory {
 				creature.modifyHp(10, "Alcanzado por la palabra de vida");
 				creature.doAction(item, "siente mas recuperado!");
 			}
-		}, 10, 88, Constants.SPELL_HEAL, new Effect(20){
+		}, 15, 88, Constants.SPELL_HEAL, new Effect(20){
 			public void start(Creature creature){
-				creature.notify("Abusas de la palabra de la vida");
+				creature.notify("Blasfemia!");
 				creature.setData("Blasfemous", true);
 			}
 			public void end(Creature creature){
@@ -706,13 +706,18 @@ public class StuffFactory {
 		item.addWrittenSpell("dolor", new Effect(1){
 			public void start(Creature creature){
 				creature.notify("Pronuncias la palabra del dolor");
-				creature.receiveDamage(6, DamageType.MAGIC, "Se retuerce hasta la muerte");
-				creature.doAction(item, "retuerce de dolor!");
+				int amount = creature.receiveDamage(6, DamageType.MAGIC, "Muere abrumado de un dolor insoportable", false);
+				
+				if(amount > 0){
+					creature.doAction(item, "retuerce en agonia!");
+				}else{
+					creature.doAction(item, "parece no ser afectado");
+				}
 			}
-		}, 4, 60, Constants.SPELL_PAIN,  new Effect(1){
+		}, 4, 90, Constants.SPELL_PAIN,  new Effect(1){
 			public void start(Creature creature){
 				creature.notify("Sientes en tu piel el dolor que infliges");
-				creature.receiveDamage(6, DamageType.MAGIC, "Se retuerce hasta la muerte");
+				creature.receiveDamage(8, DamageType.MAGIC, "Muere abrumado de un dolor insoportable", false);
 			}
 		},Speed.FAST, true);
 		

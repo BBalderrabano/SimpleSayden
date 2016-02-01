@@ -63,6 +63,6 @@ public class PriestAi extends HumanoidAi {
 		super.onUpdate();
 		
 		if(!canSee(player.x, player.y, player.z))
-			wander();
+			creature.moveBy(0,0,0);
 	}
 }

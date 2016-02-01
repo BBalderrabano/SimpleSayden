@@ -13,10 +13,12 @@ public class RockBugAi extends CreatureAi {
 	Creature player;
 	StuffFactory factory;
 	
+	int rocksEaten = 0;
+	
 	int attackBonus = 6;
 	int attackBonusDuration = 6;
 	int healthBonus = 10;
-	float healthOnEatChance = 0.2f;
+	float healthOnEatChance = 0.4f;
 	float destroyWallChance = 0.2f;
 	
 	public RockBugAi(Creature creature, Creature player, StuffFactory factory) {
@@ -65,8 +67,9 @@ public class RockBugAi extends CreatureAi {
 						}
 						creature.modifyHp(healthBonus, "Indigestion rocosa");
 						
-						if(Math.random() < destroyWallChance){
+						if(Math.random() < destroyWallChance && rocksEaten < 8){
 							creature.dig(p.x, p.y, p.z);
+							rocksEaten++;
 						}
 						
 						creature.modifyActionPoints(-creature.getMovementSpeed().velocity());

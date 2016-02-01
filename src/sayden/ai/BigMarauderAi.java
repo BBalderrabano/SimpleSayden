@@ -34,7 +34,7 @@ public class BigMarauderAi extends CreatureAi {
 			public void update(Creature creature){
 				super.update(creature);
 				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras");
+					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
 				}
 			}
 		});
@@ -102,7 +102,7 @@ public class BigMarauderAi extends CreatureAi {
 				Creature c = world.creature(p.x, p.y, p.z);
 				if(c == null || c == creature)
 					continue;
-				int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante");
+				int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante", true);
 				c.doAction("recibe un golpe por "+ damage + " de daño");
 			}
 			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());

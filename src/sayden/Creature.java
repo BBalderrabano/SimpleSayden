@@ -401,7 +401,7 @@ public class Creature extends Thing{
 		world.propagate(x, y, z, amount, Constants.BLOOD_FLUID);
 	}
 	
-	public int receiveDamage(int amount, DamageType damage, String causeOfDeath){
+	public int receiveDamage(int amount, DamageType damage, String causeOfDeath, boolean canKill){
 		int attack = Math.abs(amount);
 		
 		if(damage != null){
@@ -411,6 +411,8 @@ public class Creature extends Thing{
 				attack -= Math.max(0, defenseValue(d));
 			}
 		}
+		
+		if(hp() - attack < 1) { attack -= Math.abs(hp() - attack) + 1; }
 		
 		modifyHp(-Math.max(0, attack), causeOfDeath);
 		
@@ -784,7 +786,7 @@ public class Creature extends Thing{
 		
 		spell.effect().start(x2, y2, z);
 		
-		if(other == null)
+		if(other == null || !canSee(other.x, other.y, other.z))
 			return;
 		
 		ReadSpellScreen.lastCreature = other;
