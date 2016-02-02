@@ -42,6 +42,9 @@ public class BigMarauderAi extends CreatureAi {
 	
 	@Override
 	public boolean onGetAttacked(int amount, String position, Creature attacker, String action, Object[] params){
+		if(attacker.isPlayer() && !creature.getBooleanData("SeenPlayer"))
+			creature.setData("SeenPlayer", true);
+		
 		if(position == Constants.HEAD_POS){
 			
 			if(attacker.isPlayer()){

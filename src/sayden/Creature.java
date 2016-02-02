@@ -401,6 +401,10 @@ public class Creature extends Thing{
 		world.propagate(x, y, z, amount, Constants.BLOOD_FLUID);
 	}
 	
+	public int receiveDamage(int amount, DamageType damage, String causeOfDeath){
+		return receiveDamage(amount, damage, causeOfDeath, true);
+	}
+	
 	public int receiveDamage(int amount, DamageType damage, String causeOfDeath, boolean canKill){
 		int attack = Math.abs(amount);
 		

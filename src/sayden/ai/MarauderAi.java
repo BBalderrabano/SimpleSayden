@@ -18,6 +18,15 @@ public class MarauderAi extends CreatureAi {
 		creature.setData(Constants.RACE, "merodeador");
 	}
 	
+	public boolean onGetAttacked(int amount, String position, Creature attacker, String action, Object[] params){
+		super.onGetAttacked(amount, position, attacker, action, params);
+		
+		if(attacker.isPlayer() && !creature.getBooleanData("SeenPlayer"))
+			creature.setData("SeenPlayer", true);
+				
+		return true;
+	}
+	
 	public void onDecease(Item corpse){
 		corpse.setQuaffEffect(new Effect(6, false){
 			public void start(Creature creature){

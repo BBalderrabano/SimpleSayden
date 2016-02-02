@@ -253,7 +253,7 @@ public class StuffFactory {
 	}
 	
 	public Item newAlcoholBottle(int depth){
-		final Item alcohol = new Item('¿', 'M', AsciiPanel.brightBlack, "alcohol", null);
+		final Item alcohol = new Item('!', 'M', AsciiPanel.white, "alcohol", null);
 		alcohol.setQuaffEffect(new Effect(1, true){
 			public void start(Creature creature){
 				creature.doAction(alcohol, "bebe la botella completa");

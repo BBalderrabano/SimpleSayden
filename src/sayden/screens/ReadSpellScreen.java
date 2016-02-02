@@ -159,18 +159,6 @@ public class ReadSpellScreen implements Screen {
 			spellIndex = 0;
 		
 		return this;
-		
-//		if (letters.indexOf(c) > -1 
-//				&& items.length > letters.indexOf(c)
-//				&& item != null
-//				&& item.writtenSpells().get(letters.indexOf(c)) != null ) {
-//			lastSpell = item.writtenSpells().get(letters.indexOf(c));
-//			return use(item.writtenSpells().get(letters.indexOf(c)));
-//		} else if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-//			return null;
-//		} else {
-//			return this;
-//		}
 	}
 
 	protected Screen use(Spell spell){
