@@ -81,6 +81,10 @@ public class Item extends Thing{
 	public Speed movementSpeed() { return movementSpeed; }
 	public void modifyMovementSpeed(Speed speed) { this.movementSpeed = speed; } 
 	
+	private int durability = 1;
+	public int durability() { return durability; }
+	public void modifyDurability(int amount) { this.durability += amount; }
+	
 	public Spell addWrittenSpell(String name, Effect effect, int duration, float chance, String flag, Effect negativeEffect, Speed castSpeed, boolean target){
 		Spell spell = new Spell(name, effect, duration, chance, flag, negativeEffect, castSpeed, target);
 		writtenSpells.add(spell);
@@ -121,6 +125,8 @@ public class Item extends Thing{
 		this.attackValues = clone.attackValues();
 		this.defenseValues = clone.defenseValues();
 		this.bloodModifyer = clone.bloodModifyer();
+		this.movementSpeed = clone.movementSpeed();
+		this.attackSpeed = clone.attackSpeed();
 		this.maxStacks = clone.maxStacks;
 		this.stacks = 1;
 		setAllData(clone.getAllData());

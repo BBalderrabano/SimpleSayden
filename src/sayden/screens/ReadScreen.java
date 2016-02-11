@@ -28,5 +28,4 @@ public class ReadScreen extends InventoryBasedScreen {
 	protected Screen use(Item item) {
 		return new ReadSpellScreen(player, sx, sy, item);
 	}
-
 }

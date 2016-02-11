@@ -263,30 +263,6 @@ public class Creature extends Thing{
 			notify("Estas siendo consumido por las llamas!");
 		}
 		
-//		if (mz == -1){
-//			if (tile == Tile.STAIRS_DOWN) {
-//				doAction("asciendes por las escaleras al piso %d", z+mz+1);
-//				for(int i = 0; i < timeUnsync; i++){
-//					world.updateFloor(z+mz);
-//				}
-//				timeUnsync = 0;
-//			} else {
-//				doAction("trata de ascender pero te detiene el techo de la cueva!");
-//				return;
-//			}
-//		} else if (mz == 1){
-//			if (tile == Tile.STAIRS_UP) {
-//				doAction("desciende por las escaleras al piso %d", z+mz+1);
-//				for(int i = 0; i < timeUnsync; i++){
-//					world.updateFloor(z+mz);
-//				}
-//				timeUnsync = 0;
-//			} else {
-//				doAction("trata de descender pero te detiene el piso de la cueva!");
-//				return;
-//			}
-//		}
-		
 		Creature other = world.creature(x+mx, y+my);
 		
 		if (other == null){
@@ -301,7 +277,6 @@ public class Creature extends Thing{
 	}
 
 	public boolean meleeAttack(Creature other){
-		//return commonAttack(other, weapon(), "ataca al %s por %s de daño", other.name());
 		return commonAttack(other, weapon());
 	}
 
@@ -310,7 +285,6 @@ public class Creature extends Thing{
 				
 		Item thrown = getRidOf(item);
 		
-		//commonAttack(other, item, "arroja %s %s efectuando %d puntos de daño", item.nameUnUna(), other.nameAlALa());
 		if(c != null){
 			doAction("arroja %s hacia %s", thrown.nameUnUnaWNoStacks(), c.nameAlALa());
 		}else{
@@ -327,14 +301,12 @@ public class Creature extends Thing{
 		return commonAttack(other, weapon());
 	}
 	
-	//private boolean commonAttack(Creature other, Item object, String action, Object ... params) {
 	private boolean commonAttack(Creature other, Item object) {
 		int attack = 0;	//Start adding the inherit damage of the creature
 		boolean weakSpotHit = false;
 		boolean shieldBlock = false;
 		String position = null;
 		
-		//Get the defending item and check for weak spots
 		if(x < other.x && y >= other.y){
 			shieldBlock = true;
 			position = Constants.CHEST_POS;
@@ -343,7 +315,6 @@ public class Creature extends Thing{
 			}
 		}else if(y < other.y && x <= other.x){
 			position = Constants.HEAD_POS;
-			//defending_item = other.helment();
 			if(other.ai.getWeakSpot() == Constants.HEAD_POS){
 				weakSpotHit = true;
 			}
@@ -365,10 +336,21 @@ public class Creature extends Thing{
 				if(d.id == DamageType.RANGED.id)
 					continue;
 				if(attackValue(d) > other.shield().defenseValue(d)){
-					doAction("destroza " + other.shield().nameElLa() + " con el golpe");
-					other.inventory().remove(other.shield());
-					other.unequip(other.shield(), false);
-					return false;
+					other.shield().modifyDurability(-1);
+					
+					if(other.shield().durability() < 1){
+						doAction("destroza " + other.shield().nameElLa() + " con el golpe");
+						other.inventory().remove(other.shield());
+						other.unequip(other.shield(), false);
+						return false;
+					}else{
+						if(other.isPlayer()){
+							other.notify("Tu escudo cruje por el impacto!");
+						}else if(isPlayer()){
+							notify(Constants.capitalize(other.shield().nameElLa()) + " " + other.nameDelDeLa()
+							+ " cruje con tu impacto!");
+						}
+					}
 				}
 			}
 			other.doAction("resiste el ataque "+nameDelDeLa()+" con " + other.shield().nameElLa());
@@ -669,9 +651,12 @@ public class Creature extends Thing{
 		}
 	}
 	
-	public boolean isPlayer = false;
+	private boolean isPlayer = false;
 	public boolean isPlayer(){
 		return isPlayer;
+	}
+	public void makePlayer(){
+		this.isPlayer = true;
 	}
 	
 	public void eat(Item item){

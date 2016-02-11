@@ -10,14 +10,12 @@ import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
 import sayden.FieldOfView;
-import sayden.MapLoader;
 import sayden.Message;
 import sayden.StuffFactory;
 import sayden.Tile;
 import sayden.World;
-import sayden.WorldBuilder;
 
-public class PlayScreen implements Screen {
+public class DreamScreen implements Screen {
 	private World world;
 	private Creature player;
 	
@@ -29,11 +27,9 @@ public class PlayScreen implements Screen {
 	private Screen subscreen;
 	public Screen subscreen(){ return player != null && player.subscreen != null ? player.subscreen : subscreen; }
 	
-	private boolean pauseTooltip = true;
+	private int elapsedTurns = 0;
 	
-	public PlayScreen(){
-		MapLoader ml = new MapLoader();
-		
+	public DreamScreen(){
 		screenWidth = Constants.WORLD_WIDTH;
 		screenHeight = Constants.WORLD_HEIGHT;
 		messages = new ArrayList<String>();
@@ -42,77 +38,19 @@ public class PlayScreen implements Screen {
 		
 		StuffFactory factory = new StuffFactory(world);
 
-		world.overrideFloor(ml.preBuild("Pueblo", factory));
 		fov = new FieldOfView(world);
 		
-		player = factory.newPlayer(messages, fov);
-
-		populateTown(factory);
-	}
-	
-	private void descendStairs(){
-		if(world.tile(player.x, player.y) == Tile.STAIRS_DOWN || world.tile(player.x, player.y) == Tile.STAIRS_UP){
-			createWorld();
-			StuffFactory factory = new StuffFactory(world);
-			fov = new FieldOfView(world);
-			
-			factory.movePlayer(player, messages, fov, world);
-			
-			createCreatures(factory);
-			createItems(factory);
-			
-			world.add(player);
-		}
-	}
-	
-	private void populateTown(StuffFactory factory){
-		for (int i = 0; i < Math.random() * 10; i++){
-			factory.newRabbit();
-			factory.newMage(player);
-		}
+		player = factory.newDreamer(messages, fov, 40, 12);
 	}
 
-	private void createCreatures(StuffFactory factory){	
-		factory.newBlacksmith(player, 34, 3);
-		factory.newPriest(player, 51, 21);
-		
-		for (int i = 0; i < 15; i++){
-			factory.newRockBug(player);
-		}
-		
-		for(int i = 0; i < 2; i++){
-			factory.newCaveBrute(player);
-		}
-		
-		for(int i = 0; i < 6; i++){
-			factory.newMarauder(player);
-		}
-	}
-
-	private void createItems(StuffFactory factory) {
-		factory.randomPotion(true);
-		factory.randomPotion(true);
-		factory.randomPotion(true);
-		
-		for (int i = 0; i < world.width() * world.height() / 50; i++){
-			factory.newRock(true);
-		}
-
-		factory.newFruit(true);
-		factory.newEdibleWeapon(true);
-		factory.newBread(true);
-		factory.randomArmor(true);
-		factory.randomWeapon(true);
-		factory.randomWeapon(true);
-		
-		factory.randomPotion(true);
-		factory.randomSpellBook(true);
-	}
-	
 	private void createWorld(){
-		world = new WorldBuilder(90, 32)
-					.makeCaves()
-					.build();
+		Tile[][] tiles = new Tile[screenWidth][screenHeight];
+		world = new World(tiles);
+		for(int x = 0; x < world.width(); x++){
+			for(int y = 0; y < world.height(); y++){
+				tiles[x][y] = Tile.FLOOR;
+			}
+		}
 	}
 	
 	public int getScrollX() { return Math.max(0, Math.min(player.x - screenWidth / 2, world.width() - screenWidth)); }
@@ -129,12 +67,6 @@ public class PlayScreen implements Screen {
 		
 		String stats = String.format(" %3d/%3d hp %s", player.hp(), player.totalMaxHp(), player.statusEffects());
 		terminal.write(stats, 1, 23);
-		
-		if(pauseTooltip){
-			String tooltip = "-- esc o p ayuda --";
-			terminal.write(tooltip, terminal.getWidthInCharacters() - tooltip.length() - 2, 1);
-			pauseTooltip = false;
-		}
 		
 		if (subscreen() != null)
 			subscreen().displayOutput(terminal);
@@ -280,14 +212,58 @@ public class PlayScreen implements Screen {
 			for (int y = 0; y < screenHeight; y++){
 				int wx = x + left;
 				int wy = y + top;
-
-				if (player.canSee(wx, wy))
-					terminal.write(world.glyph(wx, wy), x, y, world.color(wx, wy), world.backgroundColor(wx, wy));
-				else
+				
+				Color dreamColor = Color.BLACK;
+				
+				double ratio = elapsedTurns * 0.1f;
+				
+				Color glyph_color = blend(world.color(x, y), dreamColor, ratio);
+				Color background_color = blend(world.backgroundColor(x, y), dreamColor, ratio);
+				
+				if (player.canSee(wx, wy)){
+					if(player.x == wx && player.y == wy){
+						glyph_color = player.color();
+					}
+					terminal.write(world.glyph(wx, wy), x, y, glyph_color, background_color);
+				}else{
 					terminal.write(fov.tile(wx, wy).glyph(), x, y, Color.darkGray, Color.BLACK);
+				}
 			}
 		}
 	}
+	
+	private static Color blend(Color color1, Color color2, double ratio) {
+        float r = (float) ratio;
+        float ir = (float) 1.0 - r;
+
+        float rgb1[] = new float[3];
+        float rgb2[] = new float[3];
+
+        color1.getColorComponents(rgb1);
+        color2.getColorComponents(rgb2);
+
+        float red = rgb1[0] * r + rgb2[0] * ir;
+        float green = rgb1[1] * r + rgb2[1] * ir;
+        float blue = rgb1[2] * r + rgb2[2] * ir;
+
+        if (red < 0) {
+            red = 0;
+        } else if (red > 1) {
+            red = 1;
+        }
+        if (green < 0) {
+            green = 0;
+        } else if (green > 1) {
+            green = 1;
+        }
+        if (blue < 0) {
+            blue = 0;
+        } else if (blue > 1) {
+            blue = 1;
+        }
+
+        return new Color(red, green, blue);
+    }
 	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
@@ -307,15 +283,15 @@ public class PlayScreen implements Screen {
 				case KeyEvent.VK_I:
 						subscreen = new MenuScreen(player, player.x - getScrollX(), 
 						player.y - getScrollY()); break;
-				case KeyEvent.VK_SPACE:	player.moveBy(0, 0); break;
+				case KeyEvent.VK_SPACE:	player.moveBy(0, 0); elapsedTurns++; break;
 				case KeyEvent.VK_LEFT:
-				case KeyEvent.VK_A: 	player.moveBy(-1, 0); break;
+				case KeyEvent.VK_A: 	player.moveBy(-1, 0); elapsedTurns++; break;
 				case KeyEvent.VK_RIGHT:
-				case KeyEvent.VK_D: 	player.moveBy( 1, 0); break;
+				case KeyEvent.VK_D: 	player.moveBy( 1, 0); elapsedTurns++; break;
 				case KeyEvent.VK_UP:
-				case KeyEvent.VK_W: 	player.moveBy( 0,-1); break;
+				case KeyEvent.VK_W: 	player.moveBy( 0,-1); elapsedTurns++; break;
 				case KeyEvent.VK_DOWN:
-				case KeyEvent.VK_S: 	player.moveBy( 0, 1); break;
+				case KeyEvent.VK_S: 	player.moveBy( 0, 1); elapsedTurns++; break;
 				case KeyEvent.VK_R: 
 						subscreen = new LookScreen(player, "Observando", 
 						player.x - getScrollX(), 
@@ -334,16 +310,9 @@ public class PlayScreen implements Screen {
 						subscreen = new ReadSpellScreen(player, player.x - getScrollX(), 
 						player.y - getScrollY(), null);
 						break;
-				case KeyEvent.VK_ENTER:
-						descendStairs();
-						break;
 			}
 			
 			switch (key.getKeyChar()){
-				case '<': 
-						descendStairs(); break;
-				case '>': 	
-						descendStairs(); break;
 				case '?': subscreen = new HelpScreen(); break;
 			}
 		}

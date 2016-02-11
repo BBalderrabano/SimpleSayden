@@ -63,6 +63,17 @@ public class StuffFactory {
 		new PlayerAi(player, messages, fov);
 	}
 	
+	public Creature newDreamer(List<String> messages, FieldOfView fov, int start_x, int start_y){
+		Creature dreamer = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "soñador", 50);
+		
+		dreamer.setStartingMovementSpeed(Speed.VERY_FAST);
+		dreamer.setStartingAttackSpeed(Speed.VERY_FAST);
+		
+		new PlayerAi(dreamer, messages, fov);
+		world.addAtEmptySpace(dreamer, start_x, start_y);
+		return dreamer;
+	}
+	
 	public Creature newPlayer(List<String> messages, FieldOfView fov){
 		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 50);
 				
@@ -695,7 +706,7 @@ public class StuffFactory {
 			}
 		}, 15, 88, Constants.SPELL_HEAL, new Effect("blasfemo", 20){
 			public void start(Creature creature){
-				creature.notify("Blasfemia!");
+				creature.notify("Tus plegarias pierden notoriedad!");
 				creature.setData("Blasfemous", true);
 			}
 			public void end(Creature creature){

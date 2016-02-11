@@ -7,6 +7,8 @@ import sayden.screens.StartScreen;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ApplicationMain extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1060623638149583738L;
@@ -16,16 +18,30 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	
 	private long lastPressProcessed = 0;
 	
+	private Timer t = new Timer();
+	
 	public ApplicationMain(){
 		super();
 		terminal = new AsciiPanel(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
 		
 		add(terminal);
 		pack();
+		
 		screen = new StartScreen();
+		
 		addKeyListener(this);
 		setFocusTraversalKeysEnabled(false);
+		setSize(terminal.getWidth() + 6, terminal.getHeight() + 28);
+		setResizable(false);
+		
 		repaint();
+		
+		t.scheduleAtFixedRate(new TimerTask(){
+			@Override
+			public void run() {
+				((StartScreen) screen).tickTime(terminal);
+			}
+		}, 0, 50);
 	}
 	
 	@Override
@@ -40,7 +56,9 @@ public class ApplicationMain extends JFrame implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		//Limit press event to 25 mls
+		if(e.getKeyCode() == KeyEvent.VK_ENTER){
+			t.cancel();
+		}
 		if(System.currentTimeMillis() - lastPressProcessed > 25) {
 			screen = screen.respondToUserInput(e);
 			repaint();

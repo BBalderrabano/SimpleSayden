@@ -21,7 +21,7 @@ public class PlayerAi extends CreatureAi {
 		this.messages = messages;
 		this.fov = fov;
 
-		creature.isPlayer = true;
+		creature.makePlayer();
 		creature.setData(Constants.RACE, "human");
 	}
 	
