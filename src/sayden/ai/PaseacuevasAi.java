@@ -41,7 +41,7 @@ public class PaseacuevasAi extends CreatureAi {
 		}
 		
 		//If we can see the player
-		if((canSee(player.x, player.y, player.z) || creature.getBooleanData("SeenPlayer"))
+		if((canSee(player.x, player.y) || creature.getBooleanData("SeenPlayer"))
 				&& creature.position().distance(player.position()) > 2){
 			hunt(player);
 			
@@ -52,7 +52,7 @@ public class PaseacuevasAi extends CreatureAi {
 			
 			creature.setData("SeenPlayer", true);
 			return;
-		}else if(canSee(player.x, player.y, player.z)){
+		}else if(canSee(player.x, player.y)){
 			hunt(player);
 			return;
 		}
@@ -79,7 +79,7 @@ public class PaseacuevasAi extends CreatureAi {
 	}
 	
 	private void goBerzerk(){
-		creature.addEffect(new Effect(10){
+		creature.addEffect(new Effect("enfurecida", 10){
 			public void start(Creature creature){
 				creature.modifyMovementSpeed(creature.getMovementSpeed().modifySpeed(2));
 				creature.changeColor(AsciiPanel.green);

@@ -6,17 +6,24 @@ import java.util.List;
 
 import asciiPanel.AsciiPanel;
 import sayden.ai.CreatureAi;
-import sayden.screens.ReadSpellScreen;
 import sayden.screens.Screen;
 
 public class Creature extends Thing{
 	private World world;
 	public World world() { return world; }
+	public void setWorld(World newWorld) { this.world = newWorld; }
 	
 	public int x;
 	public int y;
-	public int z;
-	public Point position() { return new Point(x,y,z); }
+	public Point position() { return new Point(x,y); }
+	
+	private Spell queSpell;
+	private Creature queSpellCreature;
+	
+	public Spell queSpell() { return queSpell; }
+	public Creature queSpellCreature() { return queSpellCreature; }
+	
+	public void setQueSpell(Creature c, Spell s) { this.queSpellCreature = c; this.queSpell = s; }
 	
 	private Point queAttack;
 	public Point queAttack(){ return queAttack; }
@@ -29,7 +36,7 @@ public class Creature extends Thing{
 	public char glyph() { return glyph; }
 	
 	private Color color;
-	public Color color() { return queAttack != null ? AsciiPanel.brightBlue : color; }
+	public Color color() { return queSpell != null ? AsciiPanel.brightMagenta : queAttack != null ? AsciiPanel.brightBlue : color; }
 	public void changeColor(Color color) { this.color = color; }
 	
 	private Color originalColor;
@@ -204,6 +211,10 @@ public class Creature extends Thing{
 	private String causeOfDeath;
 	public String causeOfDeath() { return causeOfDeath; }
 	
+	private int stealthLevel = 0;
+	public int stealthLevel() { return Math.max(stealthLevel - Constants.STEALTH_MIN, 0); }
+	public void modifyStealth(int amount) { this.stealthLevel += amount; this.stealthLevel = Math.min(8, this.stealthLevel); }
+	
 	private List<String> learNames;
 	
 	public Screen subscreen;
@@ -234,86 +245,90 @@ public class Creature extends Thing{
 		this.learNames = new ArrayList<String>();
 	}
 	
-	public void moveBy(int mx, int my, int mz){
-		if (mx==0 && my==0 && mz==0){
+	public void moveBy(int mx, int my){
+		ai.onMoveBy(mx, my);
+		
+		if (mx==0 && my==0){
 			modifyActionPoints(-Math.max(1, movementSpeed.velocity()));
 			return;
 		}
 		
-		if(x+mx > world.width(z+mz) || x+mx < 0 || y+my < 0 || y+my > world.height(z+mz))
+		if(x+mx > world.width() || x+mx < 0 || y+my < 0 || y+my > world.height())
 			return;
 		
-		Tile tile = world.tile(x+mx, y+my, z+mz);
+		Tile tile = world.tile(x+mx, y+my);
 		
-		if(world.fire(x+mx, y+my, z+mz) > 0){
-			modifyHp(-(int)world.fire(x+mx, y+my, z+mz) / 10, "Incinerado");
+		if(world.fire(x+mx, y+my) > 0){
+			modifyHp(-(int)world.fire(x+mx, y+my) / 10, "Incinerado");
 			notify("Estas siendo consumido por las llamas!");
 		}
 		
-		if (mz == -1){
-			if (tile == Tile.STAIRS_DOWN) {
-				doAction("asciendes por las escaleras al piso %d", z+mz+1);
-				for(int i = 0; i < timeUnsync; i++){
-					world.updateFloor(z+mz);
-				}
-				timeUnsync = 0;
-			} else {
-				doAction("trata de ascender pero te detiene el techo de la cueva!");
-				return;
-			}
-		} else if (mz == 1){
-			if (tile == Tile.STAIRS_UP) {
-				doAction("desciende por las escaleras al piso %d", z+mz+1);
-				for(int i = 0; i < timeUnsync; i++){
-					world.updateFloor(z+mz);
-				}
-				timeUnsync = 0;
-			} else {
-				doAction("trata de descender pero te detiene el piso de la cueva!");
-				return;
-			}
-		}
+//		if (mz == -1){
+//			if (tile == Tile.STAIRS_DOWN) {
+//				doAction("asciendes por las escaleras al piso %d", z+mz+1);
+//				for(int i = 0; i < timeUnsync; i++){
+//					world.updateFloor(z+mz);
+//				}
+//				timeUnsync = 0;
+//			} else {
+//				doAction("trata de ascender pero te detiene el techo de la cueva!");
+//				return;
+//			}
+//		} else if (mz == 1){
+//			if (tile == Tile.STAIRS_UP) {
+//				doAction("desciende por las escaleras al piso %d", z+mz+1);
+//				for(int i = 0; i < timeUnsync; i++){
+//					world.updateFloor(z+mz);
+//				}
+//				timeUnsync = 0;
+//			} else {
+//				doAction("trata de descender pero te detiene el piso de la cueva!");
+//				return;
+//			}
+//		}
 		
-		Creature other = world.creature(x+mx, y+my, z+mz);
+		Creature other = world.creature(x+mx, y+my);
 		
 		if (other == null){
-			ai.onEnter(x+mx, y+my, z+mz, tile);
+			ai.onEnter(x+mx, y+my, tile);
 		}else{
-			ai.onAttack(x+mx, y+my, z+mz, other);
+			ai.onAttack(x+mx, y+my, other);
 		}
 		
-		if(world.tile(x-mx, y-my, z-mz) == Tile.DOOR_OPEN){
-			open(x-mx, y-my, z-mz);
+		if(world.tile(x-mx, y-my) == Tile.DOOR_OPEN){
+			open(x-mx, y-my);
 		}
 	}
 
-	public void meleeAttack(Creature other){
-		commonAttack(other, weapon(), "ataca al %s por %s de daño", other.name());
+	public boolean meleeAttack(Creature other){
+		//return commonAttack(other, weapon(), "ataca al %s por %s de daño", other.name());
+		return commonAttack(other, weapon());
 	}
 
-	public void throwItem(Item item, int x, int y, int z) {
-		Creature c = world.creature(x, y, z);
+	public void throwItem(Item item, int x, int y) {
+		Creature c = world.creature(x, y);
 				
 		Item thrown = getRidOf(item);
 		
 		//commonAttack(other, item, "arroja %s %s efectuando %d puntos de daño", item.nameUnUna(), other.nameAlALa());
 		if(c != null){
-			doAction("arroja %s hacia %s", thrown.nameUnUna(), c.nameAlALa());
+			doAction("arroja %s hacia %s", thrown.nameUnUnaWNoStacks(), c.nameAlALa());
 		}else{
-			doAction("arroja %s", thrown.nameUnUna());
+			doAction("arroja %s", thrown.nameUnUnaWNoStacks());
 		}
 		
 		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()));
 		
-		world.add(new Projectile(world, z, new Line(this.x, this.y, x, y), 
+		world.add(new Projectile(world, new Line(this.x, this.y, x, y), 
 				thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
 	}
 	
-	public void rangedWeaponAttack(Creature other){
-		commonAttack(other, weapon(), "dispara %s %s efectuando %d puntos de daño", weapon.nameUnUna(), other.nameAlALa());
+	public boolean rangedWeaponAttack(Creature other){
+		return commonAttack(other, weapon());
 	}
 	
-	private void commonAttack(Creature other, Item object, String action, Object ... params) {
+	//private boolean commonAttack(Creature other, Item object, String action, Object ... params) {
+	private boolean commonAttack(Creature other, Item object) {
 		int attack = 0;	//Start adding the inherit damage of the creature
 		boolean weakSpotHit = false;
 		boolean shieldBlock = false;
@@ -353,11 +368,11 @@ public class Creature extends Thing{
 					doAction("destroza " + other.shield().nameElLa() + " con el golpe");
 					other.inventory().remove(other.shield());
 					other.unequip(other.shield(), false);
-					return;
+					return false;
 				}
 			}
 			other.doAction("resiste el ataque "+nameDelDeLa()+" con " + other.shield().nameElLa());
-			return;
+			return false;
 		}else{
 			for(DamageType d : DamageType.ALL_TYPES()){
 				if(d.id == DamageType.RANGED.id)
@@ -382,23 +397,25 @@ public class Creature extends Thing{
 //					(weakSpotHit ? 0 : other.defenseValue());
 //		}
 		
-		Object[] params2 = new Object[params.length+1];
-		for (int i = 0; i < params.length; i++){
-			params2[i] = params[i];
-		}
-		
-		params2[params2.length - 1] = amount;
+//		Object[] params2 = new Object[params.length+1];
+//		for (int i = 0; i < params.length; i++){
+//			params2[i] = params[i];
+//		}
+//		
+//		params2[params2.length - 1] = amount;
 				
-		other.ai().onGetAttacked(amount, position, this, action, params2);
+		other.ai().onGetAttacked(amount, position, this);
 	
 		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
 		
 		other.makeBleed(drained_blood);
+		
+		return true;
 	}
 
 	public void makeBleed(float amount){
 		modifyBlood(-amount);
-		world.propagate(x, y, z, amount, Constants.BLOOD_FLUID);
+		world.propagate(x, y, amount, Constants.BLOOD_FLUID);
 	}
 	
 	public int receiveDamage(int amount, DamageType damage, String causeOfDeath){
@@ -443,12 +460,12 @@ public class Creature extends Thing{
 		Item corpse = new Item('%', 'M', originalColor, "cadaver " + nameDelDeLa(), null);
 		corpse.setData(Constants.CHECK_CONSUMABLE, true);
 		corpse.setData(Constants.CHECK_CORPSE, true);
-		corpse.setQuaffEffect(new Effect(1, false){
+		corpse.setQuaffEffect(new Effect("indigesto", 1, false){
 			public void start(Creature creature){
 				creature.modifyHp((int) (maxHp * 0.5f), "Severa indigestion");
 			}
 		});
-		world.addAtEmptySpace(corpse, x, y, z);
+		world.addAtEmptySpace(corpse, x, y);
 		for (Item item : inventory.getItems()){
 			if (item != null)
 				drop(item);
@@ -456,13 +473,13 @@ public class Creature extends Thing{
 		return corpse;
 	}
 	
-	public void dig(int wx, int wy, int wz) {
-		world.dig(wx, wy, wz);
+	public void dig(int wx, int wy) {
+		world.dig(wx, wy);
 		doAction("derrumba la pared");
 	}
 	
-	public void open(int wx, int wy, int wz) {
-		world.open(wx, wy, wz);
+	public void open(int wx, int wy) {
+		world.open(wx, wy);
 	}
 	
 	public void update(){	
@@ -482,7 +499,7 @@ public class Creature extends Thing{
 		int startPoints = actionPoints;
 		int endPoints = 0;
 		
-		while(actionPoints > 0 && maxTries < 10){
+		while(actionPoints > 0 && maxTries < 2){
 			startPoints = actionPoints;
 			
 			regenerateHealth();
@@ -525,8 +542,8 @@ public class Creature extends Thing{
 		}
 	}
 	
-	public boolean canEnter(int wx, int wy, int wz) {
-		return world.tile(wx, wy, wz).isGround() && world.creature(wx, wy, wz) == null;
+	public boolean canEnter(int wx, int wy) {
+		return world.tile(wx, wy).isGround() && world.creature(wx, wy) == null;
 	}
 
 	public void notify(String message, Object ... params){
@@ -538,8 +555,14 @@ public class Creature extends Thing{
 			if (other == this){
 				other.notify(makeSecondPerson(message)+ ".", params);
 			} else {
-				other.notify(String.format("%s %s.", capitalize(nameElLa()), message, false), params);
+				other.notify(String.format("%s %s.", Constants.capitalize(nameElLa()), message, false), params);
 			}
+		}
+	}
+	
+	public void combatAction(String message, Object ... params){
+		for (Creature other : getCreaturesWhoSeeMe()){
+			other.notify(message, params);
 		}
 	}
 	
@@ -551,7 +574,7 @@ public class Creature extends Thing{
 			if (other == this){
 				other.notify("Te " + makeSecondPerson(message).toLowerCase()+ ".", params);
 			} else {
-				other.notify(String.format("%s se %s.", capitalize(nameElLa()), message, false), params);
+				other.notify(String.format("%s se %s.", Constants.capitalize(nameElLa()), message, false), params);
 			}
 			other.learnName(item);
 		}
@@ -565,7 +588,7 @@ public class Creature extends Thing{
 				if (ox*ox + oy*oy > r*r)
 					continue;
 				
-				Creature other = world.creature(x+ox, y+oy, z);
+				Creature other = world.creature(x+ox, y+oy);
 				
 				if (other == null)
 					continue;
@@ -574,10 +597,6 @@ public class Creature extends Thing{
 			}
 		}
 		return others;
-	}
-	
-	public static String capitalize(String text){
-		return Character.toUpperCase(text.charAt(0))+""+text.substring(1);
 	}
 	
 	public static String makeSecondPerson(String text){
@@ -594,7 +613,7 @@ public class Creature extends Thing{
 		}
 		
 		if(capitalize)
-			words[0] = capitalize(words[0]);
+			words[0] = Constants.capitalize(words[0]);
 		
 		StringBuilder builder = new StringBuilder();
 		for (String word : words){
@@ -605,43 +624,43 @@ public class Creature extends Thing{
 		return builder.toString().trim();
 	}
 	
-	public boolean canSee(int wx, int wy, int wz){
-		return (detectCreatures > 0 && world.creature(wx, wy, wz) != null
-				|| ai.canSee(wx, wy, wz));
+	public boolean canSee(int wx, int wy){
+		return (detectCreatures > 0 && world.creature(wx, wy) != null
+				|| ai.canSee(wx, wy));
 	}
 
-	public Tile realTile(int wx, int wy, int wz) {
-		return world.tile(wx, wy, wz);
+	public Tile realTile(int wx, int wy) {
+		return world.tile(wx, wy);
 	}
 	
-	public Tile tile(int wx, int wy, int wz) {
-		if (canSee(wx, wy, wz))
-			return world.tile(wx, wy, wz);
+	public Tile tile(int wx, int wy) {
+		if (canSee(wx, wy))
+			return world.tile(wx, wy);
 		else
-			return ai.rememberedTile(wx, wy, wz);
+			return ai.rememberedTile(wx, wy);
 	}
 
-	public Creature creature(int wx, int wy, int wz) {
-		if (canSee(wx, wy, wz))
-			return world.creature(wx, wy, wz);
+	public Creature creature(int wx, int wy) {
+		if (canSee(wx, wy))
+			return world.creature(wx, wy);
 		else
 			return null;
 	}
 	
 	public void pickup(){
-		Item item = world.item(x, y, z);
+		Item item = world.item(x, y);
 		
 		if (inventory.isFull() || item == null){
 			doAction("agarra la nada");
 		} else {
 			doAction("levanta %s", item.nameElLa());
-			world.remove(x, y, z);
+			world.remove(x, y);
 			inventory.add(item);
 		}
 	}
 	
 	public void drop(Item item){
-		if (world.addAtEmptySpace(item, x, y, z)){
+		if (world.addAtEmptySpace(item, x, y)){
 			doAction("suelta " + item.nameUnUna());
 			inventory.remove(item);
 			unequip(item, true);
@@ -650,17 +669,18 @@ public class Creature extends Thing{
 		}
 	}
 	
+	public boolean isPlayer = false;
 	public boolean isPlayer(){
-		return glyph == '@';
+		return isPlayer;
 	}
 	
 	public void eat(Item item){
-		doAction("consume " + item.nameElLa());
+		doAction("consume " + item.nameElLaWNoStacks());
 		consume(item);
 	}
 	
 	public void quaff(Item item){
-		doAction("bebe " + item.nameElLa());
+		doAction("bebe " + item.nameElLaWNoStacks());
 		consume(item);
 	}
 	
@@ -774,9 +794,9 @@ public class Creature extends Thing{
 		learnName(item);
 	}
 	
-	public Item item(int wx, int wy, int wz) {
-		if (canSee(wx, wy, wz))
-			return world.item(wx, wy, wz);
+	public Item item(int wx, int wy) {
+		if (canSee(wx, wy))
+			return world.item(wx, wy);
 		else
 			return null;
 	}
@@ -793,24 +813,31 @@ public class Creature extends Thing{
 	public void modifyDetectCreatures(int amount) { detectCreatures += amount; }
 	
 	public void castSpell(Spell spell, int x2, int y2) {
-		Creature other = creature(x2, y2, z);
-		
-		spell.effect().start(x2, y2, z);
-		
-		if(other == null || !canSee(other.x, other.y, other.z))
-			return;
-		
-		ReadSpellScreen.lastCreature = other;
-		spell.onCast(this, other);
-		other.addEffect(spell.effect());
+		ai.onCastSpell(spell, x2, y2);
 	}
 
 	public void learnName(Item item){
 		if(item.appearance != null){
-			if(item.name != item.appearance){	notify(capitalize(item.appearance) + " es realmente " + item.realNameUnUna() + "!"); }
+			if(item.name != item.appearance){	notify(Constants.capitalize(item.appearance) + " es realmente " + item.realNameUnUna() + "!"); }
 			item.appearance = null;
 			if(isPlayer())
 				learNames.add(item.name);
 		}
+	}
+	
+	public String statusEffects(){
+		String effectString = "";
+		
+		for(Effect f : effects){
+			if(effectString.indexOf(f.statsName()) != -1)
+				continue;
+			
+			effectString += " " + f.statsName();
+		}
+		
+		if(stealthLevel > Constants.STEALTH_MIN)
+			effectString += " escabullido";
+		
+		return effectString;
 	}
 }

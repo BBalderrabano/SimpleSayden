@@ -15,7 +15,7 @@ public class HumanoidAi extends CreatureAi {
 		if(creature.getBooleanData(Constants.FLAG_ANGRY)){
 			if (canUseBetterEquipment())
 				useBetterEquipment();
-			else if (creature.canSee(player.x, player.y, player.z))
+			else if (creature.canSee(player.x, player.y))
 				hunt(player);
 			else if (canPickup())
 				creature.pickup();

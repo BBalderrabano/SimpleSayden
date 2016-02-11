@@ -8,7 +8,9 @@ import sayden.Item;
 import sayden.Line;
 import sayden.Path;
 import sayden.Point;
+import sayden.Spell;
 import sayden.Tile;
+import sayden.screens.ReadSpellScreen;
 
 public class CreatureAi {
 	private String weakSpot;
@@ -32,11 +34,35 @@ public class CreatureAi {
 		return weakSpot == null || weakSpot.isEmpty() ? "none" : weakSpot;
 	}
 	
-	public void onDecease(Item corpse) {	
+	public void onCastSpell(Spell spell, int x2, int y2) {
+		// TODO Auto-generated method stub
+		Creature other = creature.creature(x2, y2);
+		
+		if(!creature.isPlayer() && spell.castSpeed().velocity() >= creature.getActionPoints() && creature.queSpell() == null){
+			if(other != null && other.isPlayer() && 
+					Math.abs(spell.castSpeed().velocity() - other.getMovementSpeed().velocity()) > 1){
+				creature.modifyActionPoints(-creature.getActionPoints());
+				creature.setQueSpell(other,  spell);
+				creature.doAction("comienza a pronunciar un encantamiento");
+				return;
+			}
+		}else if(creature.queSpell() != null && !creature.isPlayer() && 
+				creature.getActionPoints() < creature.queSpell().castSpeed().velocity()){
+			return;
+		}
+		
+		spell.effect().start(x2, y2);
+		
+		if(other == null || !canSee(other.x, other.y))
+			return;
+		
+		ReadSpellScreen.lastCreature = other;
+		spell.onCast(creature, other);
+		other.addEffect(spell.effect());
 	}
 	
-	public void onEnter(int x, int y, int z, Tile tile){
-		if(creature.queAttack() != null)
+	public void onEnter(int x, int y, Tile tile){
+		if(creature.queAttack() != null || creature.queSpell() != null)
 			return;
 		
 		if(creature.getActionPoints() < creature.getMovementSpeed().velocity() && !creature.isPlayer()){
@@ -47,15 +73,15 @@ public class CreatureAi {
 		if (tile.isGround()){
 			creature.x = x;
 			creature.y = y;
-			creature.z = z;
 		}
 	}
 	
-	public void onAttack(int x, int y, int z, Creature other){
+	public boolean onAttack(int x, int y, Creature other){
 		if(creature.getData("Race") == other.getData("Race") &&
 				!creature.getBooleanData(Constants.FLAG_ANGRY) &&
-				!other.getBooleanData(Constants.FLAG_ANGRY))
-			return;
+				!other.getBooleanData(Constants.FLAG_ANGRY) || 
+				creature.queSpell() != null)
+			return false;
 
 		if(creature.getActionPoints() < creature.getAttackSpeed().velocity() && !creature.isPlayer()){
 			if(other.isPlayer()){
@@ -65,33 +91,74 @@ public class CreatureAi {
 					creature.setQueAttack(other.position());
 				}
 			}
-			return;	//There are not enough action points to perform an attack, queue attack
+			return false;	//There are not enough action points to perform an attack, queue attack
 		}else if(!creature.isPlayer()){
 			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
 		}
-		creature.meleeAttack(other);
+		
+		return creature.meleeAttack(other);
 	}
 	
-	public boolean onGetAttacked(int amount, String position, Creature attacker, String action, Object[] params){
-		attacker.doAction(action, params);
+	public boolean onGetAttacked(int amount, String position, Creature attacker){
+		if(attacker.isPlayer()){
+			attacker.combatAction("Atacas |(%s %s %s)01| %s |[%s %s %s]02| por %s", 
+					attacker.attackValue(DamageType.SLICE),
+					attacker.attackValue(DamageType.BLUNT),
+					attacker.attackValue(DamageType.PIERCING),
+					creature.nameAlALa(),
+					creature.defenseValue(DamageType.SLICE),
+					creature.defenseValue(DamageType.BLUNT),
+					creature.defenseValue(DamageType.PIERCING),
+					amount);
+		}else if(creature.isPlayer()){
+			attacker.combatAction("%s |(%s %s %s)01| te ataca |[%s %s %s]02| por %s", 
+					Constants.capitalize(attacker.nameElLa()),
+					attacker.attackValue(DamageType.SLICE),
+					attacker.attackValue(DamageType.BLUNT),
+					attacker.attackValue(DamageType.PIERCING),
+					creature.defenseValue(DamageType.SLICE),
+					creature.defenseValue(DamageType.BLUNT),
+					creature.defenseValue(DamageType.PIERCING),
+					amount);
+		}else{
+			attacker.combatAction("%s |(%s %s %s)01| ataca %s |[%s %s %s]02| por %s", 
+					Constants.capitalize(attacker.nameElLa()),
+					attacker.attackValue(DamageType.SLICE),
+					attacker.attackValue(DamageType.BLUNT),
+					attacker.attackValue(DamageType.PIERCING),
+					creature.nameAlALa(),
+					creature.defenseValue(DamageType.SLICE),
+					creature.defenseValue(DamageType.BLUNT),
+					creature.defenseValue(DamageType.PIERCING),
+					amount);
+		}
+		
 		creature.modifyHp(-amount, "Matado por " + attacker.nameUnUna());
 		return true;
 	}
 	
-	public void onTalk(Creature other) { }
-	
 	public void onUpdate(){
+		if(creature.queSpell() != null &&
+				creature.getActionPoints() >= creature.queSpell().castSpeed().velocity()){
+			
+			if(creature.queSpellCreature() != null && canSee(creature.queSpellCreature().x, creature.queSpellCreature().y)){
+				creature.castSpell(creature.queSpell(), creature.queSpellCreature().x, creature.queSpellCreature().y);
+			}else{
+				creature.queSpellCreature().notify(Constants.capitalize(creature.nameElLa()) + " |falla06| el hechizo!");
+			}
+			creature.setQueSpell(null, null);
+		}
+		
 		if(creature.queAttack() != null && 
 				creature.getActionPoints() >= creature.getAttackSpeed().velocity()){
 			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
 			
-			Creature c = creature.world().creature(creature.queAttack().x, creature.queAttack().y, creature.queAttack().z);
+			Creature c = creature.world().creature(creature.queAttack().x, creature.queAttack().y);
 			
 			if(c == null){
 				creature.x = creature.queAttack().x;
 				creature.y = creature.queAttack().y;
-				creature.z = creature.queAttack().z;
-				creature.doAction("falla el ataque!");
+				creature.doAction("|falla05| el ataque!");
 			}else{
 				creature.meleeAttack(c);
 			}			
@@ -99,18 +166,26 @@ public class CreatureAi {
 		}
 	}
 	
-	public void onNotify(String message){
-	}
+	public void onMoveBy(int mx, int my){ }
+	
+	public void onTalk(Creature other) { }
+	
+	public void onNotify(String message){ }
+	
+	public void onDecease(Item corpse) { }
 
-	public boolean canSee(int wx, int wy, int wz) {
-		if (creature.z != wz)
-			return false;
+	public boolean canSee(int wx, int wy) {
+		int visionRadius = creature.visionRadius();
+		Creature c = creature.world().creature(wx, wy);
 		
-		if ((creature.x-wx)*(creature.x-wx) + (creature.y-wy)*(creature.y-wy) > creature.visionRadius()*creature.visionRadius())
+		if(c != null && c.isPlayer())
+			visionRadius = Math.max(0, visionRadius - c.stealthLevel());
+		
+		if ((creature.x-wx)*(creature.x-wx) + (creature.y-wy)*(creature.y-wy) > visionRadius*visionRadius)
 			return false;
 		
 		for (Point p : new Line(creature.x, creature.y, wx, wy)){
-			if (creature.realTile(p.x, p.y, wz).isGround() || p.x == wx && p.y == wy)
+			if (creature.realTile(p.x, p.y).isGround() || p.x == wx && p.y == wy)
 				continue;
 			
 			return false;
@@ -119,12 +194,12 @@ public class CreatureAi {
 		return true;
 	}
 
-	public Tile rememberedTile(int wx, int wy, int wz) {
+	public Tile rememberedTile(int wx, int wy) {
 		return Tile.UNKNOWN;
 	}
 
 	protected boolean canThrowAt(Creature other) {
-		return creature.canSee(other.x, other.y, other.z)
+		return creature.canSee(other.x, other.y)
 			&& getWeaponToThrow() != null;
 	}
 
@@ -146,20 +221,20 @@ public class CreatureAi {
 	protected boolean canRangedWeaponAttack(Creature other) {
 		return creature.weapon() != null
 		    && creature.weapon().attackValue(DamageType.RANGED) > 0
-		    && creature.canSee(other.x, other.y, other.z);
+		    && creature.canSee(other.x, other.y);
 	}
 
 	protected boolean canPickup() {
-		return creature.item(creature.x, creature.y, creature.z) != null
+		return creature.item(creature.x, creature.y) != null
 			&& !creature.inventory().isFull()
-			&& !creature.item(creature.x, creature.y, creature.z).getBooleanData(Constants.CHECK_CORPSE);
+			&& !creature.item(creature.x, creature.y).getBooleanData(Constants.CHECK_CORPSE);
 	}
 	
 	protected boolean canMove(int mx, int my){
-		Creature other = creature.creature(creature.x + mx, creature.y + my, creature.z);
+		Creature other = creature.creature(creature.x + mx, creature.y + my);
 		
 		if (other != null && (other.getStringData("Race") == creature.getStringData("Race")) 
-				|| !creature.tile(creature.x+mx, creature.y+my, creature.z).isGround()){
+				|| !creature.tile(creature.x+mx, creature.y+my).isGround()){
 			return false;
 		}else{
 			return true;
@@ -180,7 +255,7 @@ public class CreatureAi {
 		if (!canMove(mx, my))
 			return;
 		else
-			creature.moveBy(mx, my, 0);
+			creature.moveBy(mx, my);
 	}
 	
 	public void flee(Creature target){
@@ -193,7 +268,7 @@ public class CreatureAi {
 			
 		Point no_diagonal = eliminateDiagonal(mx, my, x_distance, y_distance);
 		
-		creature.moveBy(-no_diagonal.x, -no_diagonal.y, 0);
+		creature.moveBy(-no_diagonal.x, -no_diagonal.y);
 	}
 	
 	
@@ -210,7 +285,7 @@ public class CreatureAi {
 		
 		Point no_diagonal = eliminateDiagonal(mx, my, x_distance, y_distance);
 		
-		creature.moveBy(no_diagonal.x, no_diagonal.y, 0);
+		creature.moveBy(no_diagonal.x, no_diagonal.y);
 	}
 	
 	public void hunt(Point target) {
@@ -227,7 +302,7 @@ public class CreatureAi {
 		
 		Point no_diagonal = eliminateDiagonal(mx, my, x_distance, y_distance);
 		
-		creature.moveBy(no_diagonal.x, no_diagonal.y, 0);
+		creature.moveBy(no_diagonal.x, no_diagonal.y);
 	}
 	
 	private Point eliminateDiagonal(int mx, int my, int x_distance, int y_distance){
@@ -242,7 +317,7 @@ public class CreatureAi {
 				my = 0;
 		}
 		
-		return new Point(mx, my, 0);
+		return new Point(mx, my);
 	}
 
 	protected boolean canUseBetterEquipment() {

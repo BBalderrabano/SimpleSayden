@@ -13,27 +13,51 @@ public class PlayerAi extends CreatureAi {
 	private List<String> messages;
 	private FieldOfView fov;
 	
+	private boolean isStealthing = false;
+	private boolean lastSkipped = false;
+	
 	public PlayerAi(Creature creature, List<String> messages, FieldOfView fov) {
 		super(creature);
 		this.messages = messages;
 		this.fov = fov;
-		
+
+		creature.isPlayer = true;
 		creature.setData(Constants.RACE, "human");
 	}
+	
+	public void onMoveBy(int mx, int my){
+		if(mx == 0 && my == 0){
+			lastSkipped = true;
+		}else{
+			if(lastSkipped){
+				isStealthing = true;
+			}else{
+				isStealthing = false;
+			}
+			lastSkipped = false;
+			
+			if(isStealthing)
+				creature.modifyStealth(1);
+			else
+				creature.modifyStealth(-creature.stealthLevel());
+		}
+		
+		super.onMoveBy(mx, my);
+	}
 
-	public void onEnter(int x, int y, int z, Tile tile){
+	public void onEnter(int x, int y, Tile tile){
 		if (tile.isGround()){
 			creature.x = x;
 			creature.y = y;
-			creature.z = z;
 			
-			Item item = creature.item(creature.x, creature.y, creature.z);
-			if (item != null)
+			Item item = creature.item(creature.x, creature.y);
+			if (item != null){
 				creature.notify("Hay " + item.nameUnUna() + " aqui.");
+			}
 		} else if (tile.isDiggable()) {
-			creature.dig(x, y, z);
+			creature.dig(x, y);
 		} else if (tile.isDoor()) {
-			creature.open(x, y, z);
+			creature.open(x, y);
 		}
 		
 		creature.addTime(creature.getMovementSpeed().velocity());
@@ -43,29 +67,29 @@ public class PlayerAi extends CreatureAi {
 	public void onUpdate(){
 	}
 	
-	public void onAttack(int x, int y, int z, Creature other){
+	public boolean onAttack(int x, int y, Creature other){
 		if(creature.getData("Race") == other.getData("Race") && !other.getBooleanData(Constants.FLAG_ANGRY)){
 			other.ai().onTalk(creature);
-			return;
+			return false;
 		}
 		
 		creature.addTime(creature.getAttackSpeed().velocity());
 		creature.modifyActionPoints(creature.getAttackSpeed().velocity());
-		creature.meleeAttack(other);
+		return creature.meleeAttack(other);
 	}
 	
 	public void onNotify(String message){
 		messages.add(message);
 	}
 	
-	public boolean canSee(int wx, int wy, int wz) {
-		return fov.isVisible(wx, wy, wz);
+	public boolean canSee(int wx, int wy) {
+		return fov.isVisible(wx, wy);
 	}
 	
 	public void onGainLevel(){
 	}
 
-	public Tile rememberedTile(int wx, int wy, int wz) {
-		return fov.tile(wx, wy, wz);
+	public Tile rememberedTile(int wx, int wy) {
+		return fov.tile(wx, wy);
 	}
 }

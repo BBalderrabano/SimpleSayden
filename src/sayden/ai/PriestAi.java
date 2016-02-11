@@ -48,7 +48,7 @@ public class PriestAi extends HumanoidAi {
 					super.onSelectOption(option);
 
 					if(option.equals(OPT_MAGIC)){
-						player.pickup(factory.newLeatherSpellbook(-1));
+						player.pickup(factory.newLeatherSpellbook(false));
 						player.notify("El sacerdote te entrega un libro antiguo");
 					}
 					
@@ -62,7 +62,7 @@ public class PriestAi extends HumanoidAi {
 	public void onUpdate(){
 		super.onUpdate();
 		
-		if(!canSee(player.x, player.y, player.z))
-			creature.moveBy(0,0,0);
+		if(!canSee(player.x, player.y))
+			creature.moveBy(0,0);
 	}
 }

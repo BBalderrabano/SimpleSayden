@@ -6,13 +6,19 @@ public class Thing {
 	protected String name;
 	protected String appearance = null;
 	protected String description = null;
+	
 	public String name() { return (appearance == null || appearance == name ? name : appearance)
 			+ (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
+	
 	public String nameElLa(){ return gender == 'M' ? "el " + name() : "la " + name(); }
 	public String nameDelDeLa(){ return gender == 'M' ? "del " + name() : "de la " + name(); }
 	public String nameAlALa(){ return gender == 'M' ? "al " + name() : "a la " + name(); }
 	public String nameUnUna(){ return gender == 'M' ? "un " + name() : "una " + name(); }
 	public String realNameUnUna() { return gender == 'M' ? "un " + name : "una " + name; }
+	
+	public String nameWNoStacks() { return (appearance == null || appearance == name ? name : appearance); }
+	public String nameUnUnaWNoStacks(){ return gender == 'M' ? "un " + nameWNoStacks() : "una " + nameWNoStacks(); }
+	public String nameElLaWNoStacks(){ return gender == 'M' ? "el " + nameWNoStacks() : "la " + nameWNoStacks(); }
 	
 	public boolean isIdentified() { return appearance == null || appearance == name; }
 	

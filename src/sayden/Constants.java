@@ -8,6 +8,7 @@ public class Constants {
 	public static final int WORLD_HEIGHT = 24;
 	
 	public static final int MAX_SYNC_TIME = 100;
+	public static final int STEALTH_MIN = 2;
 	
 	public static final String CHEST_POS = "CHEST";
 	public static final String ARM_POS = "ARMS";
@@ -19,7 +20,7 @@ public class Constants {
 	public static final String WATER_FLUID = "WATER";
 	public static final String FIRE_TERRAIN = "FIRE";
 	public static final float FIRE_DEGRADATION = 10f;
-	public static final float MIN_FLUID_AMOUNT = 10f;
+	public static final float MIN_FLUID_AMOUNT = 15f;
 	public static final float BLOOD_AMOUNT_MULTIPLIER = 10f;
 	
 	public static final String CHECK_HELMENT = "IsHelment";
@@ -45,4 +46,10 @@ public class Constants {
 	
 	public static final String SPELL_HEAL = "Healed";
 	public static final String SPELL_PAIN = "Pain";
+	
+	public static final String WOUND_HEADACHE = "HasHeadache";
+	
+	public static String capitalize(String text){
+		return Character.toUpperCase(text.charAt(0))+""+text.substring(1);
+	}
 }

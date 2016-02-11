@@ -27,9 +27,9 @@ public class BigMarauderAi extends CreatureAi {
 	}
 	
 	public void onDecease(Item corpse){
-		corpse.setQuaffEffect(new Effect(6, false){
+		corpse.setQuaffEffect(new Effect("envenenado", 6, false){
 			public void start(Creature creature){
-				creature.notify("El cadaver del merodeador esta empapado de veneno!");
+				creature.notify("El cadaver del merodeador esta empapado de |veneno04|!");
 			}
 			public void update(Creature creature){
 				super.update(creature);
@@ -41,9 +41,10 @@ public class BigMarauderAi extends CreatureAi {
 	}
 	
 	@Override
-	public boolean onGetAttacked(int amount, String position, Creature attacker, String action, Object[] params){
-		if(attacker.isPlayer() && !creature.getBooleanData("SeenPlayer"))
+	public boolean onGetAttacked(int amount, String position, Creature attacker){
+		if(attacker.isPlayer() && !creature.getBooleanData("SeenPlayer")){
 			creature.setData("SeenPlayer", true);
+		}
 		
 		if(position == Constants.HEAD_POS){
 			
@@ -60,7 +61,7 @@ public class BigMarauderAi extends CreatureAi {
 		if(position == Constants.LEG_POS){
 			creature.setData("LegDamage", creature.getIntegerData("LegDamage") + amount);
 			
-			super.onGetAttacked(amount, position, attacker, action, params);
+			super.onGetAttacked(amount, position, attacker);
 			
 			if(!creature.getBooleanData("LegBroken") && creature.getIntegerData("LegDamage") > 20 && Math.random() < 0.3f){
 				creature.doAction("siente las piernas fallandole...");
@@ -74,7 +75,7 @@ public class BigMarauderAi extends CreatureAi {
 		if(position == Constants.ARM_POS){
 			creature.setData(armDamage, creature.getIntegerData(armDamage) + amount);
 			
-			super.onGetAttacked(amount, position, attacker, action, params);
+			super.onGetAttacked(amount, position, attacker);
 
 			if(!creature.getBooleanData(armBroken) && creature.getIntegerData(armDamage) > 15 && Math.random() < 0.3f){
 				creature.doAction("siente los brazos fallandole...");
@@ -89,10 +90,11 @@ public class BigMarauderAi extends CreatureAi {
 	}
 	
 	@Override
-	public void onAttack(int x, int y, int z, Creature other){
+	public boolean onAttack(int x, int y, Creature other){
 		if(creature.getBooleanData(armBroken) || creature.queAttack() == null){
-			super.onAttack(x, y, z, other);
+			return super.onAttack(x, y, other);
 		}
+		return false;
 	}
 	
 	public void onUpdate(){
@@ -102,7 +104,7 @@ public class BigMarauderAi extends CreatureAi {
 			creature.doAction("comienza a golpear a su alrededor!");
 			
 			for(Point p : creature.position().neighbors8()){
-				Creature c = world.creature(p.x, p.y, p.z);
+				Creature c = world.creature(p.x, p.y);
 				if(c == null || c == creature)
 					continue;
 				int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante", true);
@@ -115,7 +117,7 @@ public class BigMarauderAi extends CreatureAi {
 			super.onUpdate();
 		}
 		
-		if(canSee(player.x, player.y, player.z)){
+		if(canSee(player.x, player.y)){
 			if(player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
 					player.helment() != null && player.helment().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
 						!creature.getBooleanData("SeenPlayer")){
@@ -125,7 +127,7 @@ public class BigMarauderAi extends CreatureAi {
 			creature.setData("SeenPlayer", true);
 			
 			if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3 && Math.random() < 0.2){
-				creature.throwItem(getWeaponToThrow(), player.x, player.y, player.z);
+				creature.throwItem(getWeaponToThrow(), player.x, player.y);
 				return;
 			}
 			

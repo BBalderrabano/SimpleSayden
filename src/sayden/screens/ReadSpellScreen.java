@@ -123,7 +123,6 @@ public class ReadSpellScreen implements Screen {
 			}
 		}
 		
-		
 		return false;
 	}
 
@@ -147,7 +146,6 @@ public class ReadSpellScreen implements Screen {
 			return null;
 		}else if(key.getKeyCode() == KeyEvent.VK_ENTER || key.getKeyCode() == KeyEvent.VK_D
 				|| key.getKeyCode() == KeyEvent.VK_LEFT){
-			
 			lastSpell = item.writtenSpells().get(spellIndex);
 			return use(item.writtenSpells().get(spellIndex));
 		}

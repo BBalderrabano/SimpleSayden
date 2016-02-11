@@ -88,15 +88,15 @@ public class BlacksMithAi extends HumanoidAi {
 					super.onSelectOption(option);
 
 					if(option.equals(OPT_ESPADA)){
-						player.pickup(factory.newShortSword(-1));
+						player.pickup(factory.newShortSword(false));
 						player.notify("El herrero te entrega una espada corta");
 						creature.setData("GiveWeapon", true);
 					}else if(option.equals(OPT_MAZA)){
-						player.pickup(factory.newMace(-1));
+						player.pickup(factory.newMace(false));
 						player.notify("El herrero te entrega una maza");
 						creature.setData("GiveWeapon", true);
 					}else if(option.equals(OPT_DAGA)){
-						player.pickup(factory.newDagger(-1));
+						player.pickup(factory.newDagger(false));
 						player.notify("El herrero te entrega una daga");
 						creature.setData("GiveWeapon", true);
 					}
@@ -110,7 +110,7 @@ public class BlacksMithAi extends HumanoidAi {
 	public void onUpdate(){
 		super.onUpdate();
 		
-		if(!canSee(player.x, player.y, player.z))
+		if(!canSee(player.x, player.y))
 			wander();
 	}
 }

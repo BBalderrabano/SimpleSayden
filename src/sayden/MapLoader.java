@@ -20,7 +20,7 @@ public class MapLoader {
 //	private LinkedList<Creature> npcs;
 	
 	private World world;
-	private Tile[][][] tiles;
+	private Tile[][] tiles;
 	
 	public World preBuild(String mapName, StuffFactory factory)
 	{
@@ -33,27 +33,26 @@ public class MapLoader {
 			mapHeight = lines.length < Constants.WORLD_HEIGHT ? Constants.WORLD_HEIGHT : lines.length;
 			mapWidth = lines[0].length() < Constants.WORLD_HEIGHT ? Constants.WORLD_HEIGHT : lines[0].length();
 			
-			//TODO: Resolver z_index!!
-			tiles = new Tile[mapWidth][mapHeight][1];
+			tiles = new Tile[mapWidth][mapHeight];
 			
 			for(int y = 0; y < lines.length; y++){
 				for(int x = 0; x < lines[y].length(); x++){
 					char stringIndex = lines[y].replace("\n", "").replace("\r", "").replace("\t", "").charAt(x);
 					
 					if(stringIndex == ">".charAt(0)){
-						tiles[x][y][0] = Tile.STAIRS_DOWN;
+						tiles[x][y] = Tile.STAIRS_DOWN;
 					}else if(stringIndex == "<".charAt(0)){
-						tiles[x][y][0] = Tile.STAIRS_UP;
+						tiles[x][y] = Tile.STAIRS_UP;
 					}else{
 						if(!(stringIndex >= '0' && stringIndex <= '9')){
 							//En caso de que arranquemos con letras
 							//Este es un fix puesto que cada numero identifica un tile, lo que delimita cada mapa a usar
 							//9 tiles, gracias a esto tambien se podran usar letras, siendo la a = 10
 							stringIndex -= 87;	// -87 para que a = 10
-							tiles[x][y][0] = Tile.getById((int)stringIndex);
+							tiles[x][y] = Tile.getById((int)stringIndex);
 						}else{
 							//Los primeros números
-							tiles[x][y][0] = Tile.getById(Integer.parseInt(stringIndex+""));
+							tiles[x][y] = Tile.getById(Integer.parseInt(stringIndex+""));
 						}
 					}
 				}

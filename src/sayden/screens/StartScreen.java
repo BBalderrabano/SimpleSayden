@@ -10,13 +10,6 @@ public class StartScreen implements Screen {
 	public void displayOutput(AsciiPanel terminal) {
 		terminal.write("Simple Sayden", 1, 1);
 		
-		terminal.write((char)251, 1, 2);
-		terminal.write((char)249, terminal.getCursorX(), 2);
-		terminal.write((char)248, terminal.getCursorX(), 2);
-		terminal.write((char)252, terminal.getCursorX(), 2);
-		terminal.write((char)253, terminal.getCursorX(), 2);
-		terminal.write((char)254, terminal.getCursorX(), 2);
-		terminal.write((char)255, terminal.getCursorX(), 2);
 		terminal.writeCenter("-- press [enter] to start --", 22);
 	}
 

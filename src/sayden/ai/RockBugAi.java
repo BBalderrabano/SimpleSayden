@@ -33,7 +33,7 @@ public class RockBugAi extends CreatureAi {
 
 	public void onDecease(Item corpse){
 		corpse.unsetData(Constants.CHECK_CORPSE);
-		corpse.setQuaffEffect(new Effect(7, false){
+		corpse.setQuaffEffect(new Effect("alimentado", 7, false){
 			public void start(Creature creature){
 				creature.notify("Las viceras del comepiedras saben horripilante!");
 				creature.modifyHp(-3, "Indigestion de carne de comepiedra");
@@ -46,10 +46,10 @@ public class RockBugAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
-		if (creature.canSee(player.x, player.y, player.z) && creature.hp() >= creature.totalMaxHp() * .3f){
+		if (creature.canSee(player.x, player.y) && creature.hp() >= creature.totalMaxHp() * .3f){
 			hunt(player);
 		}else{
-			Item rockCheck = creature.item(creature.x, creature.y, creature.z);
+			Item rockCheck = creature.item(creature.x, creature.y);
 			
 			if(rockCheck != null && rockCheck.name().equals("roca")){
 				creature.pickup();
@@ -60,7 +60,7 @@ public class RockBugAi extends CreatureAi {
 				return;
 			}
 			for(Point p : creature.position().neighbors4()){
-				if(creature.world().tile(p.x, p.y, p.z) == Tile.WALL){
+				if(creature.world().tile(p.x, p.y) == Tile.WALL){
 					if(Math.random() < healthOnEatChance){
 						if(creature.hp() < creature.totalMaxHp()){
 							creature.doAction("devora la pared recuperando fuerzas");
@@ -68,7 +68,7 @@ public class RockBugAi extends CreatureAi {
 						creature.modifyHp(healthBonus, "Indigestion rocosa");
 						
 						if(Math.random() < destroyWallChance && rocksEaten < 8){
-							creature.dig(p.x, p.y, p.z);
+							creature.dig(p.x, p.y);
 							rocksEaten++;
 						}
 						
@@ -81,7 +81,7 @@ public class RockBugAi extends CreatureAi {
 				}
 			}
 			for(Point p : creature.position().neighbors(4)){
-				if(creature.world().tile(p.x, p.y, p.z) == Tile.WALL){
+				if(creature.world().tile(p.x, p.y) == Tile.WALL){
 					hunt(p);
 					return;
 				}
@@ -92,7 +92,7 @@ public class RockBugAi extends CreatureAi {
 	}
 	
 	void addBonusDamage(){
-		creature.addEffect(new Effect(attackBonusDuration){
+		creature.addEffect(new Effect("fortalecido", attackBonusDuration){
 			public void start(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, 6);
 			}

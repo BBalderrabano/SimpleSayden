@@ -19,7 +19,7 @@ public class Line implements Iterable<Point> {
 		int err = dx-dy;
 		
 		while (true){
-			points.add(new Point(x0, y0, 0));
+			points.add(new Point(x0, y0));
 			
 			if (x0==x1 && y0==y1)
 				break;

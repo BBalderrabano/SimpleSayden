@@ -5,7 +5,6 @@ import java.util.List;
 public class Projectile {
 	public int x;
 	public int y;
-	public int z;
 	
 	private int step = 0;
 	
@@ -29,7 +28,7 @@ public class Projectile {
 	private boolean isDone = false;
 	public boolean isDone() { return isDone || this.step >= path.getPoints().size(); }
 	
-	public Projectile(World world, int depth, Line line, Speed velocity, Item projectile, Creature creature){
+	public Projectile(World world, Line line, Speed velocity, Item projectile, Creature creature){
 		this.world = world;
 		this.path = line;
 		this.speed = velocity;
@@ -37,7 +36,6 @@ public class Projectile {
 		this.actionPoints += speed.velocity();
 		this.origin = creature;
 		this.start = creature.position();
-		this.z = depth;
 
 		step++;
 	}
@@ -48,7 +46,7 @@ public class Projectile {
 			
 			int mx = points.get(Math.min(step, points.size() - 1)).x - x;
 			int my = points.get(Math.min(step, points.size() - 1)).y - y;
-			Creature c = world.creature(x, y, z);
+			Creature c = world.creature(x, y);
 			
 			if(c != null && c != origin && !isDone)
 				end();
@@ -59,7 +57,7 @@ public class Projectile {
 	}
 	
 	public void moveBy(int mx, int my){
-		Tile tile = world.tile(x+mx, y+my, z);		
+		Tile tile = world.tile(x+mx, y+my);		
 		
 		modifyActionPoints(-speed.velocity());
 		
@@ -67,7 +65,7 @@ public class Projectile {
 			this.x = mx+x;
 			this.y = my+y;
 			
-			Creature check = world.creature(x, y, z);
+			Creature check = world.creature(x, y);
 			
 			if(check != null && check != origin && !isDone){
 				end();
@@ -80,7 +78,7 @@ public class Projectile {
 	public void end(){
 		this.isDone = true;
 		
-		Creature target = world.creature(x, y, z);
+		Creature target = world.creature(x, y);
 		String name = projectile.nameUnUna();
 		int totalDamage = 0;
 		
@@ -91,19 +89,41 @@ public class Projectile {
 			
 			totalDamage = Math.max(1, totalDamage);	//Always deals at least 1 damage (ignores shields?)
 			
-			target.doAction("recibe el impacto de %s por %s", projectile.nameUnUna(), totalDamage+"!");
+			if(target.isPlayer()){
+				target.combatAction("%s |(%s %s %s)01|%s te impacta |[%s %s %s]02| por |%s01|!", Constants.capitalize(projectile.nameUnUna()),
+						projectile.attackValue(DamageType.SLICE),
+						projectile.attackValue(DamageType.BLUNT),
+						projectile.attackValue(DamageType.PIERCING),
+						projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
+						target.defenseValue(DamageType.SLICE),
+						target.defenseValue(DamageType.BLUNT),
+						target.defenseValue(DamageType.PIERCING),
+						totalDamage);
+			}else{
+				target.combatAction("%s |(%s %s %s)01|%s impacta %s |[%s %s %s]02| por |%s01|!", 
+						Constants.capitalize(projectile.nameUnUna()),
+						projectile.attackValue(DamageType.SLICE),
+						projectile.attackValue(DamageType.BLUNT),
+						projectile.attackValue(DamageType.PIERCING),
+						projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
+						target.nameAlALa(),
+						target.defenseValue(DamageType.SLICE),
+						target.defenseValue(DamageType.BLUNT),
+						target.defenseValue(DamageType.PIERCING),
+						totalDamage);
+			}
 	
 			if(projectile.quaffEffect() != null && projectile.quaffEffect().quaffable){
 				target.addEffect(projectile.quaffEffect());
-				projectile.quaffEffect().start(x, y, z);
+				projectile.quaffEffect().start(x, y);
 			}else{
-				world.addAtEmptySpace(projectile, x, y, z);
+				world.addAtEmptySpace(projectile, x, y);
 			}
 			
 			target.ai().setCheckPoint(start);
 			target.modifyHp(-totalDamage, "Impactado por " + name);
 		}else{
-			world.addAtEmptySpace(projectile, x, y, z);
+			world.addAtEmptySpace(projectile, x, y);
 		}
 		interrupted = true;
 	}

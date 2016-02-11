@@ -8,23 +8,28 @@ public class HelpScreen implements Screen {
 	@Override
 	public void displayOutput(AsciiPanel terminal) {
 		terminal.clear();
-		terminal.writeCenter("roguelike help", 1);
-		terminal.write("Descend the Caves Of Slight Danger, find the lost Teddy Bear, and return to", 1, 3);
-		terminal.write("the surface to win. Use what you find to avoid dying.", 1, 4);
+		terminal.writeCenter("Sayden", 1);
+		terminal.write("Este es un juego en etapa de desarrollo", 1, 3);
 		
-		int y = 6;
-		terminal.write("[g] or [,] to pick up", 2, y++);
-		terminal.write("[d] to drop", 2, y++);
-		terminal.write("[e] to eat", 2, y++);
-		terminal.write("[w] to wear or wield", 2, y++);
-		terminal.write("[?] for help", 2, y++);
-		terminal.write("[x] to examine your items", 2, y++);
-		terminal.write("[;] to look around", 2, y++);
-		terminal.write("[t] to throw an item", 2, y++);
-		terminal.write("[q] to quaff a potion", 2, y++);
-		terminal.write("[r] to read something", 2, y++);
+		int y = 5;
+		terminal.write("[wasd] Muevete por el mapa", 2, y++);
+		terminal.write("Tu velocidad de movimiento define que tan rapido te mueves", 6, y++);
+		terminal.write("Tu velocidad de ataque define que tan rapido atacas", 6, y++);
+		terminal.write("Muevete a una casilla ocupada para atacar/interactuar", 6, y++);
+		terminal.write("Puedes esquivar ataques y proyectiles si te mueves rapido", 6, y++);
+		y++;
+		terminal.write("[espacio] Saltea un movimiento", 2, y++);
+		terminal.write("Saltear un movimiento es mas rapido que moverse", 6, y++);
+		y++;
+		terminal.write("[i - tab] Abre el inventario", 2, y++);
+		terminal.write("Una vez dentro navega con [wasd - enter]", 6, y++);
+		y++;
+		terminal.write("[r] Observa el entorno", 2, y++);
+		terminal.write("[f] Usa tu arma de rango", 2, y++);
+		terminal.write("[g - e] Levanta un objeto", 2, y++);
+		terminal.write("[q] Lanza hechizos rapidamente", 2, y++);
 		
-		terminal.writeCenter("-- press any key to continue --", 22);
+		terminal.writeCenter("-- presiona cualquier tecla --", 22);
 	}
 
 	@Override

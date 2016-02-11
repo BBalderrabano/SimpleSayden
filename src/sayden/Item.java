@@ -128,26 +128,31 @@ public class Item extends Thing{
 
 	public String details() {
 		String details = "";
+		String useVerb = gender == 'M' ? "usado" : "usada";
 		
 		details += nameUnUna() + ".";
 		details = details.substring(0, 1).toUpperCase()
 				+ details.substring(1);
+		
+		if(getBooleanData(Constants.CHECK_TWO_HANDED)){
+			details += ", requiere dos manos.";
+		}
 		
 		if(isIdentified()){
 			details += description == null ? "" : " " + description;
 		}
 		
 		if(getBooleanData(Constants.CHECK_ARMOR)){
-			details += " Puede ser usado de armadura.";
+			details += " Puede ser "+useVerb+" como armadura.";
 		}
 		if(getBooleanData(Constants.CHECK_HELMENT)){
-			details += " Puede ser usado como casco.";
+			details += " Puede ser "+useVerb+" como casco.";
 		}
 		if(getBooleanData(Constants.CHECK_SHIELD)){
-			details += " Puede ser usado como escudo.";
+			details += " Puede ser "+useVerb+" como escudo.";
 		}
 		if(getBooleanData(Constants.CHECK_WEAPON)){
-			details += " Puede ser usado como arma.";
+			details += " Puede ser "+useVerb+" como arma.";
 		}
 		if(stackable()){
 			details += " Puede acumularse "+maxStacks+" veces.";

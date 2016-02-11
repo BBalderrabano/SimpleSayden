@@ -6,18 +6,21 @@ public class Effect {
 	
 	public boolean isDone() { return duration < 1; }
 
-	public Effect(int duration){
+	public Effect(String statusName, int duration){
 		this.duration = duration;
+		this.statusName = statusName;
 	}
 	
-	public Effect(int duration, boolean quaffable){
+	public Effect(String statusName, int duration, boolean quaffable){
 		this.duration = duration;
 		this.quaffable = quaffable;
+		this.statusName = statusName;
 	}
 	
 	public Effect(Effect other){
 		this.duration = other.duration; 
 		this.quaffable = other.quaffable;
+		this.statusName = other.statusName;
 	}
 	
 	public void update(Creature creature){
@@ -28,11 +31,17 @@ public class Effect {
 		
 	}
 	
-	public void start(int x, int y, int z){
+	public void start(int x, int y){
 
 	}
 	
 	public void end(Creature creature){
 		
+	}
+	
+	private String statusName;
+	
+	public String statsName(){
+		return statusName;
 	}
 }

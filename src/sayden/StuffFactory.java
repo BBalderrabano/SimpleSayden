@@ -9,16 +9,18 @@ import java.util.Map;
 
 
 import asciiPanel.AsciiPanel;
-import sayden.ai.BatAi;
 import sayden.ai.BigMarauderAi;
 import sayden.ai.BlacksMithAi;
 import sayden.ai.FungusAi;
 import sayden.ai.GoblinAi;
+import sayden.ai.MageAi;
 import sayden.ai.MarauderAi;
 import sayden.ai.PaseacuevasAi;
+import sayden.ai.PaseacuevasLostAi;
 import sayden.ai.PaseacuevasMaleAi;
 import sayden.ai.PlayerAi;
 import sayden.ai.PriestAi;
+import sayden.ai.RabbitAi;
 import sayden.ai.RockBugAi;
 import sayden.ai.ZombieAi;
 
@@ -27,7 +29,6 @@ public class StuffFactory {
 	private Map<String, Color> potionColors;
 	private List<String> potionAppearances;
 	
-	protected Creature player;
 	
 	public StuffFactory(World world){
 		this.world = world;
@@ -57,78 +58,92 @@ public class StuffFactory {
 	 * ########################################################################################
 	 */
 	
+	public void movePlayer(Creature player, List<String> messages, FieldOfView fov, World world){
+		player.setWorld(world);
+		new PlayerAi(player, messages, fov);
+	}
+	
 	public Creature newPlayer(List<String> messages, FieldOfView fov){
 		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 50);
-		
+				
 		player.setStartingMovementSpeed(Speed.VERY_FAST);
 		player.setStartingAttackSpeed(Speed.VERY_FAST);
 		
-		player.modifyAttackValue(DamageType.RANGED, 1);
-		
-		Point[] startPos = {new Point(45, 2, 0),
-							new Point(36, 12, 0)};
+		Point[] startPos = {new Point(45, 2),
+							new Point(36, 12)};
 		int selectedStart = (int) (Math.random() * startPos.length);
 		
-		if(Math.random() < 0.1)
-			player.inventory().add(newAlcoholBottle(-1));
+		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y);
 		
-		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y, 0);
+		if(Math.random() < 0.1f){
+			player.inventory().add(newAlcoholBottle(false));
+		}
 		
 		new PlayerAi(player, messages, fov);
-		this.player = player;
-		player.doAction("despierta");
+		player.doAction("despierta en un pueblo abandonado");
 		return player;
 	}
 	
-	public Creature newBlacksmith(Creature player, int x, int y, int depth){
+	public Creature newRabbit(){
+		Creature rabbit = new Creature(world, 'r', 'M', AsciiPanel.brightWhite, "conejo", 5);
+		
+		rabbit.setStartingMovementSpeed(Speed.VERY_FAST);
+		
+		world.addAtEmptyLocation(rabbit);
+		new RabbitAi(rabbit);
+		return rabbit;
+	}
+	
+	public Creature newMage(Creature player){
+		Creature mage = new Creature(world, 'm', 'M', AsciiPanel.brightBlack, "mago", 10);
+		
+		world.addAtEmptyLocation(mage);
+		new MageAi(mage, player);
+		return mage;
+	}
+	
+	public Creature newBlacksmith(Creature player, int x, int y){
 		Creature blackSmith = new Creature(world, '8', 'M', Color.ORANGE, "herrero", 50);
 		
 		blackSmith.setStartingMovementSpeed(Speed.NORMAL);
 		blackSmith.setStartingAttackSpeed(Speed.NORMAL);
 		
-		blackSmith.inventory().add(newShortSword(-1));
-		blackSmith.inventory().add(newDagger(-1));
-		blackSmith.inventory().add(newMace(-1));
+		blackSmith.inventory().add(newShortSword(false));
+		blackSmith.inventory().add(newDagger(false));
+		blackSmith.inventory().add(newMace(false));
 		
-		world.addAtEmptySpace(blackSmith, x, y, depth);
+		world.addAtEmptySpace(blackSmith, x, y );
 		new BlacksMithAi(blackSmith, player, this);
 		return blackSmith;
 	}
 	
-	public Creature newPriest(Creature player, int x, int y, int depth){
+	public Creature newPriest(Creature player, int x, int y){
 		Creature priest = new Creature(world, (char)234, 'M', AsciiPanel.brightCyan, "sacerdote", 50);
 		
 		priest.setStartingMovementSpeed(Speed.NORMAL);
 		priest.setStartingAttackSpeed(Speed.NORMAL);
 		
-		world.addAtEmptySpace(priest, x, y, depth);
+		world.addAtEmptySpace(priest, x, y );
 		new PriestAi(priest, player, this);
 		return priest;
 	}
 
-	public Creature newFungus(int depth){
+	public Creature newFungus(){
 		Creature fungus = new Creature(world, 'f', 'M', AsciiPanel.green, "hongo", 10);
-		world.addAtEmptyLocation(fungus, depth);
+		world.addAtEmptyLocation(fungus );
 		new FungusAi(fungus, this);
 		return fungus;
 	}
-	
-	public Creature newBat(int depth){
-		Creature bat = new Creature(world, 'b', 'M', AsciiPanel.brightYellow, "murcielago", 15);
-		world.addAtEmptyLocation(bat, depth);
-		new BatAi(bat);
-		return bat;
-	}
-	
-	public Creature newZombie(int depth, Creature player){
+
+	public Creature newZombie(Creature player){
 		Creature zombie = new Creature(world, 'z', 'M', AsciiPanel.white, "zombie", 50);
-		world.addAtEmptyLocation(zombie, depth);
+		world.addAtEmptyLocation(zombie );
 		new ZombieAi(zombie, player);
 		return zombie;
 	}
 	
-	public Creature newCaveBrute(int depth, Creature player){
-		Creature caveBrute = new Creature(world, 'P', 'F', AsciiPanel.brightGreen, "paseacuevas", 30);
+	public Creature newCaveBrute(Creature player){
+		Creature caveBrute = new Creature(world, 'P', 'F', AsciiPanel.brightGreen, "matriarca", 30);
 		caveBrute.setStartingAttackSpeed(Speed.SLOW);
 		caveBrute.setStartingMovementSpeed(Speed.SLOW);
 		caveBrute.setVisionRadius(4);
@@ -137,19 +152,34 @@ public class StuffFactory {
 		caveBrute.modifyDefenseValue(DamageType.BLUNT, 2);
 		caveBrute.modifyDefenseValue(DamageType.SLICE, 1);
 		
-		caveBrute.equip(newBigMace(-1));
+		caveBrute.equip(newBigMace(false));
 		
-		world.addAtEmptyLocation(caveBrute, depth);
+		world.addAtEmptyLocation(caveBrute );
 		PaseacuevasAi ai = new PaseacuevasAi(caveBrute, player);
 		
 		for(int i = 0; i < Math.random() * 3; i++){
-			ai.addMale(newCaveSmall(depth, player, caveBrute));
+			ai.addMale(newCaveSmall(player, caveBrute));
 		}
 		
 		return caveBrute;
 	}
+	
+	public Creature newCaveLost(Creature player){
+		Creature caveLost = new Creature(world, 'p', 'M', AsciiPanel.green, "paseacuevas", 8);
 		
-	public Creature newCaveSmall(int depth, Creature player, Creature female){
+		caveLost.setStartingAttackSpeed(Speed.NORMAL);
+		caveLost.setStartingMovementSpeed(Speed.FAST);
+		
+		caveLost.modifyAttackValue(DamageType.SLICE, 2);
+		
+		caveLost.setVisionRadius(8);
+		
+		world.addAtEmptyLocation(caveLost);
+		new PaseacuevasLostAi(caveLost, player);
+		return caveLost;
+	}
+		
+	public Creature newCaveSmall(Creature player, Creature female){
 		Creature caveSmall = new Creature(world, 'p', 'M', AsciiPanel.brightGreen, "paseacuevas", 8);
 		caveSmall.setStartingAttackSpeed(Speed.NORMAL);
 		caveSmall.setStartingMovementSpeed(Speed.FAST);
@@ -157,50 +187,50 @@ public class StuffFactory {
 		
 		caveSmall.modifyAttackValue(DamageType.BLUNT, 2);
 		
-		world.addAtEmptySpace(caveSmall, female.x, female.y, female.z);
+		world.addAtEmptySpace(caveSmall, female.x, female.y);
 		new PaseacuevasMaleAi(caveSmall, player, female);
 		return caveSmall;
 	}
 	
-	public Creature newMarauder(int depth, Creature player){
+	public Creature newMarauder(Creature player){
 		Creature marauder = new Creature(world, 'm', 'M', AsciiPanel.brightYellow, "merodeador", 10);
 		marauder.setStartingAttackSpeed(Speed.NORMAL);
 		marauder.setStartingMovementSpeed(Speed.NORMAL);
 		marauder.setVisionRadius(6);
 		
-		marauder.inventory().add(newMarauderPoison(-1));
+		marauder.inventory().add(newMarauderPoison(false));
 		
 		if(Math.random() < .3f)
-			marauder.inventory().add(newMarauderVest(-1));
+			marauder.inventory().add(newMarauderVest(false));
 		if(Math.random() < .3f)
-			marauder.inventory().add(newMarauderHood(-1));
+			marauder.inventory().add(newMarauderHood(false));
 		
-		marauder.inventory().add(randomWeapon(-1));
+		marauder.inventory().add(randomWeapon(false));
 		
-		world.addAtEmptyLocation(marauder, depth);
+		world.addAtEmptyLocation(marauder );
 		new MarauderAi(marauder, player);
 		return marauder;
 	}
 	
-	public Creature newHugeMarauder(int depth, Creature player){
+	public Creature newHugeMarauder(Creature player){
 		Creature bigMarauder = new Creature(world, 'M', 'M', AsciiPanel.brightYellow, "merodeador gigante", 110);
 		
 		bigMarauder.setStartingAttackSpeed(Speed.VERY_SLOW);
 		bigMarauder.setStartingMovementSpeed(Speed.NORMAL);
 		bigMarauder.modifyAttackValue(DamageType.BLUNT, 8);
 
-		bigMarauder.equip(newMarauderVest(-1));
-		bigMarauder.equip(newMarauderHood(-1));
+		bigMarauder.equip(newMarauderVest(false));
+		bigMarauder.equip(newMarauderHood(false));
 		
 		for(int i = 0; i < Math.random() * 3; i++)
-			bigMarauder.inventory().add(newGiantRock(-1));
+			bigMarauder.inventory().add(newGiantRock(false));
 				
-		world.addAtEmptyLocation(bigMarauder, depth);
+		world.addAtEmptyLocation(bigMarauder );
 		new BigMarauderAi(bigMarauder, player);
 		return bigMarauder;
 	}
 	
-	public Creature newRockBug(int depth, Creature player){
+	public Creature newRockBug(Creature player){
 		Creature rockBug = new Creature(world, 'c', 'M', AsciiPanel.yellow, "comepiedras", 6);
 		
 		rockBug.setStartingAttackSpeed(Speed.NORMAL);
@@ -211,20 +241,20 @@ public class StuffFactory {
 		rockBug.modifyDefenseValue(DamageType.SLICE, 1);
 		
 		if(Math.random() > 0.2f){
-			rockBug.pickup(newRockBugHelm(-1));
+			rockBug.pickup(newRockBugHelm(false));
 		}
 		
-		world.addAtEmptyLocation(rockBug, depth);
+		world.addAtEmptyLocation(rockBug );
 		new RockBugAi(rockBug, player, this);
 		return rockBug;
 	}
 
-	public Creature newGoblin(int depth, Creature player){
+	public Creature newGoblin(Creature player){
 		Creature goblin = new Creature(world, 'g', 'M', AsciiPanel.brightGreen, "goblin", 50);
 		new GoblinAi(goblin, player);
-		goblin.equip(randomWeapon(-1));		
-		goblin.equip(randomArmor(-1));
-		world.addAtEmptyLocation(goblin, depth);
+		goblin.equip(randomWeapon(false));		
+		goblin.equip(randomArmor(false));
+		world.addAtEmptyLocation(goblin );
 		return goblin;
 	}
 
@@ -233,28 +263,29 @@ public class StuffFactory {
 	 * ########################################################################################
 	 */
 	
-	public Item newRock(int depth){
+	public Item newRock(boolean spawn){
+		if(Math.random() < 0.15)
+			return newGiantRock(spawn);
+		
 		Item rock = new Item(',', 'F', AsciiPanel.yellow, "roca", null);
 		rock.modifyAttackValue(DamageType.BLUNT, 3);
 		rock.makeStackable(5);
-		rock.description = "Tiene un substancial tamaño y bordes solidos, lo suficientemente liviana para llevar en cantidad";
-		world.addAtEmptyLocation(rock, depth);
+		world.addAtEmptyLocation(rock, spawn);
 		return rock;
 	}
 	
-	public Item newGiantRock(int depth){
+	public Item newGiantRock(boolean spawn){
 		Item rock = new Item(';', 'F', AsciiPanel.yellow, "roca gigante", null);
 		rock.modifyAttackValue(DamageType.BLUNT, 8);
 		rock.modifyAttackSpeed(Speed.FAST);
 		rock.modifyMovementSpeed(Speed.FAST);
-		rock.description = "Una gigantesca roca, extremadamente pesada";
-		world.addAtEmptyLocation(rock, depth);
+		world.addAtEmptyLocation(rock, spawn);
 		return rock;
 	}
 	
-	public Item newAlcoholBottle(int depth){
+	public Item newAlcoholBottle(boolean spawn){
 		final Item alcohol = new Item('!', 'M', AsciiPanel.white, "alcohol", null);
-		alcohol.setQuaffEffect(new Effect(1, true){
+		alcohol.setQuaffEffect(new Effect("borracho", 1, true){
 			public void start(Creature creature){
 				creature.doAction(alcohol, "bebe la botella completa");
 				if(Math.random() > .8){
@@ -264,110 +295,96 @@ public class StuffFactory {
 			}
 		});
 		alcohol.makeStackable(5);
-		world.addAtEmptyLocation(alcohol, depth);
+		world.addAtEmptyLocation(alcohol, spawn);
 		return alcohol;
 	}
 	
-	public Item newKnife(int depth){
+	public Item newKnife(boolean spawn){
 		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo");
 		knife.modifyAttackValue(DamageType.PIERCING, 2);
+		knife.modifyAttackValue(DamageType.RANGED, 1);
 		knife.setData(Constants.CHECK_WEAPON, true);
 		knife.modifyStacks(3);
 		knife.modifyBloodModifyer(0.7f);
-		knife.description = "El filo fue tratado con especial cuidado para penetrar la carne, en lugar de solo cortarla. El mango"
-				+ " de madera tambien le permite ser usado como proyectil.";
-		world.addAtEmptyLocation(knife, depth);
+		knife.description = "Bastante ligero y aerodinamico.";
+		world.addAtEmptyLocation(knife, spawn);
 		return knife;
 	}
 	
-	public Item newRockBugHelm(int depth){
+	public Item newRockBugHelm(boolean spawn){
 		Item rockBugHelm = new Item((char)248, 'M', AsciiPanel.yellow, "caparazon de comepiedra", null);
-		rockBugHelm.modifyDefenseValue(DamageType.SLICE, 0);
 		rockBugHelm.modifyDefenseValue(DamageType.BLUNT, 1);
 		rockBugHelm.setData(Constants.CHECK_HELMENT, true);
-		rockBugHelm.description = "Los comepiedras tienen una jugosa membrana en sus espaldas al nacer, haciendolos muy vulnerables"
-				+ ". Sin embargo con el tiempo los sedimentos que caen en su caparazon y quedan impregnados, creando una fuerte proteccion.";
-		world.addAtEmptyLocation(rockBugHelm, -1);
+		world.addAtEmptyLocation(rockBugHelm, spawn);
 		return rockBugHelm;
 	}
 	
-	public Item newVictoryItem(int depth){
-		Item item = new Item('*', 'M', AsciiPanel.brightWhite, "osito de peluche", null);
-		world.addAtEmptyLocation(item, depth);
-		return item;
-	}
-	
-	public Item newBread(int depth){
+	public Item newBread(boolean spawn){
 		Item item = new Item('%', 'M', AsciiPanel.yellow, "pan", null);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
-		item.setQuaffEffect(new Effect(1, false){
+		item.setQuaffEffect(new Effect("alimentado", 1, false){
 			public void start(Creature creature){
 				creature.modifyHp(5, "Comiste demasiado");
 			}
 		});
-		item.description = "Parece estar bastante viejo, pero donde hay hambre...";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newFruit(int depth){
+	public Item newFruit(boolean spawn){
 		Item item = new Item('%', 'F', AsciiPanel.brightRed, "manzana", null);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
-		item.setQuaffEffect(new Effect(1, false){
+		item.setQuaffEffect(new Effect("alimentado", 1, false){
 			public void start(Creature creature){
 				creature.modifyHp(8, "Comiste demasiado");
 			}
 		});
-		item.description = "Se encuentra blanda y mohosa, probablemente descartada por los merodeadores.";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newDagger(int depth){
+	public Item newDagger(boolean spawn){
 		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga");
 		item.modifyAttackValue(DamageType.PIERCING, 1);
 		item.modifyAttackValue(DamageType.SLICE, 1);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyBloodModifyer(0.7f);
-		item.description = "Esta daga no esta lo suficientemente afilada, pero es liviana y sencilla de usar en combate.";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newShortSword(int depth){
+	public Item newShortSword(boolean spawn){
 		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada corta", "espada corta");
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyBloodModifyer(0.6f);
-		item.description = "De corto filo pero firme temple, esta espada parece ser la obra de Marcos el herrero.";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newRockMace(int depth){
+	public Item newRockMace(boolean spawn){
 		Item rockMace = new Item((char)254, 'F', AsciiPanel.yellow, "estalactita", null);
 		rockMace.modifyAttackValue(DamageType.BLUNT, 3);
 		rockMace.setData(Constants.CHECK_WEAPON, true);
 		rockMace.modifyAttackSpeed(Speed.FAST);
 		rockMace.modifyBloodModifyer(0.2f);
-		rockMace.description = "Caida del techo de la cueva. Por suerte no sobre tu cabeza.";
-		world.addAtEmptyLocation(rockMace, depth);
+		rockMace.description = "No es muy solida.";
+		world.addAtEmptyLocation(rockMace, spawn);
 		return rockMace;
 	}
 	
-	public Item newBigSword(int depth){
+	public Item newBigSword(boolean spawn){
 		Item bigSword = new Item((char)253, 'M', Color.gray, "espadon", "espadon");
 		bigSword.modifyAttackValue(DamageType.SLICE, 3);
 		bigSword.modifyAttackValue(DamageType.BLUNT, 2);
 		bigSword.modifyAttackSpeed(Speed.NORMAL);
 		bigSword.setData(Constants.CHECK_WEAPON, true);
 		bigSword.modifyBloodModifyer(0.5f);
-		bigSword.description = "Tan grande y pesado que la fuerza bruta del impacto duele casi tanto como un miembro cercenado.";
-		world.addAtEmptyLocation(bigSword, depth);
+		world.addAtEmptyLocation(bigSword, spawn);
 		return bigSword;
 	}
 	
-	public Item newHomongousSword(int depth){
+	public Item newHomongousSword(boolean spawn){
 		Item bigSword = new Item((char)253, 'M', AsciiPanel.brightBlack, "espadon homunculo", "espadon homunculo");
 		bigSword.modifyAttackValue(DamageType.SLICE, 8);
 		bigSword.modifyAttackValue(DamageType.BLUNT, 6);
@@ -376,160 +393,146 @@ public class StuffFactory {
 		bigSword.setData(Constants.CHECK_WEAPON, true);
 		bigSword.setData(Constants.CHECK_TWO_HANDED, true);
 		bigSword.modifyBloodModifyer(0.9f);
-		bigSword.description = "La espada mas grande que jamas has visto";
-		world.addAtEmptyLocation(bigSword, depth);
+		bigSword.description = "La espada mas grande que jamas has visto.";
+		world.addAtEmptyLocation(bigSword, spawn);
 		return bigSword;
 	}
 	
-	public Item newMorningStar(int depth){
+	public Item newMorningStar(boolean spawn){
 		Item morningStar = new Item((char)254, 'F', AsciiPanel.brightBlack, "estrella", "estrella");
 		morningStar.modifyAttackValue(DamageType.BLUNT, 3);
 		morningStar.modifyAttackValue(DamageType.PIERCING, 1);
 		morningStar.modifyAttackSpeed(Speed.FAST);
 		morningStar.setData(Constants.CHECK_WEAPON, true);
 		morningStar.modifyBloodModifyer(0.4f);
-		morningStar.description = "El nombre es una alusion a las puas colocadas en la punta de esta maza.";
-		world.addAtEmptyLocation(morningStar, depth);
+		world.addAtEmptyLocation(morningStar, spawn);
 		return morningStar;
 	}
 	
-	public Item newMace(int depth){
+	public Item newMace(boolean spawn){
 		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "maza", "maza");
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyBloodModifyer(0.2f);
-		item.description = "Otro de los trabajos de Marcos, quizas no el mas inspirado de todos. De todos modos "
-				+ "no creo que al romper el craneo de un ser vivo mucho valga el estilo...";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newBigMace(int depth){
+	public Item newBigMace(boolean spawn){
 		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra");
 		bigMace.modifyAttackValue(DamageType.BLUNT, 8);
 		bigMace.modifyAttackSpeed(Speed.NORMAL);
 		bigMace.modifyMovementSpeed(Speed.FAST);
 		bigMace.modifyBloodModifyer(0.8f);
 		bigMace.setData(Constants.CHECK_WEAPON, true);
-		bigMace.description = "Las derrumbadoras usan gigantescas rocas como mazos, las derrumbadoras no esperan "
-				+ "conseguir poderosas espadas o artefactos, se como las derrumbadoras.";
-		world.addAtEmptyLocation(bigMace, depth);
+		world.addAtEmptyLocation(bigMace, spawn);
 		return bigMace;
 	}
 
-	public Item newBow(int depth){
+	public Item newBow(boolean spawn){
 		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto");
 		item.modifyAttackValue(DamageType.RANGED, 6);
 		item.modifyBloodModifyer(1f);
 		item.setData(Constants.CHECK_WEAPON, true);
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newEdibleWeapon(int depth){
+	public Item newEdibleWeapon(boolean spawn){
 		Item item = new Item(')', 'F', AsciiPanel.yellow, "baguette", null);
 		item.modifyAttackValue(DamageType.BLUNT, 1);
 		item.modifyBloodModifyer(0.1f);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
-		item.setQuaffEffect(new Effect(1, false){
+		item.setQuaffEffect(new Effect("alimentado", 1, false){
 			public void start(Creature creature){
 				creature.modifyHp(10, "El pan estaba tan duro que te mato");
 			}
 		});
-		item.description = "Esta tan duro que puede ser usado como arma. Literalmente.";
-		world.addAtEmptyLocation(item, depth);
+		item.description = "Es dura como una roca.";
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newLightArmor(int depth){
+	public Item newLightArmor(boolean spawn){
 		Item item = new Item((char)252, 'F', AsciiPanel.green, "tunica", "tunica");
 		item.modifyDefenseValue(DamageType.SLICE, 1);
 		item.setData(Constants.CHECK_ARMOR, true);
-		item.description = "Una tunica usada, quien sabe hace cuanto tiempo...quien sabe por quien...";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newMediumArmor(int depth){
+	public Item newMediumArmor(boolean spawn){
 		Item item = new Item((char)252, 'F', AsciiPanel.white, "tunica endurecida", "tunica endurecida");
 		item.modifyDefenseValue(DamageType.SLICE, 1);
 		item.modifyDefenseValue(DamageType.BLUNT, 1);
 		item.setData(Constants.CHECK_ARMOR, true);
-		item.description = "Tiras de cuero recorren la tela, haciendola mas resistente.";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newHeavyArmor(int depth){
+	public Item newHeavyArmor(boolean spawn){
 		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "armadura de placa", "armadura de placa");
 		item.modifyDefenseValue(DamageType.SLICE, 2);
 		item.modifyDefenseValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_ARMOR, true);
-		item.description = "Placas de metal fundidas se conectan y forman esta armadura, de todos modos carece de muchas"
-				+ " de las caracteristicas encontradas en una verdadera pieza.";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newLeatherArmor(int depth){
+	public Item newLeatherArmor(boolean spawn){
 		Item leatherArmor = new Item((char)252, 'F', Color.orange, "armadura de cuero", "armadura de cuero");
 		leatherArmor.modifyDefenseValue(DamageType.SLICE, 1);
 		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 1);
 		leatherArmor.setData(Constants.CHECK_ARMOR, true);
-		leatherArmor.description = "Completamente construida de tiras de cuero interconectadas. El cuero es "
-				+ "particularmente dificil de penetrar por un filo.";
-		world.addAtEmptyLocation(leatherArmor, depth);
+		world.addAtEmptyLocation(leatherArmor, spawn);
 		return leatherArmor;
 	}
 	
-	public Item newMarauderHood(int depth){
+	public Item newMarauderHood(boolean spawn){
 		Item marauderHood = new Item((char)248, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador");
 		marauderHood.modifyDefenseValue(DamageType.PIERCING, 1);
 		marauderHood.setData(Constants.CHECK_HELMENT, true);
 		marauderHood.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
-		marauderHood.description = "Los desfigurados merodeadores llevan siempre una capucha, prefieren no ver en el rostro"
-				+ " de un hermano el recordatorio del camino elegido.";
-		world.addAtEmptyLocation(marauderHood, depth);
+		marauderHood.description = "Cubre el rostro completamente.";
+		world.addAtEmptyLocation(marauderHood, spawn);
 		return marauderHood;
 	}
 	
-	public Item newMarauderVest(int depth){
+	public Item newMarauderVest(boolean spawn){
 		Item marauderVest = new Item((char)252, 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador");
 		marauderVest.modifyDefenseValue(DamageType.SLICE, 1);
 		marauderVest.setData(Constants.CHECK_ARMOR, true);
 		marauderVest.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
-		marauderVest.description = "Cubre completamente el cuerpo y esconde las mangas.";
-		world.addAtEmptyLocation(marauderVest, depth);
+		world.addAtEmptyLocation(marauderVest, spawn);
 		return marauderVest;
 	}
 	
-	public Item newWoodenShield(int depth){
+	public Item newWoodenShield(boolean spawn){
 		Item woodenShield = new Item('#', 'M', AsciiPanel.yellow, "escudo de madera", "escudo de madera");
 		woodenShield.modifyDefenseValue(DamageType.SLICE, 3);
 		woodenShield.modifyDefenseValue(DamageType.BLUNT, 3);
 		woodenShield.modifyDefenseValue(DamageType.PIERCING, 1);
 		woodenShield.setData(Constants.CHECK_SHIELD, true);
-		woodenShield.description = "\"Escudo de madera\" es un eufemismo para cualquier pedazo de madera lo suficientemente solido.";
-		world.addAtEmptyLocation(woodenShield, depth);
+		world.addAtEmptyLocation(woodenShield, spawn);
 		return woodenShield;
 	}
 	
-	public Item randomWeapon(int depth){
+	public Item randomWeapon(boolean spawn){
 		switch ((int)(Math.random() * 6)){
-		case 4: case 0: return newDagger(depth);
-		case 5: case 1: return newShortSword(depth);
-		case 2: return newMorningStar(depth);
-		case 3: return newBigSword(depth);
-		default: return newMace(depth);
+		case 4: case 0: return newDagger(spawn);
+		case 5: case 1: return newShortSword(spawn);
+		case 2: return newMorningStar(spawn);
+		case 3: return newBigSword(spawn);
+		default: return newMace(spawn);
 		}
 	}
 
-	public Item randomArmor(int depth){
+	public Item randomArmor(boolean spawn){
 		switch ((int)(Math.random() * 3)){
-		case 0: return newLightArmor(depth);
-		case 1: return newMediumArmor(depth);
-		default: return newHeavyArmor(depth);
+		case 0: return newLightArmor(spawn);
+		case 1: return newMediumArmor(spawn);
+		default: return newHeavyArmor(spawn);
 		}
 	}
 	
@@ -538,10 +541,10 @@ public class StuffFactory {
 	 * ########################################################################################
 	 */
 	
-	public Item newPotionOfHealth(int depth){
+	public Item newPotionOfHealth(boolean spawn){
 		String appearance = potionAppearances.get(0);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de vida", appearance);
-		item.setQuaffEffect(new Effect(1){
+		item.setQuaffEffect(new Effect("reanimado", 1){
 			public void start(Creature creature){
 				if (creature.hp() == creature.totalMaxHp())
 					return;
@@ -551,29 +554,14 @@ public class StuffFactory {
 			}
 		});
 		item.makeStackable(5);
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newPotionOfMana(int depth){
-		String appearance = potionAppearances.get(1);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de mana", appearance);
-		item.setQuaffEffect(new Effect(1){
-			public void start(Creature creature){
-			
-				
-				creature.doAction(item, "siente recuperado");
-			}
-		});
-		item.makeStackable(5);
-		world.addAtEmptyLocation(item, depth);
-		return item;
-	}
-	
-	public Item newPotionOfSlowHealth(int depth){
+	public Item newPotionOfSlowHealth(boolean spawn){
 		String appearance = potionAppearances.get(2);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de lenta curacion", appearance);
-		item.setQuaffEffect(new Effect(100){
+		item.setQuaffEffect(new Effect("reanimado", 100){
 			public void start(Creature creature){
 				creature.doAction(item, "siente aliviado");
 			}
@@ -584,16 +572,16 @@ public class StuffFactory {
 			}
 		});
 		item.makeStackable(5);
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newPotionOfPoison(int depth){
+	public Item newPotionOfPoison(boolean spawn){
 		String appearance = potionAppearances.get(3);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de veneno", appearance);
-		item.setQuaffEffect(new Effect(10){
-			public void start(Creature creature){
-				creature.doAction(item, "siente enfermo");
+		item.setQuaffEffect(new Effect("envenenado", 10){
+			public void start( Creature creature){
+				creature.doAction(item, "siente |enfermo04|");
 			}
 			
 			public void update(Creature creature){
@@ -602,14 +590,14 @@ public class StuffFactory {
 			}
 		});
 		item.makeStackable(5);
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newPotionOfWarrior(int depth){
+	public Item newPotionOfWarrior(boolean spawn){
 		String appearance = potionAppearances.get(4);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion del guerrero", appearance);
-		item.setQuaffEffect(new Effect(20){
+		item.setQuaffEffect(new Effect("fortalecido", 20){
 			public void start(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, 5);
 				creature.modifyDefenseValue(DamageType.BLUNT, 5);
@@ -622,14 +610,14 @@ public class StuffFactory {
 			}
 		});
 		item.makeStackable(5);
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 
-	public Item newPotionOfArcher(int depth){
+	public Item newPotionOfArcher(boolean spawn){
 		String appearance = potionAppearances.get(5);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de arqueria", appearance);
-		item.setQuaffEffect(new Effect(20){
+		item.setQuaffEffect(new Effect("alerta", 20){
 			public void start(Creature creature){
 				creature.modifyVisionRadius(3);
 				creature.doAction(item, "siente mas alerta");
@@ -640,22 +628,22 @@ public class StuffFactory {
 			}
 		});
 		item.makeStackable(5);
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newMarauderPoison(int depth){
+	public Item newMarauderPoison(boolean spawn){
 		String appearance = potionAppearances.get(6);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de merodeador", appearance);
-		item.setQuaffEffect(new Effect(8, true){
+		item.setQuaffEffect(new Effect("envenenado", 8, true){
 			public void start(Creature creature){
 				if(creature.getStringData(Constants.RACE) == "merodeador"){
 					creature.doAction("es inmune al veneno de su gente");
 				}else{
 					if(creature.isPlayer())
-						creature.doAction(item, "empapa en veneno!");
+						creature.doAction(item, "empapa en |veneno04|!");
 					else
-						creature.doAction(item, "empapa en veneno!");
+						creature.doAction(item, "empapa en |veneno04|!");
 				}
 			}
 			public void update(Creature creature){
@@ -666,23 +654,21 @@ public class StuffFactory {
 			}
 		});
 		item.makeStackable(5);
-		item.description = "Los merodeadores untan su cuerpo de veneno para protejerse de los depredadores y criaturas"
-				+ " de las profundidades lo que los hace invulnerables a su efecto. De todos modos es muy efectivo.";
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item randomPotion(int depth){
+	public Item randomPotion(boolean spawn){
 		switch ((int)(Math.random() * 9)){
-		case 0: return newPotionOfHealth(depth);
-		case 1: return newPotionOfHealth(depth);
-		case 2: return newPotionOfMana(depth);
-		case 3: return newPotionOfMana(depth);
-		case 4: return newPotionOfSlowHealth(depth);
-		case 5: return newPotionOfPoison(depth);
-		case 6: return newPotionOfWarrior(depth);
-		case 7: return newPotionOfArcher(depth);
-		default: return newPotionOfArcher(depth);
+		case 0: return newPotionOfHealth(spawn);
+		case 1: return newPotionOfHealth(spawn);
+		case 2: return newPotionOfSlowHealth(spawn);
+		case 3: return newPotionOfWarrior(spawn);
+		case 4: return newPotionOfSlowHealth(spawn);
+		case 5: return newPotionOfPoison(spawn);
+		case 6: return newPotionOfWarrior(spawn);
+		case 7: return newPotionOfArcher(spawn);
+		default: return newPotionOfArcher(spawn);
 		}
 	}
 	
@@ -691,23 +677,23 @@ public class StuffFactory {
 	 * ########################################################################################
 	 */
 	
-	public Item newLeatherSpellbook(int depth){
+	public Item newLeatherSpellbook(boolean spawn){
 		final Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro de cuero", null);
 		
-		item.addWrittenSpell("vida", new Effect(1){
+		item.addWrittenSpell("plegaria de vida", new Effect("reanimado", 1){
 			public void start(Creature creature){
 				if (creature.hp() == creature.totalMaxHp() ||
 						creature.getBooleanData("Blasfemous")){
-					creature.notify("Pronuncias la palabra de vida pero nada ocurre...");
+					creature.notify("Tu plegaria no es escuchada...");
 					return;
 				}else{
-					creature.notify("Pronuncias la palabra de vida");
+					creature.notify("Pliegas al cielo por vida");
 				}
 				
 				creature.modifyHp(10, "Alcanzado por la palabra de vida");
 				creature.doAction(item, "siente mas recuperado!");
 			}
-		}, 15, 88, Constants.SPELL_HEAL, new Effect(20){
+		}, 15, 88, Constants.SPELL_HEAL, new Effect("blasfemo", 20){
 			public void start(Creature creature){
 				creature.notify("Blasfemia!");
 				creature.setData("Blasfemous", true);
@@ -717,7 +703,7 @@ public class StuffFactory {
 			}
 		}, Speed.FAST, false);
 		
-		item.addWrittenSpell("dolor", new Effect(1){
+		item.addWrittenSpell("inflingir dolor", new Effect("adolorido", 1){
 			public void start(Creature creature){
 				creature.notify("Pronuncias la palabra del dolor");
 				int amount = creature.receiveDamage(6, DamageType.MAGIC, "Muere abrumado de un dolor insoportable", false);
@@ -728,18 +714,18 @@ public class StuffFactory {
 					creature.doAction(item, "parece no ser afectado");
 				}
 			}
-		}, 4, 90, Constants.SPELL_PAIN,  new Effect(1){
+		}, 4, 90, Constants.SPELL_PAIN,  new Effect("adolorido", 1){
 			public void start(Creature creature){
 				creature.notify("Sientes en tu piel el dolor que infliges");
 				creature.receiveDamage(8, DamageType.MAGIC, "Muere abrumado de un dolor insoportable", false);
 			}
 		},Speed.FAST, true);
 		
-		world.addAtEmptyLocation(item, depth);
+		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-//	public Item newWhiteMagesSpellbook(int depth) {
+//	public Item newWhiteMagesSpellbook() {
 //		Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro blanco", null);
 //		item.addWrittenSpell("fireball", new Effect(1){
 //			@Override
@@ -795,11 +781,11 @@ public class StuffFactory {
 //			}
 //		});
 //		
-//		world.addAtEmptyLocation(item, depth);
+//		world.addAtEmptyLocation(item );
 //		return item;
 //	}
 //	
-//	public Item newBlueMagesSpellbook(int depth) {
+//	public Item newBlueMagesSpellbook() {
 //		Item item = new Item('+', 'M', AsciiPanel.brightBlue, "libro azul", null);
 //		
 //		item.addWrittenSpell("blink", new Effect(1){
@@ -840,15 +826,15 @@ public class StuffFactory {
 //				creature.modifyDetectCreatures(-1);
 //			}
 //		});
-//		world.addAtEmptyLocation(item, depth);
+//		world.addAtEmptyLocation(item );
 //		return item;
 //	}
 	
 
-	public Item randomSpellBook(int depth){
+	public Item randomSpellBook(boolean spawn){
 		switch ((int)(Math.random() * 2)){
-		case 0: return newLeatherSpellbook(depth);
-		default: return newLeatherSpellbook(depth);
+		case 0: return newLeatherSpellbook(spawn);
+		default: return newLeatherSpellbook(spawn);
 		}
 	}
 	

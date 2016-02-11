@@ -16,8 +16,8 @@ public class GoblinAi extends CreatureAi {
 		else if (canRangedWeaponAttack(player))
 			creature.rangedWeaponAttack(player);
 		else if (canThrowAt(player))
-			creature.throwItem(getWeaponToThrow(), player.x, player.y, player.z);
-		else if (creature.canSee(player.x, player.y, player.z))
+			creature.throwItem(getWeaponToThrow(), player.x, player.y);
+		else if (creature.canSee(player.x, player.y))
 			hunt(player);
 		else if (canPickup())
 			creature.pickup();

@@ -73,7 +73,7 @@ public class PathFinder {
 	private void checkNeighbors(Creature creature, Point end, Point closest) {
 		for (Point neighbor : closest.neighbors8()) {
 		    if (closed.contains(neighbor)
-		    		|| !creature.canEnter(neighbor.x, neighbor.y, creature.z)
+		    		|| !creature.canEnter(neighbor.x, neighbor.y)
 		    		&& !neighbor.equals(end))
 		        continue;
 			
