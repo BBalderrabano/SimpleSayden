@@ -148,6 +148,8 @@ public class Item extends Thing{
 		
 		if(getBooleanData(Constants.CHECK_TWO_HANDED)){
 			details += ", requiere dos manos.";
+		}else if(getBooleanData(Constants.CHECK_DUAL_WIELD)){
+			details += ", usable en ambas manos.";
 		}
 		
 		if(isIdentified()){

@@ -96,7 +96,7 @@ public class CreatureAi {
 			}
 			return false;	//There are not enough action points to perform an attack, queue attack
 		}else if(!creature.isPlayer()){
-			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
+			creature.modifyActionPoints(-(creature.getAttackSpeed().velocity() - (creature.dualStrike() ? 1 : 0)));
 		}
 		
 		boolean success = creature.meleeAttack(other);

@@ -86,6 +86,9 @@ public class StuffFactory {
 		
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y);
 		player.inventory().add(newLeatherSpellbook(false));
+		player.inventory().add(newDagger(false));
+		player.inventory().add(newKatar(false));
+		player.inventory().add(newKatar(false));
 
 		if(Math.random() < 0.1f){
 			player.inventory().add(newAlcoholBottle(false));
@@ -361,6 +364,19 @@ public class StuffFactory {
 		item.modifyAttackValue(DamageType.SLICE, 1);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyBloodModifyer(0.7f);
+		world.addAtEmptyLocation(item, spawn);
+		return item;
+	}
+	
+	public Item newKatar(boolean spawn){
+		Item item = new Item((char)255, 'M', AsciiPanel.white, "katar", "katar");
+		item.modifyAttackValue(DamageType.PIERCING, 1);
+		item.modifyAttackValue(DamageType.SLICE, 1);
+		
+		item.setData(Constants.CHECK_WEAPON, true);
+		item.setData(Constants.CHECK_DUAL_WIELD, true);
+		
+		item.modifyBloodModifyer(1f);
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}

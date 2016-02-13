@@ -125,6 +125,9 @@ public class Creature extends Thing{
 		if(weapon != null && weapon.attackSpeed() != null && 
 				weapon.attackSpeed().velocity() > slowest.velocity())
 			slowest =  weapon.attackSpeed();
+		if(offWeapon != null && offWeapon.attackSpeed() != null && 
+				offWeapon.attackSpeed().velocity() > slowest.velocity())
+			slowest =  offWeapon.attackSpeed();
 		
 		return slowest;
 	}
@@ -156,6 +159,9 @@ public class Creature extends Thing{
 		if(weapon != null && weapon.movementSpeed() != null && 
 				weapon.movementSpeed().velocity() > slowest.velocity())
 			slowest =  weapon.movementSpeed();
+		if(offWeapon != null && offWeapon.movementSpeed() != null && 
+				offWeapon.movementSpeed().velocity() > slowest.velocity())
+			slowest =  offWeapon.movementSpeed();
 		
 		return slowest;
 	}
@@ -184,11 +190,15 @@ public class Creature extends Thing{
 	
 	public boolean hasEquipped(Item check){
 		return check == weapon || check == shield
-				|| check == armor || check == helment;
+				|| check == armor || check == helment
+				|| check == offWeapon;
 	}
 	
 	private Item weapon;
 	public Item weapon() { return weapon; }
+	
+	private Item offWeapon;
+	public Item offWeapon() { return offWeapon; }
 	
 	private Item shield;
 	public Item shield() { return shield; }
@@ -274,8 +284,20 @@ public class Creature extends Thing{
 		}
 	}
 
+	private boolean dualStrike = false;
+	public boolean dualStrike() { return dualStrike; }
+
 	public boolean meleeAttack(Creature other){
-		return commonAttack(other, weapon());
+		if(offWeapon() != null){
+			if(dualStrike){
+				dualStrike = false;
+				return commonAttack(other, offWeapon(), true);
+			}else{
+				dualStrike = true;
+			}
+		}
+		
+		return commonAttack(other, weapon(), false);
 	}
 
 	public void throwItem(Item item, int x, int y) {
@@ -296,10 +318,10 @@ public class Creature extends Thing{
 	}
 	
 	public boolean rangedWeaponAttack(Creature other){
-		return commonAttack(other, weapon());
+		return commonAttack(other, weapon(), false);
 	}
 	
-	private boolean commonAttack(Creature other, Item object) {
+	private boolean commonAttack(Creature other, Item object, boolean onlyObject) {
 		int attack = 0;	//Start adding the inherit damage of the creature
 		boolean weakSpotHit = false;
 		boolean shieldBlock = false;
@@ -333,7 +355,10 @@ public class Creature extends Thing{
 			for(DamageType d : DamageType.ALL_TYPES()){
 				if(d.id == DamageType.RANGED.id)
 					continue;
-				if(attackValue(d) > other.shield().defenseValue(d)){
+				
+				int attackValue = onlyObject ? object.attackValue(d) : attackValue(d);
+				
+				if(attackValue > other.shield().defenseValue(d)){
 					other.shield().modifyDurability(-1);
 					
 					if(other.shield().durability() < 1){
@@ -357,7 +382,10 @@ public class Creature extends Thing{
 			for(DamageType d : DamageType.ALL_TYPES()){
 				if(d.id == DamageType.RANGED.id)
 					continue;
-				attack += Math.max(0, (attackValue(d) - other.defenseValue(d)));
+				
+				int attackValue = onlyObject ? object.attackValue(d) : attackValue(d);
+				
+				attack += Math.max(0, (attackValue - other.defenseValue(d)));
 			}
 		}
 		
@@ -706,10 +734,14 @@ public class Creature extends Thing{
 			if (hp > 0 && showText)
 				doAction("guarda " + item.nameElLa());
 			shield = null;
-		} else if (item == weapon) {
+		}  if (item == weapon) {
 			if (hp > 0 && showText) 
 				doAction("guarda " + item.nameElLa());
 			weapon = null;
+		} if (item == offWeapon) {
+			if (hp > 0 && showText) 
+				doAction("guarda " + item.nameElLa());
+			offWeapon = null;
 		}
 	}
 	
@@ -747,7 +779,22 @@ public class Creature extends Thing{
 //		if (item.attackValue() == 0 && item.rangedAttackValue() == 0 && item.defenseValue() == 0)
 //			return;
 		
-		if (item.getBooleanData(Constants.CHECK_WEAPON)){
+		if (item.getBooleanData(Constants.CHECK_DUAL_WIELD)){
+			unequip(shield, true);
+			
+			if(offWeapon == null){
+				offWeapon = item;
+				doAction("empuña " + item.nameUnUna() + " en tu otra mano");
+			}else{
+				if(weapon == null){
+					weapon = item;
+					doAction("empuña " + item.nameUnUna() + " en tu mano buena");
+				}else{
+					unequip(weapon, true);
+					doAction("empuña " + item.nameUnUna() + " en tu mano buena");
+				}
+			}
+		}else if (item.getBooleanData(Constants.CHECK_WEAPON)){
 			unequip(weapon, true);
 			if(item.getBooleanData(Constants.CHECK_TWO_HANDED)){
 				unequip(shield, true);

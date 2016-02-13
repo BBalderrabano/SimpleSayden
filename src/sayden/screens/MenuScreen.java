@@ -417,8 +417,7 @@ public class MenuScreen extends InventoryBasedScreen {
 			}
 			
 			//Show item name and glyph, if equipped change color
-			if(displayItem == player.weapon() || displayItem == player.armor()
-					|| displayItem == player.helment() || displayItem == player.shield()){
+			if(player.hasEquipped(displayItem)){
 				terminal.write(displayItem.glyph(), startWidth, realHeight, displayItem.color());
 				terminal.write("[" +proccesed_line+"]", terminal.getCursorX(), realHeight, Constants.OVERLAY_COLOR);
 			}else{
@@ -454,8 +453,7 @@ public class MenuScreen extends InventoryBasedScreen {
 				|| item.getBooleanData(Constants.CHECK_HELMENT)
 				|| item.getBooleanData(Constants.CHECK_SHIELD)
 				|| item.getBooleanData(Constants.CHECK_WEAPON)){
-			if(item == player.weapon() || item == player.armor()
-					|| item == player.helment() || item == player.shield()){
+			if(player.hasEquipped(item)){
 				options.add("desequipar");
 			}else{
 				options.add("equipar");

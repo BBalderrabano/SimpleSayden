@@ -73,9 +73,8 @@ public class PlayerAi extends CreatureAi {
 			return false;
 		}
 		
-		creature.addTime(creature.getAttackSpeed().velocity());
-		creature.modifyActionPoints(creature.getAttackSpeed().velocity());
-		
+		creature.addTime(creature.getAttackSpeed().velocity() - (creature.dualStrike() ? 1 : 0));
+		creature.modifyActionPoints(creature.getAttackSpeed().velocity() - (creature.dualStrike() ? 1 : 0));
 		boolean success = creature.meleeAttack(other);
 		
 		if(success && other.hp() > 1 && other.queSpell() != null){
