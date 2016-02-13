@@ -51,7 +51,7 @@ public class RockBugAi extends CreatureAi {
 		}else{
 			Item rockCheck = creature.item(creature.x, creature.y);
 			
-			if(rockCheck != null && rockCheck.name().equals("roca")){
+			if(rockCheck != null && rockCheck.nameWStacks().equals("roca")){
 				creature.pickup();
 				creature.doAction("consume la roca recuperando fuerzas");
 				creature.modifyHp(healthBonus, "Indigestion rocosa");

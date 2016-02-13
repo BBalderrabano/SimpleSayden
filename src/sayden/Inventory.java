@@ -14,7 +14,7 @@ public class Inventory {
 	public void add(Item item){
 		if(item.stackable() && containsimilar(item)){
 			for (int i = 0; i < items.length; i++){
-				if (items[i] != null && items[i].name.equals(item.name ) && items[i].stacks + item.stacks <= items[i].maxStacks){
+				if (items[i] != null && items[i].name.equals(item.name) && items[i].stacks + item.stacks <= items[i].maxStacks){
 					items[i].modifyStacks(item.stacks);
 					return;
 				}

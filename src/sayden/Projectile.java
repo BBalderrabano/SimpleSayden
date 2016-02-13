@@ -115,6 +115,8 @@ public class Projectile {
 	
 			if(projectile.quaffEffect() != null && projectile.quaffEffect().quaffable){
 				target.addEffect(projectile.quaffEffect());
+				target.learnName(projectile);
+				origin.learnName(projectile);
 				projectile.quaffEffect().start(x, y);
 			}else{
 				world.addAtEmptySpace(projectile, x, y);
@@ -122,6 +124,11 @@ public class Projectile {
 			
 			target.ai().setCheckPoint(start);
 			target.modifyHp(-totalDamage, "Impactado por " + name);
+			
+			if(target.hp() > 1 && target.queSpell() != null){
+				target.stopCasting();
+				target.modifyActionPoints(-target.getActionPoints());
+			}
 		}else{
 			world.addAtEmptySpace(projectile, x, y);
 		}

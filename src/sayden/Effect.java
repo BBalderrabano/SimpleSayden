@@ -41,7 +41,7 @@ public class Effect {
 	
 	private String statusName;
 	
-	public String statsName(){
+	public String statusName(){
 		return statusName;
 	}
 }

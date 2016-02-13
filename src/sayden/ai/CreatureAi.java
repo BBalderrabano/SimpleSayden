@@ -43,7 +43,7 @@ public class CreatureAi {
 					Math.abs(spell.castSpeed().velocity() - other.getMovementSpeed().velocity()) > 1){
 				creature.modifyActionPoints(-creature.getActionPoints());
 				creature.setQueSpell(other,  spell);
-				creature.doAction("comienza a pronunciar un encantamiento");
+				creature.doAction("comienza a pronunciar " + spell.nameUnUna());
 				return;
 			}
 		}else if(creature.queSpell() != null && !creature.isPlayer() && 
@@ -59,6 +59,9 @@ public class CreatureAi {
 		ReadSpellScreen.lastCreature = other;
 		spell.onCast(creature, other);
 		other.addEffect(spell.effect());
+		
+		creature.learnName(spell);
+		other.learnName(spell);
 	}
 	
 	public void onEnter(int x, int y, Tile tile){
@@ -96,7 +99,14 @@ public class CreatureAi {
 			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
 		}
 		
-		return creature.meleeAttack(other);
+		boolean success = creature.meleeAttack(other);
+		
+		if(success){
+			other.stopCasting();
+			creature.stopCasting();
+		}
+				
+		return success;
 	}
 	
 	public boolean onGetAttacked(int amount, String position, Creature attacker){
@@ -138,13 +148,13 @@ public class CreatureAi {
 	}
 	
 	public void onUpdate(){
-		if(creature.queSpell() != null &&
+		if(!creature.isPlayer() && creature.queSpell() != null &&
 				creature.getActionPoints() >= creature.queSpell().castSpeed().velocity()){
 			
 			if(creature.queSpellCreature() != null && canSee(creature.queSpellCreature().x, creature.queSpellCreature().y)){
 				creature.castSpell(creature.queSpell(), creature.queSpellCreature().x, creature.queSpellCreature().y);
 			}else{
-				creature.queSpellCreature().notify(Constants.capitalize(creature.nameElLa()) + " |falla06| el hechizo!");
+				creature.queSpellCreature().notify(Constants.capitalize(creature.nameElLa()) + " |falla06| el conjuro!");
 			}
 			creature.setQueSpell(null, null);
 		}

@@ -357,8 +357,8 @@ public class MenuScreen extends InventoryBasedScreen {
 			terminal.write((char)202, offset_x + width, offset_y + height);
 			
 			//We draw the item name
-			int title_lenght = Math.min(interactingItem.name().length(), width - 2);
-			String shorten_title = interactingItem.name().substring(0, title_lenght);
+			int title_lenght = Math.min(interactingItem.nameWStacks().length(), width - 2);
+			String shorten_title = interactingItem.nameWStacks().substring(0, title_lenght);
 			terminal.write(shorten_title.toUpperCase(), offset_x + 1, offset_y);
 			
 			//We draw the item description
@@ -401,8 +401,8 @@ public class MenuScreen extends InventoryBasedScreen {
 			
 			Item displayItem = player.inventory().get(s);	//We grab the item in the inventory
 			
-			int permitted_lenght = Math.min(displayItem.name().length(), width - 4);		//We cant let the name go out of the box
-			String proccesed_line = displayItem.name().substring(0, permitted_lenght);	//so we substring if necessary
+			int permitted_lenght = Math.min(displayItem.nameWStacks().length(), width - 4);		//We cant let the name go out of the box
+			String proccesed_line = displayItem.nameWStacks().substring(0, permitted_lenght);	//so we substring if necessary
 			
 			//If the list of items is bigger than the inside box stop drawing and add indicators
 			if(itemIndex > inventoryDisplay){

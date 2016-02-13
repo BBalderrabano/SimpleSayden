@@ -7,20 +7,20 @@ public class Thing {
 	protected String appearance = null;
 	protected String description = null;
 	
-	public String name() { return (appearance == null || appearance == name ? name : appearance)
-			+ (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
+	private boolean isIdentified = true;
+	public boolean isIdentified() { return isIdentified; }
+	public void identify(boolean identify) { this.isIdentified = identify;}
 	
-	public String nameElLa(){ return gender == 'M' ? "el " + name() : "la " + name(); }
-	public String nameDelDeLa(){ return gender == 'M' ? "del " + name() : "de la " + name(); }
-	public String nameAlALa(){ return gender == 'M' ? "al " + name() : "a la " + name(); }
-	public String nameUnUna(){ return gender == 'M' ? "un " + name() : "una " + name(); }
-	public String realNameUnUna() { return gender == 'M' ? "un " + name : "una " + name; }
+	public String nameWStacks() { return Constants.knownName(name) || isIdentified || appearance == null ? name : appearance + (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
+	public String nameWNoStacks() { return Constants.knownName(name) || isIdentified || appearance == null ? name : appearance; }
 	
-	public String nameWNoStacks() { return (appearance == null || appearance == name ? name : appearance); }
 	public String nameUnUnaWNoStacks(){ return gender == 'M' ? "un " + nameWNoStacks() : "una " + nameWNoStacks(); }
 	public String nameElLaWNoStacks(){ return gender == 'M' ? "el " + nameWNoStacks() : "la " + nameWNoStacks(); }
 	
-	public boolean isIdentified() { return appearance == null || appearance == name; }
+	public String nameElLa(){ return gender == 'M' ? "el " + nameWStacks() : "la " + nameWStacks(); }
+	public String nameDelDeLa(){ return gender == 'M' ? "del " + nameWStacks() : "de la " + nameWStacks(); }
+	public String nameAlALa(){ return gender == 'M' ? "al " + nameWStacks() : "a la " + nameWStacks(); }
+	public String nameUnUna(){ return gender == 'M' ? "un " + nameWStacks() : "una " + nameWStacks(); }
 	
 	protected int stacks = 1;
 	protected int maxStacks = 0;

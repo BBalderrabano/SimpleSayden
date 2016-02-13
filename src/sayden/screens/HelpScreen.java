@@ -27,7 +27,7 @@ public class HelpScreen implements Screen {
 		terminal.write("[r] Observa el entorno", 2, y++);
 		terminal.write("[f] Usa tu arma de rango", 2, y++);
 		terminal.write("[g - e] Levanta un objeto", 2, y++);
-		terminal.write("[q] Lanza hechizos rapidamente", 2, y++);
+		terminal.write("[q] Lanza conjuros rapidamente", 2, y++);
 		
 		terminal.writeCenter("-- presiona cualquier tecla --", 22);
 	}

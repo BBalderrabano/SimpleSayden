@@ -23,7 +23,15 @@ public class World {
 	private List<Creature> creatures;
 	private List<Projectile> projectiles;
 	
-	public float fire(int x, int y) { return fire[x][y]; }
+	public float fire(int x, int y) { 
+		if(x > fire.length){
+			x = fire.length;
+		}
+		if(y > fire[0].length){
+			y = fire[0].length;
+		}
+		return fire[x][y]; 
+	}
 	
 	public World(Tile[][] tiles){
 		this.tiles = tiles;

@@ -1,6 +1,9 @@
 package sayden;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.List;
+
 import asciiPanel.AsciiPanel;
 
 public class Constants {
@@ -52,4 +55,14 @@ public class Constants {
 	public static String capitalize(String text){
 		return Character.toUpperCase(text.charAt(0))+""+text.substring(1);
 	}
+	
+	private static List<String> learNames = new ArrayList<String>();
+	public static void learnName(String name) { learNames.add(name); }
+	public static boolean knownName(String name) { 
+		if(name == null || name.isEmpty() || learNames == null || learNames.size() < 1)
+			return false;
+		if(learNames.contains(name))
+			return true;
+		return false;
+	} 
 }

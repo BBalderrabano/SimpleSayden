@@ -75,7 +75,15 @@ public class PlayerAi extends CreatureAi {
 		
 		creature.addTime(creature.getAttackSpeed().velocity());
 		creature.modifyActionPoints(creature.getAttackSpeed().velocity());
-		return creature.meleeAttack(other);
+		
+		boolean success = creature.meleeAttack(other);
+		
+		if(success && other.hp() > 1 && other.queSpell() != null){
+			other.stopCasting();
+			other.modifyActionPoints(-other.getActionPoints());
+		}
+		
+		return success;
 	}
 	
 	public void onNotify(String message){

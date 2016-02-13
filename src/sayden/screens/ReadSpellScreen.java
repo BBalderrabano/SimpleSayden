@@ -31,7 +31,7 @@ public class ReadSpellScreen implements Screen {
 	public void displayOutput(AsciiPanel terminal) {
 		ArrayList<String> lines = getList();
 		
-		String showQuestion = lines.size() > 0 ? "Elige un hechizo a lanzar" : "No recuerdas ningun hechizo";
+		String showQuestion = lines.size() > 0 ? "Elige un conjuro a lanzar" : "No recuerdas ningun conjuro";
 		
 		int y = 22 - lines.size();
 		int x = terminal.getWidthInCharacters() - showQuestion.length() - 1;
@@ -42,9 +42,9 @@ public class ReadSpellScreen implements Screen {
 		}
 		
 		if(lastSpell != null && hasSpell(lastSpell)){
-			String quickCast = "(Q) - Conjurar " + lastSpell.name();
+			String quickCast = "(Q) - Conjurar " + lastSpell.nameWStacks();
 			if(lastCreature != null && lastCreature.hp() >= 1)
-				quickCast += " sobre " + lastCreature.name();
+				quickCast += " sobre " + lastCreature.nameWStacks();
 			
 			terminal.write(quickCast, terminal.getWidthInCharacters() - quickCast.length() - 1, 0);
 		}
@@ -91,14 +91,14 @@ public class ReadSpellScreen implements Screen {
 		ArrayList<String> lines = new ArrayList<String>();
 		
 		for(int i = 0; i < player.learnedSpells().size(); i++){
-			String line = player.learnedSpells().get(i).name();
+			String line = player.learnedSpells().get(i).nameWStacks();
 			lines.add(line);
 		}
 		
 		if(item != null){
 			for (int i = 0; i < item.writtenSpells().size(); i++){
 				Spell spell = item.writtenSpells().get(i);
-				String line = spell.name();
+				String line = spell.nameWStacks();
 				lines.add(line);
 			}
 		}
@@ -108,7 +108,7 @@ public class ReadSpellScreen implements Screen {
 	
 	private boolean hasSpell(Spell spell){
 		for(Spell s : player.learnedSpells()){
-			if(s.name() == spell.name())
+			if(s.nameWStacks() == spell.nameWStacks())
 				return true;
 		}
 		
@@ -117,7 +117,7 @@ public class ReadSpellScreen implements Screen {
 				continue;
 			}
 			for(Spell s : i.writtenSpells()){
-				if(s.name().equals(spell.name())){
+				if(s.nameWStacks().equals(spell.nameWStacks())){
 					return true;
 				}
 			}

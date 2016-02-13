@@ -22,6 +22,7 @@ public class Creature extends Thing{
 	
 	public Spell queSpell() { return queSpell; }
 	public Creature queSpellCreature() { return queSpellCreature; }
+	public void stopCasting() { System.out.println("ENTRO"); if(queSpell == null && queSpellCreature == null){ return ; } doAction("|deja06| de conjurar " + queSpell.nameElLa()); this.setQueSpell(null, null); }
 	
 	public void setQueSpell(Creature c, Spell s) { this.queSpellCreature = c; this.queSpell = s; }
 	
@@ -215,8 +216,6 @@ public class Creature extends Thing{
 	public int stealthLevel() { return Math.max(stealthLevel - Constants.STEALTH_MIN, 0); }
 	public void modifyStealth(int amount) { this.stealthLevel += amount; this.stealthLevel = Math.min(8, this.stealthLevel); }
 	
-	private List<String> learNames;
-	
 	public Screen subscreen;
 	
 	public Creature(World world, char glyph, char gender, Color color, String name, int maxHp){
@@ -242,7 +241,6 @@ public class Creature extends Thing{
 		this.defenseValues.addAll(DamageType.ALL_TYPES());
 		this.effects = new ArrayList<Effect>();
 		this.spells = new ArrayList<Spell>();
-		this.learNames = new ArrayList<String>();
 	}
 	
 	public void moveBy(int mx, int my){
@@ -433,13 +431,14 @@ public class Creature extends Thing{
 			hp = maxHp;
 		} else if (hp < 1) {
 			doAction("muere");
-			ai.onDecease(leaveCorpse());
+			 ai.onDecease(leaveCorpse());
 			world.remove(this);
 		}
 	}
 	
 	private Item leaveCorpse(){
-		Item corpse = new Item('%', 'M', originalColor, "cadaver " + nameDelDeLa(), null);
+		Item corpse = new Item('%', 'M', originalColor, "cadaver de " + nameWStacks() + "", null);
+		
 		corpse.setData(Constants.CHECK_CONSUMABLE, true);
 		corpse.setData(Constants.CHECK_CORPSE, true);
 		corpse.setQuaffEffect(new Effect("indigesto", 1, false){
@@ -447,7 +446,9 @@ public class Creature extends Thing{
 				creature.modifyHp((int) (maxHp * 0.5f), "Severa indigestion");
 			}
 		});
+		
 		world.addAtEmptySpace(corpse, x, y);
+		
 		for (Item item : inventory.getItems()){
 			if (item != null)
 				drop(item);
@@ -636,8 +637,8 @@ public class Creature extends Thing{
 			doAction("agarra la nada");
 		} else {
 			doAction("levanta %s", item.nameElLa());
-			world.remove(x, y);
 			inventory.add(item);
+			world.remove(x, y);
 		}
 	}
 	
@@ -718,9 +719,6 @@ public class Creature extends Thing{
 				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLa());
 				return;
 			} else {
-				if(learNames.contains(item.name)){
-					item.description = null;
-				}
 				world.remove(item);
 				inventory.add(item);
 			}
@@ -787,7 +785,7 @@ public class Creature extends Thing{
 	}
 	
 	public String details() {
-		return String.format("weapon:%s armor:%s helment:%s shield:%s", weapon != null ? weapon().name() : "" +"", armor != null ? armor().name()+"" : "", helment != null ? helment().name()+"" : "", shield != null ? shield().name()+"" : "");
+		return String.format("weapon:%s armor:%s helment:%s shield:%s", weapon != null ? weapon().nameWStacks() : "" +"", armor != null ? armor().nameWStacks()+"" : "", helment != null ? helment().nameWStacks()+"" : "", shield != null ? shield().nameWStacks()+"" : "");
 	}
 	
 	public void summon(Creature other) {
@@ -802,22 +800,36 @@ public class Creature extends Thing{
 	}
 
 	public void learnName(Item item){
-		if(item.appearance != null){
-			if(item.name != item.appearance){	notify(Constants.capitalize(item.appearance) + " es realmente " + item.realNameUnUna() + "!"); }
-			item.appearance = null;
+		if(item != null && item.appearance != null){
+			if(!item.isIdentified()){
+				item.identify(true);
+				notify(Constants.capitalize(item.appearance) + " es realmente " + item.nameUnUna() + "!"); 
+			}
 			if(isPlayer())
-				learNames.add(item.name);
+				Constants.learnName(item.name);
+		}
+	}
+	
+	public void learnName(Spell spell){
+		if(spell != null && spell.appearance != null){
+			if(!spell.isIdentified()){
+				spell.identify(true);
+				notify("El conjuro es realmente " + spell.nameUnUna() + "!"); 
+			}
+			if(isPlayer())
+				Constants.learnName(spell.name);
 		}
 	}
 	
 	public String statusEffects(){
 		String effectString = "";
 		
-		for(Effect f : effects){
-			if(effectString.indexOf(f.statsName()) != -1)
+		for(int i = 0; i < effects.size(); i++){
+			if(effects.get(i) == null || effects.get(i).statusName() == null
+					|| effectString.indexOf(effects.get(i).statusName()) != -1)
 				continue;
 			
-			effectString += " " + f.statsName();
+			effectString += " " + effects.get(i).statusName();
 		}
 		
 		if(stealthLevel > Constants.STEALTH_MIN)

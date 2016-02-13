@@ -33,9 +33,10 @@ public class Spell extends Thing{
 	private boolean requiresTarget = true;
 	public boolean requiresTarget(){ return requiresTarget; }
 	
-	public Spell(String name, Effect effect, int cooldown, float chance, String flag, Effect negative, Speed castSpeed, boolean target){
+	public Spell(String name, char gender, Effect effect, int cooldown, float chance, String flag, Effect negative, Speed castSpeed, boolean target){
 		super();
 		this.name = name;
+		this.gender = gender;
 		this.effect = effect;
 		this.negativeEffect = negative;
 		this.cooldown = cooldown;
@@ -43,6 +44,25 @@ public class Spell extends Thing{
 		this.flag = flag;
 		this.requiresTarget = target;
 		this.castSpeed = castSpeed;
+		this.identify(false);
+		this.appearance = "conjuro desconocido";
+	}
+	
+	public Spell(String name, char gender, Effect effect, int cooldown, float chance, String flag, Effect negative, Speed castSpeed, boolean target, String appearance){
+		super();
+		this.name = name;
+		this.gender = gender;
+		this.effect = effect;
+		this.negativeEffect = negative;
+		this.cooldown = cooldown;
+		this.chance = chance;
+		this.flag = flag;
+		this.requiresTarget = target;
+		this.castSpeed = castSpeed;
+		this.appearance = appearance;
+		
+		if(appearance != null && appearance != name )
+			this.identify(false);
 	}
 
 	public void onCast(Creature caster, Creature other) {
@@ -70,7 +90,6 @@ public class Spell extends Thing{
 					creature.unsetData(flag);
 				}
 			});
-			
 		}
 	}
 }

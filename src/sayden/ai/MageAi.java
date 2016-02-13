@@ -12,7 +12,7 @@ public class MageAi extends CreatureAi {
 	public MageAi(Creature creature, Creature player) {
 		super(creature);
 		
-		creature.learnedSpells().add(new Spell("test", 
+		creature.learnedSpells().add(new Spell("prueba", 'F', 
 			new Effect("penetrado", 1){
 				public void start(Creature creature){
 					creature.modifyHp(-1, "Pija en el orto");

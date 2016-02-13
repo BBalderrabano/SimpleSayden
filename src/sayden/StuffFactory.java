@@ -85,7 +85,8 @@ public class StuffFactory {
 		int selectedStart = (int) (Math.random() * startPos.length);
 		
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y);
-		
+		player.inventory().add(newLeatherSpellbook(false));
+
 		if(Math.random() < 0.1f){
 			player.inventory().add(newAlcoholBottle(false));
 		}
@@ -572,7 +573,7 @@ public class StuffFactory {
 	public Item newPotionOfSlowHealth(boolean spawn){
 		String appearance = potionAppearances.get(2);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de lenta curacion", appearance);
-		item.setQuaffEffect(new Effect("reanimado", 100){
+		item.setQuaffEffect(new Effect("reanimado", 10){
 			public void start(Creature creature){
 				creature.doAction(item, "siente aliviado");
 			}
@@ -691,7 +692,7 @@ public class StuffFactory {
 	public Item newLeatherSpellbook(boolean spawn){
 		final Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro de cuero", null);
 		
-		item.addWrittenSpell("plegaria de vida", new Effect("reanimado", 1){
+		item.addWrittenSpell("plegaria de vida", 'F', new Effect("reanimado", 1){
 			public void start(Creature creature){
 				if (creature.hp() == creature.totalMaxHp() ||
 						creature.getBooleanData("Blasfemous")){
@@ -714,7 +715,7 @@ public class StuffFactory {
 			}
 		}, Speed.FAST, false);
 		
-		item.addWrittenSpell("inflingir dolor", new Effect("adolorido", 1){
+		item.addWrittenSpell("conjuro doloroso", 'M', new Effect("adolorido", 1){
 			public void start(Creature creature){
 				creature.notify("Pronuncias la palabra del dolor");
 				int amount = creature.receiveDamage(6, DamageType.MAGIC, "Muere abrumado de un dolor insoportable", false);
@@ -722,7 +723,7 @@ public class StuffFactory {
 				if(amount > 0){
 					creature.doAction(item, "retuerce en agonia!");
 				}else{
-					creature.doAction(item, "parece no ser afectado");
+					creature.doAction(item, "resigna al dolor");
 				}
 			}
 		}, 4, 90, Constants.SPELL_PAIN,  new Effect("adolorido", 1){
