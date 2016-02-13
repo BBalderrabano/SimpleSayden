@@ -111,6 +111,14 @@ public class CreatureAi {
 	}
 	
 	public boolean onGetAttacked(int amount, String position, Creature attacker){
+		String amountString = "";
+		
+		if(position == weakSpot){
+			amountString = "|"+amount+"01|!!!!";
+		}else{
+			amountString = amount + "";
+		}
+		
 		if(attacker.isPlayer()){
 			attacker.combatAction("Atacas |(%s %s %s)01| %s |[%s %s %s]02| por %s", 
 					attacker.attackValue(DamageType.SLICE),
@@ -120,7 +128,7 @@ public class CreatureAi {
 					creature.defenseValue(DamageType.SLICE),
 					creature.defenseValue(DamageType.BLUNT),
 					creature.defenseValue(DamageType.PIERCING),
-					amount);
+					amountString);
 		}else if(creature.isPlayer()){
 			attacker.combatAction("%s |(%s %s %s)01| te ataca |[%s %s %s]02| por %s", 
 					Constants.capitalize(attacker.nameElLa()),
@@ -130,7 +138,7 @@ public class CreatureAi {
 					creature.defenseValue(DamageType.SLICE),
 					creature.defenseValue(DamageType.BLUNT),
 					creature.defenseValue(DamageType.PIERCING),
-					amount);
+					amountString);
 		}else{
 			attacker.combatAction("%s |(%s %s %s)01| ataca %s |[%s %s %s]02| por %s", 
 					Constants.capitalize(attacker.nameElLa()),
@@ -141,7 +149,7 @@ public class CreatureAi {
 					creature.defenseValue(DamageType.SLICE),
 					creature.defenseValue(DamageType.BLUNT),
 					creature.defenseValue(DamageType.PIERCING),
-					amount);
+					amountString);
 		}
 		
 		creature.modifyHp(-amount, "Matado por " + attacker.nameUnUna());

@@ -10,8 +10,7 @@ public class Constants {
 	public static final int WORLD_WIDTH = 80;
 	public static final int WORLD_HEIGHT = 24;
 	
-	public static final int MAX_SYNC_TIME = 100;
-	public static final int STEALTH_MIN_STEPS = 2;
+	public static final int STEALTH_MIN_STEPS = 1;
 	public static final int STEALTH_MIN_RADIUS = 1;
 	public static final float STELTH_INCREMENTAL = 0.5f;
 	

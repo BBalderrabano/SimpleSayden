@@ -13,13 +13,16 @@ public class RockBugAi extends CreatureAi {
 	Creature player;
 	StuffFactory factory;
 	
+	boolean digesting = false;
+	
 	int rocksEaten = 0;
 	
 	int attackBonus = 6;
-	int attackBonusDuration = 6;
+	int attackBonusDuration = 8;
 	int healthBonus = 10;
 	float healthOnEatChance = 0.4f;
 	float destroyWallChance = 0.2f;
+	private boolean isFull() { return rocksEaten > 8; }
 	
 	public RockBugAi(Creature creature, Creature player, StuffFactory factory) {
 		super(creature);
@@ -53,7 +56,7 @@ public class RockBugAi extends CreatureAi {
 			
 			if(rockCheck != null && rockCheck.nameWStacks().equals("roca")){
 				creature.pickup();
-				creature.doAction("consume la roca recuperando fuerzas");
+				creature.doAction("consume la roca ganando fuerzas");
 				creature.modifyHp(healthBonus, "Indigestion rocosa");
 				creature.modifyActionPoints(-creature.getMovementSpeed().velocity());
 				addBonusDamage();
@@ -63,11 +66,11 @@ public class RockBugAi extends CreatureAi {
 				if(creature.world().tile(p.x, p.y) == Tile.WALL){
 					if(Math.random() < healthOnEatChance){
 						if(creature.hp() < creature.totalMaxHp()){
-							creature.doAction("devora la pared recuperando fuerzas");
+							creature.doAction("devora la pared ganando fuerzas");
 						}
 						creature.modifyHp(healthBonus, "Indigestion rocosa");
 						
-						if(Math.random() < destroyWallChance && rocksEaten < 8){
+						if(Math.random() < destroyWallChance && isFull() && !digesting){
 							creature.dig(p.x, p.y);
 							rocksEaten++;
 						}
@@ -95,9 +98,11 @@ public class RockBugAi extends CreatureAi {
 		creature.addEffect(new Effect("fortalecido", attackBonusDuration){
 			public void start(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, 6);
+				digesting = true;
 			}
 			public void end(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, -6);
+				digesting = false;
 			}
 		});
 	}

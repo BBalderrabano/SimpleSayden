@@ -30,9 +30,6 @@ public class Creature extends Thing{
 	public Point queAttack(){ return queAttack; }
 	public void setQueAttack(Point p) { this.queAttack = p; }
 	
-	private int timeUnsync;
-	public void addTime(int amount){ timeUnsync += amount; if(timeUnsync > Constants.MAX_SYNC_TIME) timeUnsync = Constants.MAX_SYNC_TIME; }
-	
 	private char glyph;
 	public char glyph() { return glyph; }
 	

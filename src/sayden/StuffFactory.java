@@ -375,6 +375,7 @@ public class StuffFactory {
 		
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.setData(Constants.CHECK_DUAL_WIELD, true);
+		item.modifyAttackSpeed(Speed.VERY_FAST);
 		
 		item.modifyBloodModifyer(1f);
 		world.addAtEmptyLocation(item, spawn);

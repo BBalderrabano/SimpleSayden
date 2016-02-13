@@ -60,7 +60,7 @@ public class PlayerAi extends CreatureAi {
 			creature.open(x, y);
 		}
 		
-		creature.addTime(creature.getMovementSpeed().velocity());
+//		creature.addTime(creature.getMovementSpeed().velocity());
 		creature.modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
@@ -73,8 +73,8 @@ public class PlayerAi extends CreatureAi {
 			return false;
 		}
 		
-		creature.addTime(creature.dualStrike() ? 	creature.offWeapon().attackSpeed().velocity() : 
-													creature.getAttackSpeed().velocity());
+//		creature.addTime(creature.dualStrike() ? 	creature.offWeapon().attackSpeed().velocity() : 
+//													creature.getAttackSpeed().velocity());
 		creature.modifyActionPoints(creature.dualStrike() ? creature.offWeapon().attackSpeed().velocity() : 
 															creature.getAttackSpeed().velocity());
 		
