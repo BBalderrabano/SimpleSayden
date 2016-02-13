@@ -22,7 +22,7 @@ public class Creature extends Thing{
 	
 	public Spell queSpell() { return queSpell; }
 	public Creature queSpellCreature() { return queSpellCreature; }
-	public void stopCasting() { System.out.println("ENTRO"); if(queSpell == null && queSpellCreature == null){ return ; } doAction("|deja06| de conjurar " + queSpell.nameElLa()); this.setQueSpell(null, null); }
+	public void stopCasting() { if(queSpell == null && queSpellCreature == null){ return ; } doAction("|deja06| de conjurar " + queSpell.nameElLa()); this.setQueSpell(null, null); }
 	
 	public void setQueSpell(Creature c, Spell s) { this.queSpellCreature = c; this.queSpell = s; }
 	
