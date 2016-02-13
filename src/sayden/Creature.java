@@ -265,6 +265,20 @@ public class Creature extends Thing{
 		
 		Creature other = world.creature(x+mx, y+my);
 		
+		if(weapon() != null && other == null && weapon().reach() > 0){
+			int reach = weapon.reach();
+			int i = 1;
+			
+			while(other == null && i <= reach){
+				if(!world.tile(x+(mx * i), y+(my * i)).isGround()){
+					i = reach;
+					break;
+				}
+				other = world.creature(x+(mx * i), y+(my * i));
+				i++;
+			}
+		}
+		
 		if (other == null){
 			dualStrike = false;
 			ai.onEnter(x+mx, y+my, tile);

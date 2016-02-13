@@ -94,6 +94,10 @@ public class Item extends Thing{
 		} 
 	}
 	
+	private int reach = 0;
+	public int reach() { return reach; }
+	public void modifyReach(int amount) { this.reach += amount; }
+	
 	public Spell addWrittenSpell(String name, char gender, Effect effect, int duration, float chance, String flag, Effect negativeEffect, Speed castSpeed, boolean target){
 		Spell spell = new Spell(name, gender, effect, duration, chance, flag, negativeEffect, castSpeed, target);
 		writtenSpells.add(spell);
@@ -155,6 +159,16 @@ public class Item extends Thing{
 		details = details.substring(0, 1).toUpperCase()
 				+ details.substring(1);
 		
+		if(canBreake() && durability() <= 20){
+			details += " A punto de romperse.";
+		}else
+		if(canBreake() && durability() <= 50){
+			details += " No se ve muy resistente.";
+		}else
+		if(canBreake() && durability() > 50){
+			details += " Puede romperse.";
+		}
+		
 		if(getBooleanData(Constants.CHECK_TWO_HANDED)){
 			details += " Requiere dos manos.";
 		}
@@ -179,14 +193,8 @@ public class Item extends Thing{
 			details += " Puede acumularse "+maxStacks+" veces.";
 		}
 		
-		if(canBreake() && durability() <= 20){
-			details += " Puede romperse en cualquier momento.";
-		}else
-		if(canBreake() && durability() <= 50){
-			details += " No se ve muy resistente.";
-		}else
-		if(canBreake() && durability() > 50){
-			details += " Puede romperse.";
+		if(reach > 0){
+			details += " Posee alcance de hasta " + reach + " casillas.";
 		}
 		
 		return details.replace('ñ', (char)164).replace('Ñ', (char)165);

@@ -87,6 +87,7 @@ public class StuffFactory {
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y);
 		player.inventory().add(newLeatherSpellbook(false));
 		player.inventory().add(newBow(false));
+		player.inventory().add(newLance(false));
 
 		if(Math.random() < 0.1f){
 			player.inventory().add(newAlcoholBottle(false));
@@ -378,6 +379,21 @@ public class StuffFactory {
 		item.modifyAttackSpeed(Speed.VERY_FAST);
 		
 		item.modifyBloodModifyer(1f);
+		world.addAtEmptyLocation(item, spawn);
+		return item;
+	}
+	
+	public Item newLance(boolean spawn){
+		Item item = new Item((char)255, 'M', AsciiPanel.white, "lanza", "lanza");
+		item.modifyAttackValue(DamageType.PIERCING, 3);
+		item.modifyAttackValue(DamageType.SLICE, 3);
+		
+		item.setData(Constants.CHECK_WEAPON, true);
+		item.setData(Constants.CHECK_TWO_HANDED, true);
+		item.modifyReach(2);
+		item.modifyAttackSpeed(Speed.FAST);
+		
+		item.modifyBloodModifyer(0.7f);
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
