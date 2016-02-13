@@ -28,14 +28,14 @@ public class Projectile {
 	private boolean isDone = false;
 	public boolean isDone() { return isDone || this.step >= path.getPoints().size(); }
 	
-	public Projectile(World world, Line line, Speed velocity, Item projectile, Creature creature){
+	public Projectile(World world, Line line, Speed velocity, Item projectile, Creature origin){
 		this.world = world;
 		this.path = line;
 		this.speed = velocity;
 		this.projectile = projectile;
 		this.actionPoints += speed.velocity();
-		this.origin = creature;
-		this.start = creature.position();
+		this.origin = origin;
+		this.start = origin.position();
 
 		step++;
 	}
@@ -79,59 +79,79 @@ public class Projectile {
 		this.isDone = true;
 		
 		Creature target = world.creature(x, y);
-		String name = projectile.nameUnUna();
-		int totalDamage = 0;
 		
 		if(target != null){
-			for(DamageType d : DamageType.ALL_TYPES()){
-				totalDamage += Math.max(0, (projectile.attackValue(d) - target.defenseValue(d)));
-			}
-			
-			totalDamage = Math.max(1, totalDamage);	//Always deals at least 1 damage (ignores shields?)
-			
-			if(target.isPlayer()){
-				target.combatAction("%s |(%s %s %s)01|%s te impacta |[%s %s %s]02| por |%s01|!", Constants.capitalize(projectile.nameUnUna()),
-						projectile.attackValue(DamageType.SLICE),
-						projectile.attackValue(DamageType.BLUNT),
-						projectile.attackValue(DamageType.PIERCING),
-						projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
-						target.defenseValue(DamageType.SLICE),
-						target.defenseValue(DamageType.BLUNT),
-						target.defenseValue(DamageType.PIERCING),
-						totalDamage);
-			}else{
-				target.combatAction("%s |(%s %s %s)01|%s impacta %s |[%s %s %s]02| por |%s01|!", 
-						Constants.capitalize(projectile.nameUnUna()),
-						projectile.attackValue(DamageType.SLICE),
-						projectile.attackValue(DamageType.BLUNT),
-						projectile.attackValue(DamageType.PIERCING),
-						projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
-						target.nameAlALa(),
-						target.defenseValue(DamageType.SLICE),
-						target.defenseValue(DamageType.BLUNT),
-						target.defenseValue(DamageType.PIERCING),
-						totalDamage);
-			}
-	
-			if(projectile.quaffEffect() != null && projectile.quaffEffect().quaffable){
-				target.addEffect(projectile.quaffEffect());
-				target.learnName(projectile);
-				origin.learnName(projectile);
-				projectile.quaffEffect().start(x, y);
+			pickTarget(target);
+		}else{
+			if(projectile.getBooleanData(Constants.CHECK_AMMUNITION)){
+				for(Point p : new Point(x, y).neighbors8()){
+					if(world.creature(p.x, p.y) == null || world.creature(p.x, p.y) == origin)
+						continue;
+					
+					target = world.creature(p.x, p.y);
+					pickTarget(target);
+					break;
+				}
 			}else{
 				world.addAtEmptySpace(projectile, x, y);
 			}
-			
-			target.ai().setCheckPoint(start);
-			target.modifyHp(-totalDamage, "Impactado por " + name);
-			
-			if(target.hp() > 1 && target.queSpell() != null){
-				target.stopCasting();
-				target.modifyActionPoints(-target.getActionPoints());
-			}
+		}
+		interrupted = true;
+		
+		if(projectile.getBooleanData(Constants.CHECK_AMMUNITION)){
+			world.remove(projectile);
+		}
+	}
+	
+	private void pickTarget(Creature target){
+		String name = projectile.nameUnUna();
+		int totalDamage = 0;
+		
+		for(DamageType d : DamageType.ALL_TYPES()){
+			totalDamage += Math.max(0, (projectile.attackValue(d) - target.defenseValue(d)));
+		}
+		
+		totalDamage = Math.max(1, totalDamage);	//Always deals at least 1 damage (ignores shields?)
+		
+		if(target.isPlayer()){
+			target.combatAction("%s |(%s %s %s)01|%s te impacta |[%s %s %s]02| por |%s01|!", Constants.capitalize(projectile.nameUnUna()),
+					projectile.attackValue(DamageType.SLICE),
+					projectile.attackValue(DamageType.BLUNT),
+					projectile.attackValue(DamageType.PIERCING),
+					projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
+					target.defenseValue(DamageType.SLICE),
+					target.defenseValue(DamageType.BLUNT),
+					target.defenseValue(DamageType.PIERCING),
+					totalDamage);
+		}else{
+			target.combatAction("%s |(%s %s %s)01|%s impacta %s |[%s %s %s]02| por |%s01|!", 
+					Constants.capitalize(projectile.nameUnUna()),
+					projectile.attackValue(DamageType.SLICE),
+					projectile.attackValue(DamageType.BLUNT),
+					projectile.attackValue(DamageType.PIERCING),
+					projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
+					target.nameAlALa(),
+					target.defenseValue(DamageType.SLICE),
+					target.defenseValue(DamageType.BLUNT),
+					target.defenseValue(DamageType.PIERCING),
+					totalDamage);
+		}
+
+		if(projectile.quaffEffect() != null && projectile.quaffEffect().quaffable){
+			target.addEffect(projectile.quaffEffect());
+			target.learnName(projectile);
+			origin.learnName(projectile);
+			projectile.quaffEffect().start(x, y);
 		}else{
 			world.addAtEmptySpace(projectile, x, y);
 		}
-		interrupted = true;
+		
+		target.ai().setCheckPoint(start);
+		target.modifyHp(-totalDamage, "Impactado por " + name);
+		
+		if(target.hp() > 1 && target.queSpell() != null){
+			target.stopCasting();
+			target.modifyActionPoints(-target.getActionPoints());
+		}
 	}
 }

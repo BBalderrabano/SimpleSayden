@@ -309,8 +309,29 @@ public class Creature extends Thing{
 				thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
 	}
 	
-	public boolean rangedWeaponAttack(Creature other){
-		return commonAttack(other, weapon(), false);
+	public void rangedWeaponAttack(Creature other){
+		char glyph = '|';
+		
+		if(x != other.x && y == other.y)
+			glyph = '-';
+		if(x < other.x && y < other.y || x > other.x && y > other.y)
+			glyph = (char)92;
+		if(x < other.x && y > other.y || x > other.x && y < other.y)
+			glyph = '/';
+		
+		Item thrown = new Item(glyph, 'F', weapon().color(), "flecha", null);
+		for(DamageType t : DamageType.ALL_TYPES()){
+			thrown.modifyAttackValue(t, weapon().attackValue(t));
+		}
+		
+		thrown.setData(Constants.CHECK_AMMUNITION, true);
+		
+		doAction("dispara %s hacia %s", weapon.nameElLaWNoStacks(), other.nameElLa());
+		
+		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()));
+		
+		world.add(new Projectile(world, new Line(this.x, this.y, other.x, other.y), 
+				weapon().attackSpeed() != null ? weapon().attackSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
 	}
 	
 	private boolean commonAttack(Creature other, Item object, boolean onlyObject) {
@@ -403,7 +424,10 @@ public class Creature extends Thing{
 //		}
 //		
 //		params2[params2.length - 1] = amount;
-				
+		
+		if(weapon() != null && weapon().getBooleanData(Constants.CHECK_RANGED))
+			amount = 1;
+		
 		other.ai().onGetAttacked(amount, position, this);
 	
 		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
@@ -716,23 +740,23 @@ public class Creature extends Thing{
 		
 		if (item == armor){
 			if (hp > 0 && showText)
-				doAction("remueve " + item.nameElLa());
+				doAction("remueve " + item.nameElLaWNoStacks());
 			armor = null;
 		} if(item == helment){
 			if (hp > 0 && showText)
-				doAction("remueve " + item.nameElLa());
+				doAction("remueve " + item.nameElLaWNoStacks());
 			helment = null;
 		}  if(item == shield){
 			if (hp > 0 && showText)
-				doAction("guarda " + item.nameElLa());
+				doAction("guarda " + item.nameElLaWNoStacks());
 			shield = null;
 		}  if (item == weapon) {
 			if (hp > 0 && showText) 
-				doAction("guarda " + item.nameElLa());
+				doAction("guarda " + item.nameElLaWNoStacks());
 			weapon = null;
 		} if (item == offWeapon) {
 			if (hp > 0 && showText) 
-				doAction("guarda " + item.nameElLa());
+				doAction("guarda " + item.nameElLaWNoStacks());
 			offWeapon = null;
 		}
 	}
@@ -740,7 +764,7 @@ public class Creature extends Thing{
 	public void pickup(Item item){
 		if (!inventory.contains(item)) {
 			if (inventory.isFull()) {
-				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLa());
+				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLaWNoStacks());
 				return;
 			} else {
 				world.remove(item);
@@ -760,7 +784,7 @@ public class Creature extends Thing{
 	public void equip(Item item){
 		if (!inventory.contains(item)) {
 			if (inventory.isFull()) {
-				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLa());
+				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLaWNoStacks());
 				return;
 			} else {
 				world.remove(item);
@@ -776,14 +800,14 @@ public class Creature extends Thing{
 			
 			if(offWeapon == null){
 				offWeapon = item;
-				doAction("empuña " + item.nameUnUna() + " en tu otra mano");
+				doAction("empuña " + item.nameUnUnaWNoStacks() + " en tu otra mano");
 			}else{
 				if(weapon == null){
 					weapon = item;
-					doAction("empuña " + item.nameUnUna() + " en tu mano buena");
+					doAction("empuña " + item.nameUnUnaWNoStacks() + " en tu mano buena");
 				}else{
 					unequip(weapon, true);
-					doAction("empuña " + item.nameUnUna() + " en tu mano buena");
+					doAction("empuña " + item.nameUnUnaWNoStacks() + " en tu mano buena");
 				}
 			}
 		}else if (item.getBooleanData(Constants.CHECK_WEAPON)){
@@ -791,22 +815,22 @@ public class Creature extends Thing{
 			if(item.getBooleanData(Constants.CHECK_TWO_HANDED)){
 				unequip(shield, true);
 			}
-			doAction("empuña " + item.nameUnUna());
+			doAction("empuña " + item.nameUnUnaWNoStacks());
 			weapon = item;
 		} else if (item.getBooleanData(Constants.CHECK_ARMOR)){
 			unequip(armor, true);
-			doAction("viste " + item.nameUnUna());
+			doAction("viste " + item.nameUnUnaWNoStacks());
 			armor = item;
 		} else if (item.getBooleanData(Constants.CHECK_HELMENT)){
 			unequip(helment, true);
-			doAction("calza " + item.nameUnUna());
+			doAction("calza " + item.nameUnUnaWNoStacks());
 			helment = item;
 		} else if (item.getBooleanData(Constants.CHECK_SHIELD)){
 			if(weapon != null && weapon.getBooleanData(Constants.CHECK_TWO_HANDED)){
 				doAction("tiene ambas manos ocupadas");
 			}else{
 				unequip(shield, true);
-				doAction("alza " + item.nameUnUna());
+				doAction("alza " + item.nameUnUnaWNoStacks());
 				shield = item;
 			}
 		}else{
@@ -824,7 +848,7 @@ public class Creature extends Thing{
 	}
 	
 	public String details() {
-		return String.format("weapon:%s armor:%s helment:%s shield:%s", weapon != null ? weapon().nameWStacks() : "" +"", armor != null ? armor().nameWStacks()+"" : "", helment != null ? helment().nameWStacks()+"" : "", shield != null ? shield().nameWStacks()+"" : "");
+		return String.format("weapon:%s armor:%s helment:%s shield:%s", weapon != null ? weapon().nameWNoStacks() : "" +"", armor != null ? armor().nameWNoStacks()+"" : "", helment != null ? helment().nameWNoStacks()+"" : "", shield != null ? shield().nameWNoStacks()+"" : "");
 	}
 	
 	public void summon(Creature other) {
@@ -842,7 +866,7 @@ public class Creature extends Thing{
 		if(item != null && item.appearance != null){
 			if(!item.isIdentified()){
 				item.identify(true);
-				notify(Constants.capitalize(item.appearance) + " es realmente " + item.nameUnUna() + "!"); 
+				notify(Constants.capitalize(item.appearance) + " es realmente " + item.nameUnUnaWNoStacks() + "!"); 
 			}
 			if(isPlayer())
 				Constants.learnName(item.name);
@@ -853,7 +877,7 @@ public class Creature extends Thing{
 		if(spell != null && spell.appearance != null){
 			if(!spell.isIdentified()){
 				spell.identify(true);
-				notify("El conjuro es realmente " + spell.nameUnUna() + "!"); 
+				notify("El conjuro es realmente " + spell.nameUnUnaWNoStacks() + "!"); 
 			}
 			if(isPlayer())
 				Constants.learnName(spell.name);

@@ -86,9 +86,7 @@ public class StuffFactory {
 		
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y);
 		player.inventory().add(newLeatherSpellbook(false));
-		player.inventory().add(newDagger(false));
-		player.inventory().add(newKatar(false));
-		player.inventory().add(newKatar(false));
+		player.inventory().add(newBow(false));
 
 		if(Math.random() < 0.1f){
 			player.inventory().add(newAlcoholBottle(false));
@@ -316,15 +314,27 @@ public class StuffFactory {
 	
 	public Item newKnife(boolean spawn){
 		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo");
-		knife.modifyAttackValue(DamageType.PIERCING, 2);
+		knife.modifyAttackValue(DamageType.SLICE, 2);
 		knife.modifyAttackValue(DamageType.RANGED, 1);
 		knife.setData(Constants.CHECK_WEAPON, true);
-		knife.modifyStacks(3);
+		knife.makeStackable(3);
 		knife.modifyBloodModifyer(0.7f);
-		knife.description = "Bastante ligero y aerodinamico.";
 		world.addAtEmptyLocation(knife, spawn);
 		return knife;
 	}
+	
+	public Item newDagger(boolean spawn){
+		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga");
+		item.modifyAttackValue(DamageType.PIERCING, 1);
+		item.modifyAttackValue(DamageType.SLICE, 1);
+		item.modifyAttackValue(DamageType.RANGED, 1);
+		item.setData(Constants.CHECK_WEAPON, true);
+		item.modifyBloodModifyer(0.7f);
+		world.addAtEmptyLocation(item, spawn);
+		return item;
+	}
+	
+	//////////////////////////
 	
 	public Item newRockBugHelm(boolean spawn){
 		Item rockBugHelm = new Item((char)248, 'M', AsciiPanel.yellow, "caparazon de comepiedra", null);
@@ -354,16 +364,6 @@ public class StuffFactory {
 				creature.modifyHp(8, "Comiste demasiado");
 			}
 		});
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newDagger(boolean spawn){
-		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga");
-		item.modifyAttackValue(DamageType.PIERCING, 1);
-		item.modifyAttackValue(DamageType.SLICE, 1);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyBloodModifyer(0.7f);
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
@@ -460,9 +460,11 @@ public class StuffFactory {
 
 	public Item newBow(boolean spawn){
 		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto");
-		item.modifyAttackValue(DamageType.RANGED, 6);
-		item.modifyBloodModifyer(1f);
+		item.modifyAttackValue(DamageType.RANGED, 1);
+		item.modifyAttackValue(DamageType.PIERCING, 2);
+		item.modifyBloodModifyer(0.7f);
 		item.setData(Constants.CHECK_WEAPON, true);
+		item.setData(Constants.CHECK_RANGED, true);
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}

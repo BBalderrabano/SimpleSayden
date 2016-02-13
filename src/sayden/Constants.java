@@ -37,6 +37,8 @@ public class Constants {
 	public static final String CHECK_TWO_HANDED = "IsTwoHanded";
 	public static final String CHECK_MARAUDER_DISGUISE = "IsMarauderDisguise";
 	public static final String CHECK_DUAL_WIELD = "IsDualWieldable";
+	public static final String CHECK_RANGED = "IsRanged";
+	public static final String CHECK_AMMUNITION = "IsAmunition";
 	
 	public static final Color UNIDENTIFIED_COLOR = AsciiPanel.magenta;
 	public static final Color OVERLAY_COLOR = AsciiPanel.cyan;

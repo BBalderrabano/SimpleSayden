@@ -11,7 +11,7 @@ public class Thing {
 	public boolean isIdentified() { return isIdentified; }
 	public void identify(boolean identify) { this.isIdentified = identify;}
 	
-	public String nameWStacks() { return Constants.knownName(name) || isIdentified || appearance == null ? name : appearance + (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
+	public String nameWStacks() { return (Constants.knownName(name) || isIdentified || appearance == null ? name : appearance) + (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
 	public String nameWNoStacks() { return Constants.knownName(name) || isIdentified || appearance == null ? name : appearance; }
 	
 	public String nameUnUnaWNoStacks(){ return gender == 'M' ? "un " + nameWNoStacks() : "una " + nameWNoStacks(); }
