@@ -274,6 +274,7 @@ public class Creature extends Thing{
 		Creature other = world.creature(x+mx, y+my);
 		
 		if (other == null){
+			dualStrike = false;
 			ai.onEnter(x+mx, y+my, tile);
 		}else{
 			ai.onAttack(x+mx, y+my, other);

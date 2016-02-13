@@ -147,9 +147,7 @@ public class Item extends Thing{
 				+ details.substring(1);
 		
 		if(getBooleanData(Constants.CHECK_TWO_HANDED)){
-			details += ", requiere dos manos.";
-		}else if(getBooleanData(Constants.CHECK_DUAL_WIELD)){
-			details += ", usable en ambas manos.";
+			details += " Requiere dos manos.";
 		}
 		
 		if(isIdentified()){
@@ -166,7 +164,7 @@ public class Item extends Thing{
 			details += " Puede ser "+useVerb+" como escudo.";
 		}
 		if(getBooleanData(Constants.CHECK_WEAPON)){
-			details += " Puede ser "+useVerb+" como arma.";
+			details += " Puede ser "+useVerb+" como arma" + (getBooleanData(Constants.CHECK_DUAL_WIELD) ? " en cualquier mano" : "") + ".";
 		}
 		if(stackable()){
 			details += " Puede acumularse "+maxStacks+" veces.";
