@@ -12,6 +12,7 @@ public class Constants {
 	
 	public static final int STEALTH_MIN_STEPS = 1;
 	public static final int STEALTH_MIN_RADIUS = 1;
+	public static final int STEALTH_LEVEL_MAX = 8;
 	public static final float STELTH_INCREMENTAL = 0.5f;
 	
 	public static final String CHEST_POS = "CHEST";

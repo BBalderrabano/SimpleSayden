@@ -214,8 +214,9 @@ public class Creature extends Thing{
 	public String causeOfDeath() { return causeOfDeath; }
 	
 	private float stealthLevel = 0;
-	public int stealthLevel() { return (int) Math.floor(Math.max(stealthLevel - Constants.STEALTH_MIN_STEPS, 0)); }
-	public void modifyStealth(float amount) { this.stealthLevel += amount; this.stealthLevel = Math.min(8, this.stealthLevel); }
+	public int stealthLevel() { return (int) Math.max(0, stealthLevel - Constants.STEALTH_MIN_STEPS); }
+	public void modifyStealth(float amount) { this.stealthLevel += amount; this.stealthLevel = Math.max(Math.min(Constants.STEALTH_LEVEL_MAX, this.stealthLevel), 0); }
+	public void removeStealth() { this.stealthLevel = 0; }
 	
 	public Screen subscreen;
 	
@@ -280,6 +281,8 @@ public class Creature extends Thing{
 	public boolean dualStrike() { return dualStrike; }
 
 	public boolean meleeAttack(Creature other){
+		modifyStealth(-1);
+
 		if(offWeapon() != null){
 			if(dualStrike){
 				dualStrike = false;
@@ -293,6 +296,8 @@ public class Creature extends Thing{
 	}
 
 	public void throwItem(Item item, int x, int y) {
+		modifyStealth(-1);
+
 		Creature c = world.creature(x, y);
 				
 		Item thrown = getRidOf(item);
@@ -310,6 +315,8 @@ public class Creature extends Thing{
 	}
 	
 	public void rangedWeaponAttack(Creature other){
+		modifyStealth(-1);
+		
 		char glyph = '|';
 		
 		if(x != other.x && y == other.y)
@@ -324,14 +331,24 @@ public class Creature extends Thing{
 			thrown.modifyAttackValue(t, weapon().attackValue(t));
 		}
 		
+		thrown.modifyBloodModifyer(weapon().bloodModifyer());
 		thrown.setData(Constants.CHECK_AMMUNITION, true);
 		
 		doAction("dispara %s hacia %s", weapon.nameElLaWNoStacks(), other.nameElLa());
 		
 		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()));
 		
-		world.add(new Projectile(world, new Line(this.x, this.y, other.x, other.y), 
-				weapon().attackSpeed() != null ? weapon().attackSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
+		if(weapon() != null && weapon().canBreake()){
+			weapon().modifyDurability(-1);
+			
+			if(weapon().durability() < 1){
+				doAction("rompe " + weapon().nameElLaWNoStacks() + " al tensarlo demasiado");
+				inventory().remove(weapon());
+				unequip(weapon(), false);
+			}
+		}
+		
+		world.add(new Projectile(world, new Line(this.x, this.y, other.x, other.y), Speed.SUPER_FAST, thrown, this));
 	}
 	
 	private boolean commonAttack(Creature other, Item object, boolean onlyObject) {
@@ -433,6 +450,16 @@ public class Creature extends Thing{
 		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
 		
 		other.makeBleed(drained_blood);
+		
+		if(weapon() != null && weapon().canBreake()){
+			weapon().modifyDurability(-1);
+			
+			if(weapon().durability() < 1){
+				doAction("rompe " + weapon().nameElLaWNoStacks() + " con el impacto");
+				inventory().remove(weapon());
+				unequip(weapon(), false);
+			}
+		}
 		
 		return true;
 	}

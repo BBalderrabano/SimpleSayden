@@ -149,6 +149,9 @@ public class Projectile {
 		target.ai().setCheckPoint(start);
 		target.modifyHp(-totalDamage, "Impactado por " + name);
 		
+		float drained_blood = (totalDamage * Constants.BLOOD_AMOUNT_MULTIPLIER) * projectile.bloodModifyer();
+		target.makeBleed(drained_blood);
+		
 		if(target.hp() > 1 && target.queSpell() != null){
 			target.stopCasting();
 			target.modifyActionPoints(-target.getActionPoints());

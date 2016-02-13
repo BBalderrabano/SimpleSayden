@@ -462,6 +462,8 @@ public class StuffFactory {
 		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto");
 		item.modifyAttackValue(DamageType.RANGED, 1);
 		item.modifyAttackValue(DamageType.PIERCING, 2);
+		item.modifyAttackSpeed(Speed.FAST);
+		item.modifyDurability(10);
 		item.modifyBloodModifyer(0.7f);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.setData(Constants.CHECK_RANGED, true);

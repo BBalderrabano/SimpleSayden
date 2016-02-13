@@ -81,9 +81,18 @@ public class Item extends Thing{
 	public Speed movementSpeed() { return movementSpeed; }
 	public void modifyMovementSpeed(Speed speed) { this.movementSpeed = speed; } 
 	
+	private boolean canBreake = false;
+	public boolean canBreake() { return canBreake; }
+	
 	private int durability = 1;
 	public int durability() { return durability; }
-	public void modifyDurability(int amount) { this.durability += amount; }
+	public void modifyDurability(int amount) { 
+		this.durability += amount; 
+		
+		if(this.durability > 1) { 
+			this.canBreake = true; 
+		} 
+	}
 	
 	public Spell addWrittenSpell(String name, char gender, Effect effect, int duration, float chance, String flag, Effect negativeEffect, Speed castSpeed, boolean target){
 		Spell spell = new Spell(name, gender, effect, duration, chance, flag, negativeEffect, castSpeed, target);
@@ -168,6 +177,16 @@ public class Item extends Thing{
 		}
 		if(stackable()){
 			details += " Puede acumularse "+maxStacks+" veces.";
+		}
+		
+		if(canBreake() && durability() <= 20){
+			details += " Puede romperse en cualquier momento.";
+		}else
+		if(canBreake() && durability() <= 50){
+			details += " No se ve muy resistente.";
+		}else
+		if(canBreake() && durability() > 50){
+			details += " Puede romperse.";
 		}
 		
 		return details.replace('ñ', (char)164).replace('Ñ', (char)165);

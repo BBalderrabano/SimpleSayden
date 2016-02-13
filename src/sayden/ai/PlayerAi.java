@@ -39,7 +39,7 @@ public class PlayerAi extends CreatureAi {
 			if(isStealthing)
 				creature.modifyStealth(Constants.STELTH_INCREMENTAL);
 			else
-				creature.modifyStealth(-creature.stealthLevel());
+				creature.removeStealth();
 		}
 		
 		super.onMoveBy(mx, my);
