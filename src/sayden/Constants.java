@@ -11,7 +11,9 @@ public class Constants {
 	public static final int WORLD_HEIGHT = 24;
 	
 	public static final int MAX_SYNC_TIME = 100;
-	public static final int STEALTH_MIN = 2;
+	public static final int STEALTH_MIN_STEPS = 2;
+	public static final int STEALTH_MIN_RADIUS = 1;
+	public static final float STELTH_INCREMENTAL = 0.5f;
 	
 	public static final String CHEST_POS = "CHEST";
 	public static final String ARM_POS = "ARMS";

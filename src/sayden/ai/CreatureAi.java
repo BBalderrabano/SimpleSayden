@@ -96,7 +96,8 @@ public class CreatureAi {
 			}
 			return false;	//There are not enough action points to perform an attack, queue attack
 		}else if(!creature.isPlayer()){
-			creature.modifyActionPoints(-(creature.getAttackSpeed().velocity() - (creature.dualStrike() ? 1 : 0)));
+			creature.modifyActionPoints(-(creature.dualStrike() ?	creature.offWeapon().attackSpeed().velocity() : 
+																	creature.getAttackSpeed().velocity()));
 		}
 		
 		boolean success = creature.meleeAttack(other);
@@ -189,7 +190,7 @@ public class CreatureAi {
 		Creature c = creature.world().creature(wx, wy);
 		
 		if(c != null && c.isPlayer())
-			visionRadius = Math.max(0, visionRadius - c.stealthLevel());
+			visionRadius = Math.max(Constants.STEALTH_MIN_RADIUS, visionRadius - c.stealthLevel());
 		
 		if ((creature.x-wx)*(creature.x-wx) + (creature.y-wy)*(creature.y-wy) > visionRadius*visionRadius)
 			return false;

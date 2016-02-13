@@ -125,9 +125,6 @@ public class Creature extends Thing{
 		if(weapon != null && weapon.attackSpeed() != null && 
 				weapon.attackSpeed().velocity() > slowest.velocity())
 			slowest =  weapon.attackSpeed();
-		if(offWeapon != null && offWeapon.attackSpeed() != null && 
-				offWeapon.attackSpeed().velocity() > slowest.velocity())
-			slowest =  offWeapon.attackSpeed();
 		
 		return slowest;
 	}
@@ -159,9 +156,6 @@ public class Creature extends Thing{
 		if(weapon != null && weapon.movementSpeed() != null && 
 				weapon.movementSpeed().velocity() > slowest.velocity())
 			slowest =  weapon.movementSpeed();
-		if(offWeapon != null && offWeapon.movementSpeed() != null && 
-				offWeapon.movementSpeed().velocity() > slowest.velocity())
-			slowest =  offWeapon.movementSpeed();
 		
 		return slowest;
 	}
@@ -222,9 +216,9 @@ public class Creature extends Thing{
 	private String causeOfDeath;
 	public String causeOfDeath() { return causeOfDeath; }
 	
-	private int stealthLevel = 0;
-	public int stealthLevel() { return Math.max(stealthLevel - Constants.STEALTH_MIN, 0); }
-	public void modifyStealth(int amount) { this.stealthLevel += amount; this.stealthLevel = Math.min(8, this.stealthLevel); }
+	private float stealthLevel = 0;
+	public int stealthLevel() { return (int) Math.floor(Math.max(stealthLevel - Constants.STEALTH_MIN_STEPS, 0)); }
+	public void modifyStealth(float amount) { this.stealthLevel += amount; this.stealthLevel = Math.min(8, this.stealthLevel); }
 	
 	public Screen subscreen;
 	
@@ -880,7 +874,7 @@ public class Creature extends Thing{
 			effectString += " " + effects.get(i).statusName();
 		}
 		
-		if(stealthLevel > Constants.STEALTH_MIN)
+		if(stealthLevel > Constants.STEALTH_MIN_STEPS)
 			effectString += " escabullido";
 		
 		return effectString;

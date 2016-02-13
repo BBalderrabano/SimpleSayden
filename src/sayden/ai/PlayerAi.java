@@ -37,7 +37,7 @@ public class PlayerAi extends CreatureAi {
 			lastSkipped = false;
 			
 			if(isStealthing)
-				creature.modifyStealth(1);
+				creature.modifyStealth(Constants.STELTH_INCREMENTAL);
 			else
 				creature.modifyStealth(-creature.stealthLevel());
 		}
@@ -73,8 +73,11 @@ public class PlayerAi extends CreatureAi {
 			return false;
 		}
 		
-		creature.addTime(creature.getAttackSpeed().velocity() - (creature.dualStrike() ? 1 : 0));
-		creature.modifyActionPoints(creature.getAttackSpeed().velocity() - (creature.dualStrike() ? 1 : 0));
+		creature.addTime(creature.dualStrike() ? 	creature.offWeapon().attackSpeed().velocity() : 
+													creature.getAttackSpeed().velocity());
+		creature.modifyActionPoints(creature.dualStrike() ? creature.offWeapon().attackSpeed().velocity() : 
+															creature.getAttackSpeed().velocity());
+		
 		boolean success = creature.meleeAttack(other);
 		
 		if(success && other.hp() > 1 && other.queSpell() != null){
