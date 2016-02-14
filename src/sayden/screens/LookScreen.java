@@ -2,26 +2,53 @@ package sayden.screens;
 
 import java.awt.event.KeyEvent;
 
+import asciiPanel.AsciiPanel;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Item;
 import sayden.Tile;
 
 public class LookScreen extends TargetBasedScreen {
-
+	
+	private Creature creature = null;
+	
 	public LookScreen(Creature player, String caption, int sx, int sy) {
 		super(player, caption, sx, sy);
 	}
 
+	@Override
+	public void displayOutput(AsciiPanel terminal) {
+		super.displayOutput(terminal);
+		
+		terminal.clear(' ', 0, 23, terminal.getWidthInCharacters(), 1);
+		
+		if(creature != null)
+			terminal.write(creature.glyph(), 0, 23, creature.originalColor());
+		else
+			terminal.setCursorX(0);
+		
+		terminal.write(caption, terminal.getCursorX(), 23);
+		
+		if(creature != null){
+			if(creature.weapon() != null)
+				terminal.write(" " + creature.weapon().glyph(), terminal.getCursorX(), 23, creature.weapon().color());
+			if(creature.offWeapon() != null)
+				terminal.write(" " + creature.offWeapon().glyph(), terminal.getCursorX(), 23, creature.offWeapon().color());
+			if(creature.shield() != null)
+				terminal.write(" " + creature.shield().glyph(), terminal.getCursorX(), 23, creature.shield().color());
+			if(creature.helment() != null)
+				terminal.write(" " + creature.helment().glyph(), terminal.getCursorX(), 23, creature.helment().color());
+			if(creature.armor() != null)
+				terminal.write(" " + creature.armor().glyph(), terminal.getCursorX(), 23, creature.armor().color());
+
+		}
+	}
+	
 	public void enterWorldCoordinate(int x, int y, int screenX, int screenY) {
-		Creature creature = player.creature(x, y);
+		creature = player.creature(x, y);
 		
 		if (creature != null){
-			caption = creature.glyph() + " " + Constants.capitalize(creature.nameUnUna()) + " " + creature.statusEffects();
-			caption += creature.weapon() != null ? creature.weapon().glyph() : "";
-			caption += creature.shield() != null ? creature.shield().glyph() : "";
-			caption += creature.helment() != null ? creature.helment().glyph() : "";
-			caption += creature.armor() != null ? creature.armor().glyph() : "";
+			caption = Constants.capitalize(creature.nameUnUna()) + " " + creature.statusEffects();
 			caption = PlayScreen.splitPhraseByLimit(caption, Constants.WORLD_WIDTH).get(0);
 			return;
 		}

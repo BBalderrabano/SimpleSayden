@@ -94,6 +94,10 @@ public class Item extends Thing{
 		} 
 	}
 	
+	private int cantReach = 0;
+	public int cantReach() { return cantReach; }
+	public void modifyCantReach(int amount) { this.cantReach += amount; }
+	
 	private int reach = 0;
 	public int reach() { return reach; }
 	public void modifyReach(int amount) { this.reach += amount; }

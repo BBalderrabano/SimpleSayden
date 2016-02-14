@@ -264,6 +264,19 @@ public class Creature extends Thing{
 		}
 		
 		Creature other = world.creature(x+mx, y+my);
+		boolean reachWarning = false;
+		
+		if(weapon() != null && weapon().cantReach() > 0){
+			if(other != null){
+				if(isPlayer()){
+					notify("Tu " + weapon().nameWNoStacks() + " es demasiado larga para alcanzar " + other.nameAlALa());
+				}else{
+					doAction("|falla05| el ataque!");
+				}
+				other = null;
+				reachWarning = true;
+			}
+		}
 		
 		if(weapon() != null && other == null && weapon().reach() > 0){
 			int reach = weapon.reach();
@@ -275,12 +288,32 @@ public class Creature extends Thing{
 					break;
 				}
 				other = world.creature(x+(mx * i), y+(my * i));
+				
+				if(weapon() != null && weapon().cantReach() >= i){
+					if(other != null){
+						if(!reachWarning){
+							if(isPlayer()){
+								notify("Tu " + weapon().nameWNoStacks() + " es demasiado larga para alcanzar " + other.nameAlALa());
+							}else{
+								doAction("|falla05| el ataque!");
+							}
+						}
+						other = null;
+						reachWarning = true;
+					}
+				}
+				
 				i++;
 			}
 		}
 		
 		if (other == null){
-			dualStrike = false;
+			if(reachWarning){
+				mx = 0;
+				my = 0;
+			}else{
+				dualStrike = false;
+			}
 			ai.onEnter(x+mx, y+my, tile);
 		}else{
 			ai.onAttack(x+mx, y+my, other);
