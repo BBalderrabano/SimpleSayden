@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Item extends Thing{
-
+	@Override
+	public String name() { return (level >= 3 ? "+++" : (level == 2 ? "++" : (level == 1 ? "+" : ""))) + name; }
+	
 	private char glyph;
 	public char glyph() { return glyph; }
 	
@@ -41,6 +43,19 @@ public class Item extends Thing{
 				return d.amount;
 		}
 		return 0;
+	}
+	public DamageType highestDamage() { 
+		int highest = 0;
+		DamageType highestDamage = null;
+		
+		for(DamageType d : attackValues){
+			if(d.amount >= highest){
+				highest = d.amount;
+				highestDamage = d;
+			}
+		}
+		
+		return highestDamage;
 	}
 
 	private ArrayList<DamageType> defenseValues;
@@ -94,6 +109,27 @@ public class Item extends Thing{
 		} 
 	}
 	
+	private int level = 0;
+	public int level() { return level; }
+	public boolean canWound() { return level >= 2; }
+	
+	private int countHit = 0;
+	public int countHit() { 
+		int to_return = 0;
+		this.countHit++; 
+		
+		if(countHit >= 20){
+			level++;
+			countHit = 0;
+			to_return = level;
+		}
+		
+		return to_return;
+	}
+	
+	private int spawnWeight = 10;
+	public int spawnWeight() { return spawnWeight; }
+	
 	private int cantReach = 0;
 	public int cantReach() { return cantReach; }
 	public void modifyCantReach(int amount) { this.cantReach += amount; }
@@ -114,7 +150,7 @@ public class Item extends Thing{
 			getBooleanData(Constants.CHECK_WEAPON) ||
 			getBooleanData(Constants.CHECK_HELMENT);}
 	
-	public Item(char glyph, char gender, Color color, String name, String appearance){
+	public Item(char glyph, char gender, Color color, String name, String appearance, int spawnWeight){
 		super();
 		this.glyph = glyph;
 		this.gender = gender;
@@ -126,6 +162,7 @@ public class Item extends Thing{
 		this.attackValues.addAll(DamageType.ALL_TYPES());
 		this.defenseValues = new ArrayList<DamageType>();
 		this.defenseValues.addAll(DamageType.ALL_TYPES());
+		this.spawnWeight = spawnWeight;
 		this.bloodModifyer = 0.5f;
 		
 		if(this.appearance != null && this.appearance != this.name)
@@ -149,6 +186,7 @@ public class Item extends Thing{
 		this.attackSpeed = clone.attackSpeed();
 		this.maxStacks = clone.maxStacks;
 		this.stacks = 1;
+		this.spawnWeight = clone.spawnWeight();
 		setAllData(clone.getAllData());
 		
 		if(this.appearance != null && this.appearance != this.name)

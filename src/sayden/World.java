@@ -24,11 +24,11 @@ public class World {
 	private List<Projectile> projectiles;
 	
 	public float fire(int x, int y) { 
-		if(x > fire.length){
-			x = fire.length;
+		if(x > width){
+			x = width;
 		}
-		if(y > fire[0].length){
-			y = fire[0].length;
+		if(y > height){
+			y = height;
 		}
 		return fire[x][y]; 
 	}

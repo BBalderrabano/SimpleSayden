@@ -102,8 +102,8 @@ public class PlayScreen implements Screen {
 		factory.newEdibleWeapon(true);
 		factory.newBread(true);
 		factory.randomArmor(true);
-		factory.randomWeapon(true);
-		factory.randomWeapon(true);
+		factory.randomWeapon(null, true, true, false, false, false);
+		factory.randomWeapon(null, true, true, false, true, false);
 		
 		factory.randomPotion(true);
 		factory.randomSpellBook(true);
@@ -291,6 +291,9 @@ public class PlayScreen implements Screen {
 	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
+		if (player.hp() < 1)
+			return new LoseScreen(player);
+		
 		if (subscreen() != null) {
 			if(player.subscreen != null){
 				player.subscreen = subscreen().respondToUserInput(key);
@@ -351,9 +354,6 @@ public class PlayScreen implements Screen {
 		if (subscreen() == null){
 			world.updateFloor();
 		}
-		
-		if (player.hp() < 1)
-			return new LoseScreen(player);
 		
 		return this;
 	}

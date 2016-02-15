@@ -3,7 +3,7 @@ package sayden;
 import java.util.HashMap;
 
 public class Thing {
-	protected String name;
+	public String name;
 	protected String appearance = null;
 	protected String description = null;
 	
@@ -11,8 +11,9 @@ public class Thing {
 	public boolean isIdentified() { return isIdentified; }
 	public void identify(boolean identify) { this.isIdentified = identify;}
 	
-	public String nameWStacks() { return (Constants.knownName(name) || isIdentified || appearance == null ? name : appearance) + (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
-	public String nameWNoStacks() { return Constants.knownName(name) || isIdentified || appearance == null ? name : appearance; }
+	public String name() { return name; }
+	public String nameWStacks() { return (Constants.knownName(name) || isIdentified || appearance == null ? name() : appearance) + (stackable() && stacks > 1 ? "(x"+stacks+")" : ""); }
+	public String nameWNoStacks() { return Constants.knownName(name) || isIdentified || appearance == null ? name() : appearance; }
 	
 	public String nameUnUnaWNoStacks(){ return gender == 'M' ? "un " + nameWNoStacks() : "una " + nameWNoStacks(); }
 	public String nameElLaWNoStacks(){ return gender == 'M' ? "el " + nameWNoStacks() : "la " + nameWNoStacks(); }

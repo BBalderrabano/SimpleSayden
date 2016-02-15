@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 import asciiPanel.AsciiPanel;
 import sayden.ai.BigMarauderAi;
 import sayden.ai.BlacksMithAi;
@@ -219,7 +218,7 @@ public class StuffFactory {
 		if(Math.random() < .3f)
 			marauder.inventory().add(newMarauderHood(false));
 		
-		marauder.inventory().add(randomWeapon(false));
+		marauder.inventory().add(randomWeapon(null, false, true, false, false, false));
 		
 		world.addAtEmptyLocation(marauder );
 		new MarauderAi(marauder, player);
@@ -266,7 +265,6 @@ public class StuffFactory {
 	public Creature newGoblin(Creature player){
 		Creature goblin = new Creature(world, 'g', 'M', AsciiPanel.brightGreen, "goblin", 50);
 		new GoblinAi(goblin, player);
-		goblin.equip(randomWeapon(false));		
 		goblin.equip(randomArmor(false));
 		world.addAtEmptyLocation(goblin );
 		return goblin;
@@ -278,10 +276,15 @@ public class StuffFactory {
 	 */
 	
 	public Item newRock(boolean spawn){
-		if(Math.random() < 0.15)
-			return newGiantRock(spawn);
-		
-		Item rock = new Item(',', 'F', AsciiPanel.yellow, "roca", null);
+		ArrayList<Item> rockItems = new ArrayList<Item>();
+		rockItems.add(newSmallRock(false));
+		rockItems.add(newGiantRock(false));
+		rockItems.add(newRockMace(false));
+		return randomWeapon(rockItems, spawn, false, false, false, false);
+	}
+	
+	public Item newSmallRock(boolean spawn){
+		Item rock = new Item(',', 'F', AsciiPanel.yellow, "roca", null, 100);
 		rock.modifyAttackValue(DamageType.BLUNT, 3);
 		rock.makeStackable(5);
 		world.addAtEmptyLocation(rock, spawn);
@@ -289,7 +292,7 @@ public class StuffFactory {
 	}
 	
 	public Item newGiantRock(boolean spawn){
-		Item rock = new Item(';', 'F', AsciiPanel.yellow, "roca gigante", null);
+		Item rock = new Item(';', 'F', AsciiPanel.yellow, "roca gigante", null, 40);
 		rock.modifyAttackValue(DamageType.BLUNT, 8);
 		rock.modifyAttackSpeed(Speed.FAST);
 		rock.modifyMovementSpeed(Speed.FAST);
@@ -298,7 +301,7 @@ public class StuffFactory {
 	}
 	
 	public Item newAlcoholBottle(boolean spawn){
-		final Item alcohol = new Item('!', 'M', AsciiPanel.white, "alcohol", null);
+		final Item alcohol = new Item('!', 'M', AsciiPanel.white, "alcohol", null, 100);
 		alcohol.setQuaffEffect(new Effect("borracho", 1, true){
 			public void start(Creature creature){
 				creature.doAction(alcohol, "bebe la botella completa");
@@ -314,7 +317,7 @@ public class StuffFactory {
 	}
 	
 	public Item newKnife(boolean spawn){
-		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo");
+		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo", 80);
 		knife.modifyAttackValue(DamageType.PIERCING, 3);
 		knife.modifyAttackValue(DamageType.RANGED, 1);
 		knife.modifyAttackSpeed(Speed.VERY_FAST);
@@ -326,7 +329,7 @@ public class StuffFactory {
 	}
 	
 	public Item newDagger(boolean spawn){
-		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga");
+		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga", 80);
 		item.modifyAttackValue(DamageType.PIERCING, 3);
 		item.modifyAttackValue(DamageType.SLICE, 1);
 		item.modifyAttackSpeed(Speed.VERY_FAST);
@@ -338,7 +341,7 @@ public class StuffFactory {
 	}
 	
 	public Item newCurveDagger(boolean spawn){
-		Item item = new Item((char)255, 'F', AsciiPanel.yellow, "daga curva", "daga curva");
+		Item item = new Item((char)255, 'F', AsciiPanel.yellow, "daga curva", "daga curva", 60);
 		item.modifyAttackValue(DamageType.PIERCING, 4);
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.modifyAttackSpeed(Speed.VERY_FAST);
@@ -349,7 +352,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLance(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.white, "lanza", "lanza");
+		Item item = new Item((char)244, 'F', AsciiPanel.white, "lanza", "lanza", 60);
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 6);
 		
@@ -364,7 +367,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLongLance(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.brightWhite, "lanza larga", "lanza larga");
+		Item item = new Item((char)244, 'F', AsciiPanel.brightWhite, "lanza larga", "lanza larga", 40);
 		item.modifyAttackValue(DamageType.SLICE, 4);
 		item.modifyAttackValue(DamageType.PIERCING, 8);
 		
@@ -380,7 +383,7 @@ public class StuffFactory {
 	}
 	
 	public Item newKnightLance(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.brightBlue, "lanza de caballeria", "lanza de caballeria");
+		Item item = new Item((char)244, 'F', AsciiPanel.brightBlue, "lanza de caballeria", "lanza de caballeria", 30);
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 6);
@@ -396,7 +399,7 @@ public class StuffFactory {
 	}
 	
 	public Item newJavelin(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.white, "lanza", "lanza");
+		Item item = new Item((char)244, 'F', AsciiPanel.white, "javalina", "javalina", 60);
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 6);
 		item.modifyAttackValue(DamageType.RANGED, 2);
@@ -411,7 +414,7 @@ public class StuffFactory {
 	}
 	
 	public Item newSchyte(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.white, "guadaña", "guadaña");
+		Item item = new Item((char)244, 'F', AsciiPanel.white, "guadaña", "guadaña", 30);
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 10);
 		
@@ -427,7 +430,7 @@ public class StuffFactory {
 	}
 	
 	public Item newCimitarra(boolean spawn){
-		Item item = new Item((char)253, 'F', new Color(167, 166, 166), "cimitarra", "cimitarra");
+		Item item = new Item((char)253, 'F', new Color(167, 166, 166), "cimitarra", "cimitarra", 70);
 		item.modifyAttackValue(DamageType.SLICE, 6);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyBloodModifyer(0.6f);
@@ -437,7 +440,7 @@ public class StuffFactory {
 	}
 	
 	public Item newSword(boolean spawn){
-		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada", "espada");
+		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada", "espada", 80);
 		item.modifyAttackValue(DamageType.SLICE, 6);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -447,7 +450,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLongSword(boolean spawn){
-		Item item = new Item((char)253, 'F', Color.DARK_GRAY, "espada larga", "espada larga");
+		Item item = new Item((char)253, 'F', Color.DARK_GRAY, "espada larga", "espada larga", 70);
 		item.modifyAttackValue(DamageType.SLICE, 7);
 		item.modifyAttackValue(DamageType.BLUNT, 1);
 		item.setData(Constants.CHECK_WEAPON, true);
@@ -458,7 +461,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMandoble(boolean spawn){
-		Item item = new Item((char)253, 'F', Color.green, "mandoble", "mandoble");
+		Item item = new Item((char)253, 'F', Color.green, "mandoble", "mandoble", 60);
 		item.modifyAttackValue(DamageType.SLICE, 10);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		
@@ -472,7 +475,7 @@ public class StuffFactory {
 	}
 	
 	public Item newShortSword(boolean spawn){
-		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada corta", "espada corta");
+		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada corta", "espada corta", 80);
 		item.modifyAttackValue(DamageType.SLICE, 4);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -482,7 +485,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBastardSword(boolean spawn){
-		Item item = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada bastarda", "espada bastarda");
+		Item item = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada bastarda", "espada bastarda", 65);
 		item.modifyAttackValue(DamageType.SLICE, 8);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.NORMAL);
@@ -492,7 +495,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBigSword(boolean spawn){
-		Item bigSword = new Item((char)253, 'M', Color.gray, "espadon", "espadon");
+		Item bigSword = new Item((char)253, 'M', Color.gray, "espadon", "espadon", 60);
 		bigSword.modifyAttackValue(DamageType.SLICE, 10);
 		bigSword.modifyAttackSpeed(Speed.NORMAL);
 		bigSword.setData(Constants.CHECK_WEAPON, true);
@@ -503,7 +506,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHugeSword(boolean spawn){
-		Item hugeSword = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada gigante", "espada gigante");
+		Item hugeSword = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada gigante", "espada gigante", 30);
 		hugeSword.modifyAttackValue(DamageType.SLICE, 15);
 		hugeSword.modifyAttackValue(DamageType.BLUNT, 4);
 		hugeSword.modifyAttackSpeed(Speed.SLOW);
@@ -516,7 +519,7 @@ public class StuffFactory {
 	}
 	
 	public Item newAxe(boolean spawn){
-		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha", "hacha");
+		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha", "hacha", 80);
 		item.modifyAttackValue(DamageType.SLICE, 4);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
@@ -527,7 +530,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBigAxe(boolean spawn){
-		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha grande", "hacha grande");
+		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha grande", "hacha grande", 70);
 		item.modifyAttackValue(DamageType.SLICE, 6);
 		item.modifyAttackValue(DamageType.BLUNT, 4);
 		item.setData(Constants.CHECK_WEAPON, true);
@@ -538,7 +541,7 @@ public class StuffFactory {
 	}
 	
 	public Item newWarAxe(boolean spawn){
-		Item item = new Item((char)243, 'M', AsciiPanel.brightBlack, "hacha de guerra", "hacha de guerra");
+		Item item = new Item((char)243, 'M', AsciiPanel.brightBlack, "hacha de guerra", "hacha de guerra", 60);
 		item.modifyAttackValue(DamageType.SLICE, 8);
 		item.modifyAttackValue(DamageType.BLUNT, 4);
 		item.setData(Constants.CHECK_WEAPON, true);
@@ -549,7 +552,7 @@ public class StuffFactory {
 	}
 	
 	public Item newTomahawk(boolean spawn){
-		Item item = new Item((char)243, 'M', AsciiPanel.yellow, "tomahawk", "tomahawk");
+		Item item = new Item((char)243, 'M', AsciiPanel.yellow, "tomahawk", "tomahawk", 80);
 		item.modifyAttackValue(DamageType.SLICE, 3);
 		item.modifyAttackValue(DamageType.BLUNT, 1);
 		item.modifyAttackValue(DamageType.RANGED, 1);
@@ -561,7 +564,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMace(boolean spawn){
-		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "maza", "maza");
+		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "maza", "maza", 80);
 		item.modifyAttackValue(DamageType.BLUNT, 4);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -571,7 +574,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHammer(boolean spawn){
-		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo", "martillo");
+		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo", "martillo", 75);
 		item.modifyAttackValue(DamageType.BLUNT, 8);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.VERY_FAST);
@@ -581,7 +584,7 @@ public class StuffFactory {
 	}
 	
 	public Item newWarHammer(boolean spawn){
-		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo de guerra", "martillo de guerra");
+		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo de guerra", "martillo de guerra", 65);
 		item.modifyAttackValue(DamageType.BLUNT, 10);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.NORMAL);
@@ -591,7 +594,7 @@ public class StuffFactory {
 	}
 	
 	public Item newGiantHammer(boolean spawn){
-		Item item = new Item((char)254, 'M', AsciiPanel.brightBlack, "martillo gigante", "martillo gigante");
+		Item item = new Item((char)254, 'M', AsciiPanel.brightBlack, "martillo gigante", "martillo gigante", 30);
 		item.modifyAttackValue(DamageType.BLUNT, 15);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.setData(Constants.CHECK_TWO_HANDED, true);
@@ -602,7 +605,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBallAndChain(boolean spawn){
-		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "bola y cadena", "bola y cadena");
+		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "bola y cadena", "bola y cadena", 55);
 		item.modifyAttackValue(DamageType.BLUNT, 6);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -612,7 +615,7 @@ public class StuffFactory {
 	}
 	
 	public Item newRockMace(boolean spawn){
-		Item rockMace = new Item((char)254, 'F', AsciiPanel.yellow, "estalactita", null);
+		Item rockMace = new Item((char)254, 'F', AsciiPanel.yellow, "estalactita", null, 10);
 		rockMace.modifyAttackValue(DamageType.BLUNT, 6);
 		rockMace.setData(Constants.CHECK_WEAPON, true);
 		rockMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
@@ -623,7 +626,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMorningStar(boolean spawn){
-		Item morningStar = new Item((char)254, 'F', AsciiPanel.brightBlack, "estrella", "estrella");
+		Item morningStar = new Item((char)254, 'F', AsciiPanel.brightBlack, "estrella", "estrella", 60);
 		morningStar.modifyAttackValue(DamageType.SLICE, 1);
 		morningStar.modifyAttackValue(DamageType.BLUNT, 4);
 		morningStar.modifyAttackValue(DamageType.PIERCING, 1);
@@ -635,7 +638,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBigMace(boolean spawn){
-		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra");
+		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra", 100);
 		bigMace.modifyAttackValue(DamageType.BLUNT, 10);
 		bigMace.modifyAttackSpeed(Speed.SLOW);
 		bigMace.modifyMovementSpeed(Speed.FAST);
@@ -647,7 +650,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHalberd(boolean spawn){
-		Item item = new Item((char)244, 'M', Color.LIGHT_GRAY, "alabarda", "alabarda");
+		Item item = new Item((char)244, 'M', Color.LIGHT_GRAY, "alabarda", "alabarda", 35);
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 6);
@@ -663,7 +666,7 @@ public class StuffFactory {
 	}
 	
 	public Item newShortBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto");
+		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto", 50);
 		item.modifyAttackValue(DamageType.RANGED, 1);
 		item.modifyAttackValue(DamageType.PIERCING, 4);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -678,7 +681,7 @@ public class StuffFactory {
 	}
 	
 	public Item newCompositeBow(boolean spawn){
-		Item item = new Item(')', 'M', Color.gray, "arco compuesto", "arco compuesto");
+		Item item = new Item(')', 'M', Color.gray, "arco compuesto", "arco compuesto", 40);
 		item.modifyAttackValue(DamageType.RANGED, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 6);
 		item.modifyAttackSpeed(Speed.NORMAL);
@@ -693,7 +696,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLongBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.white, "arco largo", "arco largo");
+		Item item = new Item(')', 'M', AsciiPanel.white, "arco largo", "arco largo", 30);
 		item.modifyAttackValue(DamageType.RANGED, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 8);
 		item.modifyAttackSpeed(Speed.SLOW);
@@ -708,7 +711,7 @@ public class StuffFactory {
 	}
 	
 	public Item newCrossbow(boolean spawn){
-		Item item = new Item(')', 'F', Color.gray, "ballesta", "ballesta");
+		Item item = new Item(')', 'F', Color.gray, "ballesta", "ballesta", 30);
 		item.modifyAttackValue(DamageType.RANGED, 4);
 		item.modifyAttackValue(DamageType.BLUNT, 1);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -722,7 +725,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHeavyCrossbow(boolean spawn){
-		Item item = new Item(')', 'F', Color.darkGray, "ballesta pesada", "ballesta pesada");
+		Item item = new Item(')', 'F', Color.darkGray, "ballesta pesada", "ballesta pesada", 25);
 		item.modifyAttackValue(DamageType.RANGED, 6);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -737,7 +740,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHunterBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.green, "arco cazador", "arco cazador");
+		Item item = new Item(')', 'M', AsciiPanel.green, "arco cazador", "arco cazador", 25);
 		item.modifyAttackValue(DamageType.RANGED, 4);
 		item.modifyAttackValue(DamageType.PIERCING, 8);
 		item.modifyAttackSpeed(Speed.SLOW);
@@ -751,8 +754,22 @@ public class StuffFactory {
 		return item;
 	}
 	
+	public Item newKatar(boolean spawn){
+		Item item = new Item((char)255, 'M', AsciiPanel.white, "katar", "katar", 45);
+		item.modifyAttackValue(DamageType.PIERCING, 3);
+		item.modifyAttackValue(DamageType.SLICE, 3);
+		
+		item.setData(Constants.CHECK_WEAPON, true);
+		item.setData(Constants.CHECK_DUAL_WIELD, true);
+		item.modifyAttackSpeed(Speed.VERY_FAST);
+		
+		item.modifyBloodModifyer(.75f);
+		world.addAtEmptyLocation(item, spawn);
+		return item;
+	}
+	
 	public Item newWoodenShield(boolean spawn){
-		Item woodenShield = new Item('#', 'M', AsciiPanel.yellow, "escudo de madera", "escudo de madera");
+		Item woodenShield = new Item('#', 'M', AsciiPanel.yellow, "escudo de madera", "escudo de madera", 70);
 		woodenShield.modifyDefenseValue(DamageType.SLICE, 4);
 		woodenShield.modifyDefenseValue(DamageType.BLUNT, 4);
 		woodenShield.modifyDefenseValue(DamageType.PIERCING, 3);
@@ -763,7 +780,7 @@ public class StuffFactory {
 	}
 	
 	public Item newRoundShield(boolean spawn){
-		Item roundShield = new Item('#', 'M', AsciiPanel.brightBlack, "escudo redondo", "escudo redondo");
+		Item roundShield = new Item('#', 'M', AsciiPanel.brightBlack, "escudo redondo", "escudo redondo", 40);
 		roundShield.modifyDefenseValue(DamageType.SLICE, 5);
 		roundShield.modifyDefenseValue(DamageType.BLUNT, 5);
 		roundShield.modifyDefenseValue(DamageType.PIERCING, 4);
@@ -774,7 +791,7 @@ public class StuffFactory {
 	}
 	
 	public Item newWoodPieceShield(boolean spawn){
-		Item woodPieceShield = new Item('#', 'M', AsciiPanel.yellow, "trozo de madera", "trozo de madera");
+		Item woodPieceShield = new Item('#', 'M', AsciiPanel.yellow, "trozo de madera", "trozo de madera", 80);
 		woodPieceShield.modifyDefenseValue(DamageType.SLICE, 3);
 		woodPieceShield.modifyDefenseValue(DamageType.BLUNT, 3);
 		woodPieceShield.modifyDefenseValue(DamageType.PIERCING, 2);
@@ -788,7 +805,7 @@ public class StuffFactory {
 	//////////////////////////
 	
 	public Item newRockBugHelm(boolean spawn){
-		Item rockBugHelm = new Item((char)248, 'M', AsciiPanel.yellow, "caparazon de comepiedra", null);
+		Item rockBugHelm = new Item((char)248, 'M', AsciiPanel.yellow, "caparazon de comepiedra", null, 100);
 		rockBugHelm.modifyDefenseValue(DamageType.BLUNT, 1);
 		rockBugHelm.setData(Constants.CHECK_HELMENT, true);
 		world.addAtEmptyLocation(rockBugHelm, spawn);
@@ -796,7 +813,7 @@ public class StuffFactory {
 	}
 	
 	public Item newBread(boolean spawn){
-		Item item = new Item('%', 'M', AsciiPanel.yellow, "pan", null);
+		Item item = new Item('%', 'M', AsciiPanel.yellow, "pan", null, 50);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
 		item.setQuaffEffect(new Effect("alimentado", 1, false){
 			public void start(Creature creature){
@@ -808,7 +825,7 @@ public class StuffFactory {
 	}
 	
 	public Item newFruit(boolean spawn){
-		Item item = new Item('%', 'F', AsciiPanel.brightRed, "manzana", null);
+		Item item = new Item('%', 'F', AsciiPanel.brightRed, "manzana", null, 60);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
 		item.setQuaffEffect(new Effect("alimentado", 1, false){
 			public void start(Creature creature){
@@ -819,22 +836,8 @@ public class StuffFactory {
 		return item;
 	}
 	
-	public Item newKatar(boolean spawn){
-		Item item = new Item((char)255, 'M', AsciiPanel.white, "katar", "katar");
-		item.modifyAttackValue(DamageType.PIERCING, 1);
-		item.modifyAttackValue(DamageType.SLICE, 1);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_DUAL_WIELD, true);
-		item.modifyAttackSpeed(Speed.VERY_FAST);
-		
-		item.modifyBloodModifyer(1f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
 	public Item newEdibleWeapon(boolean spawn){
-		Item item = new Item(')', 'F', AsciiPanel.yellow, "baguette", null);
+		Item item = new Item(')', 'F', AsciiPanel.yellow, "baguette", null, 40);
 		item.modifyAttackValue(DamageType.BLUNT, 1);
 		item.modifyBloodModifyer(0.1f);
 		item.setData(Constants.CHECK_WEAPON, true);
@@ -850,7 +853,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLightArmor(boolean spawn){
-		Item item = new Item((char)252, 'F', AsciiPanel.green, "tunica", "tunica");
+		Item item = new Item((char)252, 'F', AsciiPanel.green, "tunica", "tunica", 100);
 		item.modifyDefenseValue(DamageType.SLICE, 1);
 		item.setData(Constants.CHECK_ARMOR, true);
 		world.addAtEmptyLocation(item, spawn);
@@ -858,7 +861,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMediumArmor(boolean spawn){
-		Item item = new Item((char)252, 'F', AsciiPanel.white, "tunica endurecida", "tunica endurecida");
+		Item item = new Item((char)252, 'F', AsciiPanel.white, "tunica endurecida", "tunica endurecida", 100);
 		item.modifyDefenseValue(DamageType.SLICE, 1);
 		item.modifyDefenseValue(DamageType.BLUNT, 1);
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -867,7 +870,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHeavyArmor(boolean spawn){
-		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "armadura de placa", "armadura de placa");
+		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "armadura de placa", "armadura de placa", 100);
 		item.modifyDefenseValue(DamageType.SLICE, 2);
 		item.modifyDefenseValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -876,7 +879,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLeatherArmor(boolean spawn){
-		Item leatherArmor = new Item((char)252, 'F', Color.orange, "armadura de cuero", "armadura de cuero");
+		Item leatherArmor = new Item((char)252, 'F', Color.orange, "armadura de cuero", "armadura de cuero", 100);
 		leatherArmor.modifyDefenseValue(DamageType.SLICE, 1);
 		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 1);
 		leatherArmor.setData(Constants.CHECK_ARMOR, true);
@@ -885,7 +888,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMarauderHood(boolean spawn){
-		Item marauderHood = new Item((char)248, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador");
+		Item marauderHood = new Item((char)248, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador", 100);
 		marauderHood.modifyDefenseValue(DamageType.PIERCING, 1);
 		marauderHood.setData(Constants.CHECK_HELMENT, true);
 		marauderHood.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
@@ -895,7 +898,7 @@ public class StuffFactory {
 	}
 	
 	public Item newMarauderVest(boolean spawn){
-		Item marauderVest = new Item((char)252, 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador");
+		Item marauderVest = new Item((char)252, 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador", 100);
 		marauderVest.modifyDefenseValue(DamageType.SLICE, 1);
 		marauderVest.setData(Constants.CHECK_ARMOR, true);
 		marauderVest.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
@@ -903,15 +906,92 @@ public class StuffFactory {
 		return marauderVest;
 	}
 	
-	public Item randomWeapon(boolean spawn){
-		switch ((int)(Math.random() * 6)){
-		case 4: case 0: return newDagger(spawn);
-		case 5: case 1: return newShortSword(spawn);
-		case 2: return newMorningStar(spawn);
-		case 3: return newBigSword(spawn);
-		default: return newMace(spawn);
+	public Item randomWeapon(ArrayList<Item> pool, boolean spawn, boolean includeCommons, boolean includeUncommon, boolean includeRanged, boolean includeHeavy){
+		ArrayList<Item> items = new ArrayList<Item>();
+		
+		if(includeUncommon){
+			items.add(newLance(false));
+			items.add(newBallAndChain(false));
+			items.add(newCimitarra(false));
+			items.add(newCurveDagger(false));
+			items.add(newWarAxe(false));
+			items.add(newWarHammer(false));
+			items.add(newSchyte(false));
+			items.add(newJavelin(false));
+			items.add(newKnightLance(false));
+			items.add(newLongLance(false));
 		}
+		if(includeHeavy){
+			items.add(newLongSword(false));
+			items.add(newMandoble(false));
+			items.add(newBigSword(false));
+			items.add(newHugeSword(false));
+			items.add(newBigAxe(false));
+			items.add(newGiantHammer(false));
+			items.add(newHalberd(false));
+		}
+		if(includeCommons){
+			items.add(newShortSword(false));
+			items.add(newMace(false));
+			items.add(newDagger(false));
+			items.add(newKnife(false));
+			items.add(newMorningStar(false));
+			items.add(newSword(false));
+			items.add(newBastardSword(false));
+			items.add(newAxe(false));
+			items.add(newTomahawk(false));
+			items.add(newHammer(false));
+		}
+		if(includeRanged){
+			items.add(newShortBow(false));
+			items.add(newCompositeBow(false));
+			items.add(newHunterBow(false));
+			items.add(newLongBow(false));
+			items.add(newCrossbow(false));
+			items.add(newHeavyCrossbow(false));
+		}
+		
+		if(pool != null)
+			items.addAll(pool);
+		
+		// Compute the total weight of all items together
+		double totalWeight = 0.0d;
+		for (Item i : items)
+		{
+		    totalWeight += i.spawnWeight();
+		}
+		// Now choose a random item
+		int randomIndex = -1;
+		double random = Math.random() * totalWeight;
+		
+		for (int i = 0; i < items.size(); ++i)
+		{
+		    random -= items.get(i).spawnWeight();
+		    if (random <= 0.0d)
+		    {
+		        randomIndex = i;
+		        break;
+		    }
+		}
+		
+		Item myRandomItem = items.get(randomIndex);
+
+		if(spawn){
+			world.addAtEmptyLocation(myRandomItem);
+		}
+		
+		return myRandomItem;
 	}
+	
+//	public Item randomWeapon(boolean spawn){
+//		switch ((int)(Math.random() * 6)){
+//		case 4: case 0: return newDagger(spawn);
+//		case 5: case 1: return newShortSword(spawn);
+//		case 2: return newMorningStar(spawn);
+//		case 3: return newBigSword(spawn);
+//		default: return newMace(spawn);
+//		}
+//	}
 
 	public Item randomArmor(boolean spawn){
 		switch ((int)(Math.random() * 3)){
@@ -928,7 +1008,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfHealth(boolean spawn){
 		String appearance = potionAppearances.get(0);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de vida", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de vida", appearance, 60);
 		item.setQuaffEffect(new Effect("reanimado", 1){
 			public void start(Creature creature){
 				if (creature.hp() == creature.totalMaxHp())
@@ -945,7 +1025,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfSlowHealth(boolean spawn){
 		String appearance = potionAppearances.get(2);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de lenta curacion", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de lenta curacion", appearance, 60);
 		item.setQuaffEffect(new Effect("reanimado", 10){
 			public void start(Creature creature){
 				creature.doAction(item, "siente aliviado");
@@ -963,7 +1043,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfPoison(boolean spawn){
 		String appearance = potionAppearances.get(3);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de veneno", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de veneno", appearance, 70);
 		item.setQuaffEffect(new Effect("envenenado", 10){
 			public void start( Creature creature){
 				creature.doAction(item, "siente |enfermo04|");
@@ -981,7 +1061,7 @@ public class StuffFactory {
 	
 	public Item newPotionOfWarrior(boolean spawn){
 		String appearance = potionAppearances.get(4);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion del guerrero", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion del guerrero", appearance, 50);
 		item.setQuaffEffect(new Effect("fortalecido", 20){
 			public void start(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, 5);
@@ -991,7 +1071,7 @@ public class StuffFactory {
 			public void end(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, -5);
 				creature.modifyDefenseValue(DamageType.BLUNT, -5);
-				creature.doAction("siente su fuerza amainar");
+				creature.doAction("siente amainar su fuerza");
 			}
 		});
 		item.makeStackable(5);
@@ -1001,7 +1081,7 @@ public class StuffFactory {
 
 	public Item newPotionOfArcher(boolean spawn){
 		String appearance = potionAppearances.get(5);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de arqueria", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de arqueria", appearance, 70);
 		item.setQuaffEffect(new Effect("alerta", 20){
 			public void start(Creature creature){
 				creature.modifyVisionRadius(3);
@@ -1019,7 +1099,7 @@ public class StuffFactory {
 	
 	public Item newMarauderPoison(boolean spawn){
 		String appearance = potionAppearances.get(6);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de merodeador", appearance);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de merodeador", appearance, 100);
 		item.setQuaffEffect(new Effect("envenenado", 8, true){
 			public void start(Creature creature){
 				if(creature.getStringData(Constants.RACE) == "merodeador"){
@@ -1044,17 +1124,13 @@ public class StuffFactory {
 	}
 	
 	public Item randomPotion(boolean spawn){
-		switch ((int)(Math.random() * 9)){
-		case 0: return newPotionOfHealth(spawn);
-		case 1: return newPotionOfHealth(spawn);
-		case 2: return newPotionOfSlowHealth(spawn);
-		case 3: return newPotionOfWarrior(spawn);
-		case 4: return newPotionOfSlowHealth(spawn);
-		case 5: return newPotionOfPoison(spawn);
-		case 6: return newPotionOfWarrior(spawn);
-		case 7: return newPotionOfArcher(spawn);
-		default: return newPotionOfArcher(spawn);
-		}
+		ArrayList<Item> potions = new ArrayList<Item>();
+		potions.add(newPotionOfArcher(false));
+		potions.add(newPotionOfHealth(false));
+		potions.add(newPotionOfPoison(false));
+		potions.add(newPotionOfSlowHealth(false));
+		potions.add(newPotionOfWarrior(false));
+		return randomWeapon(potions, spawn, false, false, false, false);
 	}
 	
 	/* ########################################################################################
@@ -1063,7 +1139,7 @@ public class StuffFactory {
 	 */
 	
 	public Item newLeatherSpellbook(boolean spawn){
-		final Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro de cuero", null);
+		final Item item = new Item('+', 'M', AsciiPanel.brightWhite, "libro de cuero", null, 100);
 		
 		item.addWrittenSpell("plegaria de vida", 'F', new Effect("reanimado", 1){
 			public void start(Creature creature){

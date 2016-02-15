@@ -192,6 +192,10 @@ public class CreatureAi {
 	public void onNotify(String message){ }
 	
 	public void onDecease(Item corpse) { }
+	
+	public void onRangedWeaponAttack(Item weapon) { }
+	
+	public void onThrowItem(Item thrown) { }
 
 	public boolean canSee(int wx, int wy) {
 		int visionRadius = creature.visionRadius();

@@ -357,6 +357,8 @@ public class Creature extends Thing{
 		
 		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()));
 		
+		ai.onThrowItem(thrown);
+		
 		world.add(new Projectile(world, new Line(this.x, this.y, x, y), 
 				thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
 	}
@@ -373,7 +375,7 @@ public class Creature extends Thing{
 		if(x < other.x && y > other.y || x > other.x && y < other.y)
 			glyph = '/';
 		
-		Item thrown = new Item(glyph, 'F', weapon().color(), "flecha", null);
+		Item thrown = new Item(glyph, 'F', weapon().color(), "flecha", null, 100);
 		for(DamageType t : DamageType.ALL_TYPES()){
 			thrown.modifyAttackValue(t, weapon().attackValue(t));
 		}
@@ -387,11 +389,12 @@ public class Creature extends Thing{
 		
 		if(weapon() != null && weapon().canBreake()){
 			weapon().modifyDurability(-1);
-			
 			if(weapon().durability() < 1){
 				doAction("rompe " + weapon().nameElLaWNoStacks() + " al tensarlo demasiado");
 				inventory().remove(weapon());
 				unequip(weapon(), false);
+			}else{
+				ai.onRangedWeaponAttack(weapon());
 			}
 		}
 		
@@ -549,13 +552,15 @@ public class Creature extends Thing{
 			hp = maxHp;
 		} else if (hp < 1) {
 			doAction("muere");
-			 ai.onDecease(leaveCorpse());
+			if(!isPlayer()){
+				ai.onDecease(leaveCorpse());
+			}
 			world.remove(this);
 		}
 	}
 	
 	private Item leaveCorpse(){
-		Item corpse = new Item('%', 'M', originalColor, "cadaver de " + nameWStacks() + "", null);
+		Item corpse = new Item('%', 'M', originalColor, "cadaver de " + nameWStacks() + "", null, 100);
 		
 		corpse.setData(Constants.CHECK_CONSUMABLE, true);
 		corpse.setData(Constants.CHECK_CORPSE, true);

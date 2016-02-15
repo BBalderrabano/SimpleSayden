@@ -81,12 +81,45 @@ public class PlayerAi extends CreatureAi {
 		
 		boolean success = creature.meleeAttack(other);
 		
-		if(success && other.hp() > 1 && other.queSpell() != null){
-			other.stopCasting();
-			other.modifyActionPoints(-other.getActionPoints());
+		if(success){
+			if(other.hp() > 1 && other.queSpell() != null){
+				other.stopCasting();
+				other.modifyActionPoints(-other.getActionPoints());
+			}
+			if(creature.weapon() != null && !creature.weapon().getBooleanData(Constants.CHECK_RANGED)){
+				int weaponLevel = creature.weapon().countHit();
+				
+				if(weaponLevel > 0){
+					creature.notify("Te sientes mas comodo con tu " + creature.weapon().name);
+					if(weaponLevel == 1){
+						creature.weapon().modifyAttackValue(creature.weapon().highestDamage(), 2);
+					}
+					if(weaponLevel == 3){
+						if(creature.weapon().attackSpeed() != null){
+							creature.weapon().modifyAttackSpeed(creature.weapon().attackSpeed().modifySpeed(-1));
+						}
+					}
+				}
+			}
 		}
 		
 		return success;
+	}
+	
+	public void onRangedWeaponAttack(Item weapon){
+		int weaponLevel = weapon.countHit();
+		
+		if(weaponLevel > 0){
+			creature.notify("Te sientes mas comodo con tu " + weapon.name);
+			if(weaponLevel == 1){
+				weapon.modifyAttackValue(weapon.highestDamage(), 2);
+			}
+			if(weaponLevel == 3){
+				if(weapon.attackSpeed() != null){
+					weapon.modifyAttackSpeed(weapon.attackSpeed().modifySpeed(-1));
+				}
+			}
+		}
 	}
 	
 	public void onNotify(String message){
