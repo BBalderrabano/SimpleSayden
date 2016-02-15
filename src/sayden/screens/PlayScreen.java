@@ -43,6 +43,7 @@ public class PlayScreen implements Screen {
 		StuffFactory factory = new StuffFactory(world);
 
 		world.overrideFloor(ml.preBuild("Pueblo", factory));
+		
 		fov = new FieldOfView(world);
 		
 		player = factory.newPlayer(messages, fov);
@@ -70,6 +71,7 @@ public class PlayScreen implements Screen {
 			factory.newRabbit();
 			factory.newMage(player);
 		}
+		player.notify("Despiertas en un pueblo abandonado.");
 	}
 
 	private void createCreatures(StuffFactory factory){	
@@ -101,7 +103,8 @@ public class PlayScreen implements Screen {
 		factory.newFruit(true);
 		factory.newEdibleWeapon(true);
 		factory.newBread(true);
-		factory.randomArmor(true);
+		
+		factory.randomArmor(null, true, true, true, false, false);
 		factory.randomWeapon(null, true, true, false, false, false);
 		factory.randomWeapon(null, true, true, false, true, false);
 		

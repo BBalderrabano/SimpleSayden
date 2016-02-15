@@ -10,10 +10,12 @@ import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
 import sayden.FieldOfView;
+import sayden.MapLoader;
 import sayden.Message;
 import sayden.StuffFactory;
 import sayden.Tile;
 import sayden.World;
+import sayden.WorldBuilder;
 
 public class DreamScreen implements Screen {
 	private World world;
@@ -29,7 +31,11 @@ public class DreamScreen implements Screen {
 	
 	private int elapsedTurns = 0;
 	
+	private boolean displayTip = false;
+	
 	public DreamScreen(){
+		MapLoader ml = new MapLoader();
+		
 		screenWidth = Constants.WORLD_WIDTH;
 		screenHeight = Constants.WORLD_HEIGHT;
 		messages = new ArrayList<String>();
@@ -37,10 +43,18 @@ public class DreamScreen implements Screen {
 		createWorld();
 		
 		StuffFactory factory = new StuffFactory(world);
-
+		world.overrideFloor(ml.preBuild("DBatalla", factory));
+		
+		WorldBuilder wb = new WorldBuilder(world.tiles());
+		world = wb.makeForest(world);
+		
 		fov = new FieldOfView(world);
 		
 		player = factory.newDreamer(messages, fov, 40, 12);
+		createCreatures(factory);
+		world.updateFloor();
+
+		player.notify("-- usa [wasd] para moverte --");
 	}
 
 	private void createWorld(){
@@ -53,6 +67,15 @@ public class DreamScreen implements Screen {
 		}
 	}
 	
+	private void createCreatures(StuffFactory factory){
+		for(int i = 0; i < (Math.random() * (20 - 10) + 10); i++){
+			factory.newDreamFighter(player, true);
+		}
+		for(int i = 0; i < (Math.random() * (20 - 10) + 10); i++){
+			factory.newDreamFighter(player, false);
+		}
+	}
+	
 	public int getScrollX() { return Math.max(0, Math.min(player.x - screenWidth / 2, world.width() - screenWidth)); }
 	
 	public int getScrollY() { return Math.max(0, Math.min(player.y - screenHeight / 2, world.height() - screenHeight)); }
@@ -61,6 +84,16 @@ public class DreamScreen implements Screen {
 	public void displayOutput(AsciiPanel terminal) {
 		int left = getScrollX();
 		int top = getScrollY(); 
+		
+		if(elapsedTurns == 3 && !displayTip){
+			player.notify("-- muevete a la casilla de un enemigo (gris) para atacarlo --");
+			displayTip = true;
+		}else if(elapsedTurns == 1 && !displayTip){
+			player.notify("Sueñas con una batalla");
+			displayTip = true;
+		}else{
+			displayTip = false;
+		}
 		
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
@@ -215,7 +248,7 @@ public class DreamScreen implements Screen {
 				
 				Color dreamColor = Color.BLACK;
 				
-				double ratio = elapsedTurns * 0.1f;
+				double ratio = Math.min(1, elapsedTurns * 0.1f);
 				
 				Color glyph_color = blend(world.color(x, y), dreamColor, ratio);
 				Color background_color = blend(world.backgroundColor(x, y), dreamColor, ratio);
@@ -267,6 +300,14 @@ public class DreamScreen implements Screen {
 	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
+//		if(displayTip){
+//			if(key.getKeyCode() == KeyEvent.VK_ENTER){
+//				elapsedTurns++;
+//				displayTip = false;
+//			}
+//			return this;
+//		}
+		
 		if (subscreen() != null) {
 			if(player.subscreen != null){
 				player.subscreen = subscreen().respondToUserInput(key);
@@ -278,7 +319,7 @@ public class DreamScreen implements Screen {
 			switch (key.getKeyCode()){
 				case KeyEvent.VK_P:
 				case KeyEvent.VK_ESCAPE:
-						subscreen = new HelpScreen(); break;
+						return new PlayScreen();
 				case KeyEvent.VK_TAB:
 				case KeyEvent.VK_I:
 						subscreen = new MenuScreen(player, player.x - getScrollX(), 
@@ -322,7 +363,7 @@ public class DreamScreen implements Screen {
 		}
 		
 		if (player.hp() < 1)
-			return new LoseScreen(player);
+			return new PlayScreen();
 		
 		return this;
 	}

@@ -23,7 +23,7 @@ public enum Tile {
 	FIRE_3((char)30, AsciiPanel.brightYellow, "Una columna de fuego ardiente", 100),
 	BURNT_FLOOR((char)175, AsciiPanel.brightBlack, "Cenizas y escombros de un fuego", 100),
 	ALTAR('#', new Color(90,55,0), "Un altar de madera", 20),
-	TREE((char)219, new Color(102, 51, 0), "Un gran y fornido arbol", -10);
+	TREE((char)219, new Color(139, 69, 19), "Un gran y fornido arbol", -10);
 	
 	public static Tile getById(int id){
 		switch(id){

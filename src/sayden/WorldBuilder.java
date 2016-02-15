@@ -16,6 +16,14 @@ public class WorldBuilder {
 		this.regions = new int[width][height];
 		this.nextRegion = 1;
 	}
+	
+	public WorldBuilder(Tile[][] tiles) {
+		this.width = tiles.length;
+		this.height = tiles[0].length;
+		this.tiles = tiles;
+		this.regions = new int[width][height];
+		this.nextRegion = 1;
+	}
 
 	public World build() {
 		World world = new World(tiles);		
@@ -127,6 +135,43 @@ public class WorldBuilder {
 		return this;
 	}
 
+	private WorldBuilder addTrees(World world, int amount) {
+		int placedTrees = 0;
+		boolean skipTree = false;
+		
+		int x = -1;
+		int y = -1;
+		
+		while(placedTrees < amount){
+			x = (int)(Math.random() * world.width());
+			y = (int)(Math.random() * world.height());
+			
+			if(!world.tile(x, y).isGround())
+				continue;
+			
+			for(Point test : new Point(x, y).neighbors8()){
+				if(world.tile(test.x, test.y) == Tile.TREE){
+					skipTree = true;
+					break;
+				}
+			}
+			
+			if(!skipTree){
+				tiles[x][y] = Tile.TREE;
+				placedTrees++;
+			}else{
+				skipTree = false;
+			}
+		}
+		
+		return this;
+	}
+	
+	public World makeForest(World world) {
+		addTrees(world, (int) Math.random() * (60 - 30) + 30);
+		return world;
+	}
+	
 	public WorldBuilder makeCaves() {
 		return randomizeTiles()
 				.smooth(8)

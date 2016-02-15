@@ -80,7 +80,7 @@ public class CreatureAi {
 	}
 	
 	public boolean onAttack(int x, int y, Creature other){
-		if(creature.getData("Race") == other.getData("Race") &&
+		if(creature.isAlly(other) &&
 				!creature.getBooleanData(Constants.FLAG_ANGRY) &&
 				!other.getBooleanData(Constants.FLAG_ANGRY) || 
 				creature.queSpell() != null)
@@ -294,6 +294,17 @@ public class CreatureAi {
 		creature.moveBy(-no_diagonal.x, -no_diagonal.y);
 	}
 	
+	public boolean distanceFrom(Creature target, int amount){
+		if(target == null || target.hp() < 1 || amount == 0)
+			return false;
+		
+		if(creature.position().distance(target.position()) <= amount){
+			flee(target);
+			return true;
+		}
+		
+		return false;
+	}
 	
 	public void hunt(Creature target) {
 		List<Point> points = new Path(creature, target.x, target.y).points();
@@ -308,7 +319,10 @@ public class CreatureAi {
 		
 		Point no_diagonal = eliminateDiagonal(mx, my, x_distance, y_distance);
 		
-		creature.moveBy(no_diagonal.x, no_diagonal.y);
+		boolean distanced = distanceFrom(target, creature.weapon() != null ? creature.weapon().cantReach() : 0);
+		
+		if(!distanced)
+			creature.moveBy(no_diagonal.x, no_diagonal.y);
 	}
 	
 	public void hunt(Point target) {

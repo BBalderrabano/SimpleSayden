@@ -20,6 +20,8 @@ public class Creature extends Thing{
 	private Spell queSpell;
 	private Creature queSpellCreature;
 	
+	public boolean isAlly(Creature target) { return getData(Constants.RACE) == target.getData(Constants.RACE); }
+	
 	public Spell queSpell() { return queSpell; }
 	public Creature queSpellCreature() { return queSpellCreature; }
 	public void stopCasting() { if(queSpell == null && queSpellCreature == null){ return ; } doAction("|deja06| de conjurar " + queSpell.nameElLa()); this.setQueSpell(null, null); }
@@ -267,11 +269,13 @@ public class Creature extends Thing{
 		boolean reachWarning = false;
 		
 		if(weapon() != null && weapon().cantReach() > 0){
-			if(other != null){
+			if(other != null && !isAlly(other)){
 				if(isPlayer()){
-					notify("Tu " + weapon().nameWNoStacks() + " es demasiado larga para alcanzar " + other.nameAlALa());
+					notify("Estas |demasiado cerca05| para atacar " + other.nameAlALa());
+				}else if(other.isPlayer()){
+					doAction("esta |demasiado cerca05| para atacarte!");
 				}else{
-					doAction("|falla05| el ataque!");
+					doAction("esta |demasiado cerca05| para atacar "+other.nameAlALa()+"!");
 				}
 				other = null;
 				reachWarning = true;
@@ -290,12 +294,14 @@ public class Creature extends Thing{
 				other = world.creature(x+(mx * i), y+(my * i));
 				
 				if(weapon() != null && weapon().cantReach() >= i){
-					if(other != null){
+					if(other != null && !isAlly(other)){
 						if(!reachWarning){
 							if(isPlayer()){
-								notify("Tu " + weapon().nameWNoStacks() + " es demasiado larga para alcanzar " + other.nameAlALa());
+								notify("Estas |demasiado cerca05| para atacar " + other.nameAlALa());
+							}else if(other.isPlayer()){
+								doAction("esta |demasiado cerca05| para atacarte!");
 							}else{
-								doAction("|falla05| el ataque!");
+								doAction("esta |demasiado cerca05| para atacar "+other.nameAlALa()+"!");
 							}
 						}
 						other = null;
@@ -554,8 +560,10 @@ public class Creature extends Thing{
 			doAction("muere");
 			if(!isPlayer()){
 				ai.onDecease(leaveCorpse());
+				world.remove(this);
+			}else{
+				glyph = '%';
 			}
-			world.remove(this);
 		}
 	}
 	
@@ -696,7 +704,7 @@ public class Creature extends Thing{
 				
 				Creature other = world.creature(x+ox, y+oy);
 				
-				if (other == null)
+				if (other == null || !other.canSee(x, y))
 					continue;
 				
 				others.add(other);
@@ -971,7 +979,7 @@ public class Creature extends Thing{
 					|| effectString.indexOf(effects.get(i).statusName()) != -1)
 				continue;
 			
-			effectString += " " + effects.get(i).statusName();
+			effectString += " " + effects.get(i).statusName().replace('ñ', (char)164);
 		}
 		
 		if(stealthLevel > Constants.STEALTH_MIN_STEPS)

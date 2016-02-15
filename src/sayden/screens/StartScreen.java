@@ -18,7 +18,6 @@ public class StartScreen implements Screen {
 
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
-//		return key.getKeyCode() == KeyEvent.VK_ENTER ? new PlayScreen() : this;
 		return key.getKeyCode() == KeyEvent.VK_ENTER ? new DreamScreen() : this;
 	}
 	

@@ -8,6 +8,8 @@ import asciiPanel.AsciiPanel;
 
 public class World {
 	private Tile[][] tiles;
+	public Tile[][] tiles() { return tiles; }
+	
 	private Item[][] items;
 	private float[][] blood;
 	private float[][] fire;
@@ -24,13 +26,10 @@ public class World {
 	private List<Projectile> projectiles;
 	
 	public float fire(int x, int y) { 
-		if(x > width){
-			x = width;
-		}
-		if(y > height){
-			y = height;
-		}
-		return fire[x][y]; 
+		if (x < 0 || x >= width || y < 0 || y >= height)
+			return 0;
+		
+		return fire[x][y];
 	}
 	
 	public World(Tile[][] tiles){
@@ -103,6 +102,13 @@ public class World {
 			return Tile.BOUNDS;
 		else
 			return tiles[x][y];
+	}
+	
+	public void setTile(int x, int y, Tile newTile){
+		if (x < 0 || x >= width || y < 0 || y >= height)
+			return;
+		else
+			tiles[x][y] = newTile;
 	}
 	
 	public void propagate(int x, int y, float amount, String fluidType){
