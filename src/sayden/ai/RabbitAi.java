@@ -17,6 +17,7 @@ public class RabbitAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
+		super.onUpdate();
 		wander();
 	}
 }

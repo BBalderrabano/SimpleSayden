@@ -10,8 +10,10 @@ import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
 import sayden.FieldOfView;
+import sayden.Line;
 import sayden.MapLoader;
 import sayden.Message;
+import sayden.Point;
 import sayden.StuffFactory;
 import sayden.Tile;
 import sayden.World;
@@ -30,6 +32,8 @@ public class PlayScreen implements Screen {
 	public Screen subscreen(){ return player != null && player.subscreen != null ? player.subscreen : subscreen; }
 	
 	private boolean pauseTooltip = true;
+	
+	private int depth = 0;
 	
 	public PlayScreen(){
 		MapLoader ml = new MapLoader();
@@ -53,11 +57,31 @@ public class PlayScreen implements Screen {
 	
 	private void descendStairs(){
 		if(world.tile(player.x, player.y) == Tile.STAIRS_DOWN || world.tile(player.x, player.y) == Tile.STAIRS_UP){
+			depth++;
+			
 			createWorld();
 			StuffFactory factory = new StuffFactory(world);
 			fov = new FieldOfView(world);
 			
 			factory.movePlayer(player, messages, fov, world);
+			
+			if(!world.tile(player.x, player.y).isGround()){
+				Point targetPoint = new Point(player.x, player.y);
+				
+				world.setTile(player.x, player.y, Tile.FLOOR);
+				
+				for(Point p : player.position().neighbors((int) (Math.random() * (10 - 3) + 3))){
+					if(!world.tile(p.x, p.y).isGround() || p == targetPoint)
+						continue;
+					
+					targetPoint = p;
+					break;
+				}
+				
+				for(Point p : new Line(targetPoint.x, targetPoint.y, player.x, player.y)){
+					world.setTile(p.x, p.y, Tile.FLOOR);
+				}
+			}
 			
 			createCreatures(factory);
 			createItems(factory);
@@ -69,25 +93,80 @@ public class PlayScreen implements Screen {
 	private void populateTown(StuffFactory factory){
 		for (int i = 0; i < Math.random() * 10; i++){
 			factory.newRabbit();
-			factory.newMage(player);
 		}
 		player.notify("Despiertas en un pueblo abandonado.");
 	}
 
+	private int randomNumber(int min, int max){
+		return (int) (Math.random() * (max - min) + min);
+	}
+	
 	private void createCreatures(StuffFactory factory){	
-		factory.newBlacksmith(player, 34, 3);
-		factory.newPriest(player, 51, 21);
-		
-		for (int i = 0; i < 15; i++){
-			factory.newRockBug(player);
-		}
-		
-		for(int i = 0; i < 2; i++){
-			factory.newCaveBrute(player);
-		}
-		
-		for(int i = 0; i < 6; i++){
-			factory.newMarauder(player);
+		switch(depth){
+			case 1:
+				for (int i = 0; i < 15; i++){
+					factory.newRockBug(player);
+				}
+				
+				for(int i = 0; i < 2; i++){
+					factory.newCaveBrute(player);
+				}
+				
+				for(int i = 0; i < 8; i++){
+					factory.newMarauder(player);
+				}
+			break;
+			case 2:
+				for (int i = 0; i < 15; i++){
+					factory.newRockBug(player);
+				}
+				
+				for(int i = 0; i < randomNumber(1, 3); i++){
+					factory.newCaveBrute(player);
+				}
+				
+				for(int i = 0; i < randomNumber(0, 3); i++){
+					factory.newCaveLost(player);
+				}
+				
+				for(int i = 0; i < randomNumber(6, 12); i++){
+					factory.newMarauder(player);
+				}
+			break;
+			case 3:
+				for (int i = 0; i < 15; i++){
+					factory.newRockBug(player);
+				}
+				
+				for(int i = 0; i < randomNumber(6, 12); i++){
+					factory.newMarauder(player);
+				}
+				
+				for(int i = 0; i < randomNumber(5, 8); i++){
+					factory.newCaveLost(player);
+				}
+				
+				for(int i = 0; i < randomNumber(0, 2); i++){
+					factory.newHugeMarauder(player);
+				}
+			break;
+			case 4:
+				for (int i = 0; i < 15; i++){
+					factory.newRockBug(player);
+				}
+				
+				for(int i = 0; i < randomNumber(8, 12); i++){
+					factory.newMarauder(player);
+				}
+				
+				for(int i = 0; i < randomNumber(5, 8); i++){
+					factory.newCaveLost(player);
+				}
+				
+				for(int i = 0; i < randomNumber(0, 4); i++){
+					factory.newHugeMarauder(player);
+				}
+			break;
 		}
 	}
 

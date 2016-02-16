@@ -41,6 +41,8 @@ public class MarauderAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
+		super.onUpdate();
+		
 		if(canPickup()){
 			creature.pickup();
 			return;

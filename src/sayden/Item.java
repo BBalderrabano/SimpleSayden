@@ -138,17 +138,23 @@ public class Item extends Thing{
 	public int reach() { return reach; }
 	public void modifyReach(int amount) { this.reach += amount; }
 	
-	public Spell addWrittenSpell(String name, char gender, Effect effect, int duration, float chance, String flag, Effect negativeEffect, Speed castSpeed, boolean target){
-		Spell spell = new Spell(name, gender, effect, duration, chance, flag, negativeEffect, castSpeed, target);
-		writtenSpells.add(spell);
-		return spell;
+	public Item augmentItem(float augment){
+		//TODO: Implement
+		return this;
 	}
 	
 	public boolean equippable() { return
 			getBooleanData(Constants.CHECK_ARMOR) ||
 			getBooleanData(Constants.CHECK_SHIELD) ||
 			getBooleanData(Constants.CHECK_WEAPON) ||
-			getBooleanData(Constants.CHECK_HELMENT);}
+			getBooleanData(Constants.CHECK_HELMENT);
+	}
+	
+	public Spell addWrittenSpell(String name, char gender, Effect effect, int duration, float chance, String flag, Effect negativeEffect, Speed castSpeed, boolean target){
+		Spell spell = new Spell(name, gender, effect, duration, chance, flag, negativeEffect, castSpeed, target);
+		writtenSpells.add(spell);
+		return spell;
+	}
 	
 	public Item(char glyph, char gender, Color color, String name, String appearance, int spawnWeight){
 		super();

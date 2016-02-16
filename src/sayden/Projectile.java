@@ -114,7 +114,7 @@ public class Projectile {
 		totalDamage = Math.max(1, totalDamage);	//Always deals at least 1 damage (ignores shields?)
 		
 		if(target.isPlayer()){
-			target.combatAction("%s |(%s %s %s)01|%s te impacta |[%s %s %s]02| por |%s01|!", Constants.capitalize(projectile.nameUnUna()),
+			target.notifyArround("%s |(%s %s %s)01|%s te impacta |[%s %s %s]02| por |%s01|!", Constants.capitalize(projectile.nameUnUna()),
 					projectile.attackValue(DamageType.SLICE),
 					projectile.attackValue(DamageType.BLUNT),
 					projectile.attackValue(DamageType.PIERCING),
@@ -124,7 +124,7 @@ public class Projectile {
 					target.defenseValue(DamageType.PIERCING),
 					totalDamage);
 		}else{
-			target.combatAction("%s |(%s %s %s)01|%s impacta %s |[%s %s %s]02| por |%s01|!", 
+			target.notifyArround("%s |(%s %s %s)01|%s impacta %s |[%s %s %s]02| por |%s01|!", 
 					Constants.capitalize(projectile.nameUnUna()),
 					projectile.attackValue(DamageType.SLICE),
 					projectile.attackValue(DamageType.BLUNT),

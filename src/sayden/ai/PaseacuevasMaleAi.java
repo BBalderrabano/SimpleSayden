@@ -21,6 +21,8 @@ public class PaseacuevasMaleAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
+		super.onUpdate();
+		
 		if((female == null || female.hp() < 1) && !alone){
 			creature.addEffect(new Effect("solitario", 25){
 				public void end(Creature creature){

@@ -12,7 +12,6 @@ import sayden.ai.BigMarauderAi;
 import sayden.ai.BlacksMithAi;
 import sayden.ai.DreamFighterAi;
 import sayden.ai.FungusAi;
-import sayden.ai.GoblinAi;
 import sayden.ai.MageAi;
 import sayden.ai.MarauderAi;
 import sayden.ai.PaseacuevasAi;
@@ -92,7 +91,7 @@ public class StuffFactory {
 		dreamer.equip(randomWeapon(null, false, false, true, true, true));
 		dreamer.equip(randomArmor(null, false, true, true, true, false));
 		
-		dreamer.addEffect(new Effect("soñando", 9999));
+		dreamer.addEffect(new Effect("soñando", 99999));
 		
 		new PlayerAi(dreamer, messages, fov);
 		world.addAtEmptySpace(dreamer, start_x, start_y);
@@ -119,7 +118,8 @@ public class StuffFactory {
 	public Creature newRabbit(){
 		Creature rabbit = new Creature(world, 'r', 'M', AsciiPanel.brightWhite, "conejo", 5);
 		
-		rabbit.setStartingMovementSpeed(Speed.VERY_FAST);
+		rabbit.setStartingMovementSpeed(Speed.VERY_SLOW);
+		rabbit.modifyStealth(4);
 		
 		world.addAtEmptyLocation(rabbit);
 		new RabbitAi(rabbit);
@@ -225,7 +225,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newMarauder(Creature player){
-		Creature marauder = new Creature(world, 'm', 'M', AsciiPanel.brightYellow, "merodeador", 10);
+		Creature marauder = new Creature(world, 'm', 'M', AsciiPanel.brightYellow, "merodeador", 12);
 		marauder.setStartingAttackSpeed(Speed.NORMAL);
 		marauder.setStartingMovementSpeed(Speed.NORMAL);
 		marauder.setVisionRadius(6);
@@ -245,8 +245,9 @@ public class StuffFactory {
 	}
 	
 	public Creature newHugeMarauder(Creature player){
-		Creature bigMarauder = new Creature(world, 'M', 'M', AsciiPanel.brightYellow, "merodeador gigante", 110);
+		Creature bigMarauder = new Creature(world, 'M', 'M', AsciiPanel.brightYellow, "merodeador gigante", 50);
 		
+		bigMarauder.setVisionRadius(6);
 		bigMarauder.setStartingAttackSpeed(Speed.VERY_SLOW);
 		bigMarauder.setStartingMovementSpeed(Speed.NORMAL);
 		bigMarauder.modifyAttackValue(DamageType.BLUNT, 8);
@@ -269,8 +270,8 @@ public class StuffFactory {
 		rockBug.setStartingMovementSpeed(Speed.FAST);
 		rockBug.setVisionRadius(2);
 		
-		rockBug.modifyAttackValue(DamageType.PIERCING, 1);
-		rockBug.modifyDefenseValue(DamageType.SLICE, 1);
+		rockBug.modifyDefenseValue(DamageType.SLICE, 3);
+		rockBug.modifyDefenseValue(DamageType.BLUNT, 2);
 		
 		if(Math.random() > 0.2f){
 			rockBug.pickup(newRockBugHelm(false));
@@ -279,13 +280,6 @@ public class StuffFactory {
 		world.addAtEmptyLocation(rockBug );
 		new RockBugAi(rockBug, player, this);
 		return rockBug;
-	}
-
-	public Creature newGoblin(Creature player){
-		Creature goblin = new Creature(world, 'g', 'M', AsciiPanel.brightGreen, "goblin", 50);
-		new GoblinAi(goblin, player);
-		world.addAtEmptyLocation(goblin );
-		return goblin;
 	}
 
 	/* ########################################################################################
@@ -297,7 +291,7 @@ public class StuffFactory {
 	private int DROP_2_CHANCE = 160;
 	private int DROP_3_CHANCE = 80;
 	private int DROP_4_CHANCE = 40;
-//	private int DROP_5_CHANCE = 10;
+	private int DROP_5_CHANCE = 10;
 	
 	public Item newRock(boolean spawn){
 		ArrayList<Item> rockItems = new ArrayList<Item>();
@@ -874,9 +868,8 @@ public class StuffFactory {
 	}
 	
 	public Item newMarauderHood(boolean spawn){
-		Item marauderHood = new Item((char)248, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador", 100);
+		Item marauderHood = new Item((char)248, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador", DROP_1_CHANCE);
 		marauderHood.modifyDefenseValue(DamageType.PIERCING, 1);
-		marauderHood.modifyDefenseValue(DamageType.SLICE, 1);
 		marauderHood.setData(Constants.CHECK_HELMENT, true);
 		marauderHood.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
 		marauderHood.setData(Constants.CHECK_UNAUGMENTABLE, true);
@@ -886,41 +879,42 @@ public class StuffFactory {
 	}
 	
 	public Item newMarauderVest(boolean spawn){
-		Item marauderVest = new Item((char)252, 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador", 100);
+		Item marauderVest = new Item((char)252, 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador", DROP_1_CHANCE);
 		marauderVest.modifyDefenseValue(DamageType.SLICE, 2);
-		marauderVest.modifyDefenseValue(DamageType.BLUNT, 2);
-		marauderVest.setData(Constants.CHECK_ARMOR, true);
+		marauderVest.modifyDefenseValue(DamageType.BLUNT, 1);
 		marauderVest.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
 		marauderVest.setData(Constants.CHECK_UNAUGMENTABLE, true);
+		marauderVest.setData(Constants.CHECK_ARMOR, true);
 		world.addAtEmptyLocation(marauderVest, spawn);
 		return marauderVest;
 	}
 	
 	public Item newLeatherArmor(boolean spawn){
-		Item leatherArmor = new Item((char)252, 'F', Color.orange, "armadura de cuero", "armadura de cuero", 120);
-		leatherArmor.modifyDefenseValue(DamageType.SLICE, 4);
-		leatherArmor.modifyDefenseValue(DamageType.BLUNT, 3);
+		Item leatherArmor = new Item((char)252, 'F', Color.orange, "armadura de cuero", "armadura de cuero", DROP_2_CHANCE);
+		leatherArmor.modifyDefenseValue(DamageType.SLICE, 3);
+		leatherArmor.modifyDefenseValue(DamageType.BLUNT, 1);
 		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 1);
 		leatherArmor.setData(Constants.CHECK_ARMOR, true);
+		leatherArmor.modifyMovementSpeed(Speed.FAST);
 		world.addAtEmptyLocation(leatherArmor, spawn);
 		return leatherArmor;
 	}
 	
 	public Item newLeatherMediumArmor(boolean spawn){
-		Item leatherArmor = new Item((char)252, 'M', AsciiPanel.yellow, "cuero tachonado", "cuero tachonado", 100);
-		leatherArmor.modifyDefenseValue(DamageType.SLICE, 3);
-		leatherArmor.modifyDefenseValue(DamageType.BLUNT, 3);
-		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 3);
+		Item leatherArmor = new Item((char)252, 'M', AsciiPanel.yellow, "cuero tachonado", "cuero tachonado", DROP_2_CHANCE);
+		leatherArmor.modifyDefenseValue(DamageType.SLICE, 2);
+		leatherArmor.modifyDefenseValue(DamageType.BLUNT, 2);
+		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 1);
 		leatherArmor.setData(Constants.CHECK_ARMOR, true);
+		leatherArmor.modifyMovementSpeed(Speed.FAST);
 		world.addAtEmptyLocation(leatherArmor, spawn);
 		return leatherArmor;
 	}
 	
 	public Item newMediumArmor(boolean spawn){
-		Item leatherArmor = new Item((char)252, 'F', AsciiPanel.brightWhite, "cota de malla", "cota de malla", 60);
-		leatherArmor.modifyDefenseValue(DamageType.SLICE, 6);
-		leatherArmor.modifyDefenseValue(DamageType.BLUNT, 2);
-		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 4);
+		Item leatherArmor = new Item((char)252, 'F', AsciiPanel.brightWhite, "cota de malla", "cota de malla", DROP_2_CHANCE);
+		leatherArmor.modifyDefenseValue(DamageType.SLICE, 2);
+		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 3);
 		leatherArmor.setData(Constants.CHECK_ARMOR, true);
 		leatherArmor.modifyMovementSpeed(Speed.FAST);
 		world.addAtEmptyLocation(leatherArmor, spawn);
@@ -928,19 +922,19 @@ public class StuffFactory {
 	}
 
 	public Item newLightArmor(boolean spawn){
-		Item item = new Item((char)252, 'F', AsciiPanel.green, "tunica", "tunica", 120);
-		item.modifyDefenseValue(DamageType.SLICE, 2);
-		item.modifyDefenseValue(DamageType.PIERCING, 4);
+		Item item = new Item((char)252, 'F', AsciiPanel.green, "tunica", "tunica", DROP_2_CHANCE);
+		item.modifyDefenseValue(DamageType.SLICE, 1);
+		item.modifyDefenseValue(DamageType.PIERCING, 2);
 		item.setData(Constants.CHECK_ARMOR, true);
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
 	public Item newFullArmor(boolean spawn){
-		Item item = new Item((char)249, 'F', AsciiPanel.white, "armadura completa", "armadura completa", 40);
-		item.modifyDefenseValue(DamageType.SLICE, 8);
-		item.modifyDefenseValue(DamageType.BLUNT, 8);
-		item.modifyDefenseValue(DamageType.PIERCING, 6);
+		Item item = new Item((char)249, 'F', AsciiPanel.white, "armadura completa", "armadura completa", DROP_2_CHANCE);
+		item.modifyDefenseValue(DamageType.SLICE, 3);
+		item.modifyDefenseValue(DamageType.BLUNT, 3);
+		item.modifyDefenseValue(DamageType.PIERCING, 1);
 		item.modifyMovementSpeed(Speed.NORMAL);
 		
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -949,10 +943,9 @@ public class StuffFactory {
 	}
 	
 	public Item newLaminatedArmor(boolean spawn){
-		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "armadura laminada", "armadura laminada", 35);
-		item.modifyDefenseValue(DamageType.SLICE, 8);
+		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "armadura laminada", "armadura laminada", DROP_3_CHANCE);
+		item.modifyDefenseValue(DamageType.SLICE, 3);
 		item.modifyDefenseValue(DamageType.BLUNT, 4);
-		item.modifyDefenseValue(DamageType.PIERCING, 8);
 		item.modifyMovementSpeed(Speed.FAST);
 		
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -961,10 +954,10 @@ public class StuffFactory {
 	}
 	
 	public Item newCoraza(boolean spawn){
-		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "coraza", "coraza", 15);
-		item.modifyDefenseValue(DamageType.SLICE, 6);
-		item.modifyDefenseValue(DamageType.BLUNT, 10);
-		item.modifyDefenseValue(DamageType.PIERCING, 4);
+		Item item = new Item((char)249, 'F', AsciiPanel.brightWhite, "coraza", "coraza", DROP_3_CHANCE);
+		item.modifyDefenseValue(DamageType.SLICE, 1);
+		item.modifyDefenseValue(DamageType.BLUNT, 7);
+		item.modifyDefenseValue(DamageType.PIERCING, 1);
 		item.modifyMovementSpeed(Speed.NORMAL);
 		
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -973,11 +966,11 @@ public class StuffFactory {
 	}
 	
 	public Item newBandArmor(boolean spawn){
-		Item item = new Item((char)249, 'F', AsciiPanel.green, "cota de bandas", "cota de bandas", 55);
+		Item item = new Item((char)249, 'F', AsciiPanel.green, "cota de bandas", "cota de bandas", DROP_3_CHANCE);
 		item.modifyDefenseValue(DamageType.SLICE, 4);
-		item.modifyDefenseValue(DamageType.BLUNT, 2);
-		item.modifyDefenseValue(DamageType.PIERCING, 6);
-		item.modifyMovementSpeed(Speed.FAST);
+		item.modifyDefenseValue(DamageType.BLUNT, 4);
+		item.modifyDefenseValue(DamageType.PIERCING, 1);
+		item.modifyMovementSpeed(Speed.NORMAL);
 		
 		item.setData(Constants.CHECK_ARMOR, true);
 		world.addAtEmptyLocation(item, spawn);
@@ -985,10 +978,10 @@ public class StuffFactory {
 	}
 	
 	public Item newWarArmor(boolean spawn){
-		Item item = new Item((char)249, 'F', Color.gray, "armadura de guerra", "armadura de guerra", 15);
-		item.modifyDefenseValue(DamageType.SLICE, 10);
-		item.modifyDefenseValue(DamageType.BLUNT, 8);
-		item.modifyDefenseValue(DamageType.PIERCING, 6);
+		Item item = new Item((char)249, 'F', Color.gray, "armadura de guerra", "armadura de guerra", DROP_4_CHANCE);
+		item.modifyDefenseValue(DamageType.SLICE, 4);
+		item.modifyDefenseValue(DamageType.BLUNT, 5);
+		item.modifyDefenseValue(DamageType.PIERCING, 2);
 		item.modifyMovementSpeed(Speed.NORMAL);
 		
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -997,10 +990,10 @@ public class StuffFactory {
 	}
 	
 	public Item newBigWarArmor(boolean spawn){
-		Item item = new Item((char)249, 'F', AsciiPanel.brightBlack, "cota de guerra", "cota de guerra", 5);
-		item.modifyDefenseValue(DamageType.SLICE, 12);
-		item.modifyDefenseValue(DamageType.BLUNT, 10);
-		item.modifyDefenseValue(DamageType.PIERCING, 6);
+		Item item = new Item((char)249, 'F', AsciiPanel.brightBlack, "cota de guerra", "cota de guerra", DROP_5_CHANCE);
+		item.modifyDefenseValue(DamageType.SLICE, 4);
+		item.modifyDefenseValue(DamageType.BLUNT, 5);
+		item.modifyDefenseValue(DamageType.PIERCING, 4);
 		item.modifyMovementSpeed(Speed.SLOW);
 		
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -1009,10 +1002,10 @@ public class StuffFactory {
 	}
 	
 	public Item newElefantArmor(boolean spawn){
-		Item item = new Item((char)249, 'F', Color.darkGray, "armadura elefante", "armadura elefante", 5);
-		item.modifyDefenseValue(DamageType.SLICE, 12);
-		item.modifyDefenseValue(DamageType.BLUNT, 15);
-		item.modifyDefenseValue(DamageType.PIERCING, 8);
+		Item item = new Item((char)249, 'F', Color.darkGray, "armadura elefante", "armadura elefante", DROP_5_CHANCE);
+		item.modifyDefenseValue(DamageType.SLICE, 6);
+		item.modifyDefenseValue(DamageType.BLUNT, 6);
+		item.modifyDefenseValue(DamageType.PIERCING, 3);
 		item.modifyMovementSpeed(Speed.VERY_SLOW);
 		
 		item.setData(Constants.CHECK_ARMOR, true);
@@ -1020,17 +1013,19 @@ public class StuffFactory {
 		return item;
 	}
 	
-	public Item newPlaques(boolean spawn){
-		Item item = new Item((char)249, 'F', Color.lightGray, "placa impermeable", "placa impermeable", 40);
-		item.modifyDefenseValue(DamageType.SLICE, 8);
-		item.modifyDefenseValue(DamageType.BLUNT, 8);
-		item.modifyDefenseValue(DamageType.PIERCING, 8);
-		item.modifyMovementSpeed(Speed.FAST);
-		item.modifyAttackSpeed(Speed.FAST);
+	public Item randomThrowableWeapon(boolean spawn, boolean fullyStacked){
+		ArrayList<Item> items = new ArrayList<Item>();
 		
-		item.setData(Constants.CHECK_ARMOR, true);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
+		items.add(newKnife(false));
+		items.add(newThrowAxe(false));
+		items.add(newJavelin(false));
+		
+		Item to_return = randomWeapon(items, spawn, false, false, false, false);
+		
+		if(fullyStacked)
+			to_return.modifyStacks(to_return.maxStacks);
+		
+		return to_return;
 	}
 	
 	public Item randomWeapon(ArrayList<Item> pool, boolean spawn, boolean includeCommons, boolean includeUncommon, boolean includeRanged, boolean includeHeavy){
@@ -1040,12 +1035,10 @@ public class StuffFactory {
 			items.add(newShortSword(false));
 			items.add(newMace(false));
 			items.add(newDagger(false));
-			items.add(newKnife(false));
 			items.add(newMorningStar(false));
 			items.add(newSword(false));
 			items.add(newBastardSword(false));
 			items.add(newAxe(false));
-			items.add(newThrowAxe(false));
 			items.add(newHammer(false));
 		}
 		if(includeUncommon){
@@ -1121,7 +1114,6 @@ public class StuffFactory {
 		if(includeMedium){
 			items.add(newMediumArmor(false));
 			items.add(newBandArmor(false));
-			items.add(newPlaques(false));
 		}
 		if(includeHeavy){
 			items.add(newFullArmor(false));

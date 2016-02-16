@@ -114,13 +114,13 @@ public class CreatureAi {
 		String amountString = "";
 		
 		if(position == weakSpot){
-			amountString = "|"+amount+"01|!!!!";
+			amountString = amount + " (|critico01|)";
 		}else{
 			amountString = amount + "";
 		}
 		
 		if(attacker.isPlayer()){
-			attacker.combatAction("Atacas |(%s %s %s)01| %s |[%s %s %s]02| por %s", 
+			attacker.notifyArround("Atacas |(%s %s %s)01| %s |[%s %s %s]02| por %s", 
 					attacker.attackValue(DamageType.SLICE),
 					attacker.attackValue(DamageType.BLUNT),
 					attacker.attackValue(DamageType.PIERCING),
@@ -130,7 +130,7 @@ public class CreatureAi {
 					creature.defenseValue(DamageType.PIERCING),
 					amountString);
 		}else if(creature.isPlayer()){
-			attacker.combatAction("%s |(%s %s %s)01| te ataca |[%s %s %s]02| por %s", 
+			attacker.notifyArround("%s |(%s %s %s)01| te ataca |[%s %s %s]02| por %s", 
 					Constants.capitalize(attacker.nameElLa()),
 					attacker.attackValue(DamageType.SLICE),
 					attacker.attackValue(DamageType.BLUNT),
@@ -140,7 +140,7 @@ public class CreatureAi {
 					creature.defenseValue(DamageType.PIERCING),
 					amountString);
 		}else{
-			attacker.combatAction("%s |(%s %s %s)01| ataca %s |[%s %s %s]02| por %s", 
+			attacker.notifyArround("%s |(%s %s %s)01| ataca %s |[%s %s %s]02| por %s", 
 					Constants.capitalize(attacker.nameElLa()),
 					attacker.attackValue(DamageType.SLICE),
 					attacker.attackValue(DamageType.BLUNT),
@@ -234,7 +234,7 @@ public class CreatureAi {
 					creature.helment() == item || creature.shield() == item)
 				continue;
 			
-			if (toThrow == null || item.totalAttackValue() > 0)
+			if (toThrow == null && (item.totalAttackValue() > 0 || item.stackable()))
 				toThrow = item;
 		}
 		

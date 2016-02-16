@@ -471,15 +471,14 @@ public class Creature extends Thing{
 				
 				int attackValue = onlyObject ? object.attackValue(d) : attackValue(d);
 				
-				attack += Math.max(0, (attackValue - other.defenseValue(d)));
+				if(weakSpotHit)
+					attack += Math.max(0, attackValue);
+				else
+					attack += Math.max(0, attackValue - other.defenseValue(d));
 			}
 		}
 		
 		int amount = attack;
-		
-		if(weakSpotHit){
-			amount += 3;
-		}
 		
 		amount = Math.max(1, amount);
 		
@@ -664,6 +663,12 @@ public class Creature extends Thing{
 		ai.onNotify(String.format(message, params));
 	}
 	
+	public void notifyArround(String message, Object ... params){
+		for (Creature other : getCreaturesWhoSeeMe()){
+			other.notify(message, params);
+		}
+	}
+	
 	public void doAction(String message, Object ... params){
 		for (Creature other : getCreaturesWhoSeeMe()){
 			if (other == this){
@@ -671,12 +676,6 @@ public class Creature extends Thing{
 			} else {
 				other.notify(String.format("%s %s.", Constants.capitalize(nameElLa()), message, false), params);
 			}
-		}
-	}
-	
-	public void combatAction(String message, Object ... params){
-		for (Creature other : getCreaturesWhoSeeMe()){
-			other.notify(message, params);
 		}
 	}
 	

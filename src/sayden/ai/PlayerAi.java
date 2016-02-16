@@ -65,8 +65,7 @@ public class PlayerAi extends CreatureAi {
 		creature.modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
-	public void onUpdate(){
-	}
+	public void onUpdate(){	}
 	
 	public boolean onAttack(int x, int y, Creature other){
 		if(creature.getData("Race") == other.getData("Race") && !other.getBooleanData(Constants.FLAG_ANGRY)){
@@ -86,7 +85,8 @@ public class PlayerAi extends CreatureAi {
 				other.stopCasting();
 				other.modifyActionPoints(-other.getActionPoints());
 			}
-			if(creature.weapon() != null && !creature.weapon().getBooleanData(Constants.CHECK_RANGED)){
+			if(creature.weapon() != null && !creature.weapon().getBooleanData(Constants.CHECK_RANGED) && 
+					!creature.weapon().getBooleanData(Constants.CHECK_UNAUGMENTABLE)){
 				int weaponLevel = creature.weapon().countHit();
 				
 				if(weaponLevel > 0){

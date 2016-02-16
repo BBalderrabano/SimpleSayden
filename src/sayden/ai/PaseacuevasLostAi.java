@@ -43,6 +43,8 @@ public class PaseacuevasLostAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
+		super.onUpdate();
+		
 		if(canSee(player.x, player.y)){
 			hunt(player);
 			return;

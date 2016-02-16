@@ -49,6 +49,8 @@ public class RockBugAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
+		super.onUpdate();
+		
 		if (creature.canSee(player.x, player.y) && creature.hp() >= creature.totalMaxHp() * .3f){
 			hunt(player);
 		}else{

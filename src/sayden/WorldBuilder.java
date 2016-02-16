@@ -129,7 +129,7 @@ public class WorldBuilder {
 			x = (int)(Math.random() * width);
 			y = (int)(Math.random() * height);
 		}
-		while (tiles[x][y] != Tile.FLOOR);
+		while (!tiles[x][y].isGround());
 		
 		tiles[x][y] = Tile.STAIRS_UP;
 		return this;
