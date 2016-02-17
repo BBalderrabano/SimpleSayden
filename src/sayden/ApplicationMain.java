@@ -13,6 +13,8 @@ import java.util.TimerTask;
 public class ApplicationMain extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1060623638149583738L;
 	
+	private ApplicationUpdater updater = new ApplicationUpdater();
+	
 	private AsciiPanel terminal;
 	private Screen screen;
 	
@@ -22,6 +24,9 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	
 	public ApplicationMain(){
 		super();
+		
+		updater.checkUpdate();
+		
 		terminal = new AsciiPanel(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
 		
 		add(terminal);
