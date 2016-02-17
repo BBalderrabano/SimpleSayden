@@ -91,7 +91,6 @@ public class StuffFactory {
 		
 		dreamer.equip(randomWeapon(null, false, false, true, true, true));
 		dreamer.equip(randomArmor(null, false, true, true, true, false));
-		dreamer.equip(newRoundShield(false));
 		
 		dreamer.addEffect(new Effect("soñando", 99999));
 		
@@ -1206,6 +1205,19 @@ public class StuffFactory {
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
+		
+	public Item newPotionOfFire(boolean spawn){
+		String appearance = potionAppearances.get(1);
+		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion ignea", appearance, 70);
+		item.setQuaffEffect(new Effect("incinerado", 1){
+			public void start(int x, int y){
+				world.propagate(x, y, 400, Constants.FIRE_TERRAIN);
+			}
+		});
+		item.makeStackable(5);
+		world.addAtEmptyLocation(item, spawn);
+		return item;
+	}
 	
 	public Item newPotionOfSlowHealth(boolean spawn){
 		String appearance = potionAppearances.get(2);
@@ -1242,6 +1254,7 @@ public class StuffFactory {
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
+
 	
 	public Item newPotionOfWarrior(boolean spawn){
 		String appearance = potionAppearances.get(4);

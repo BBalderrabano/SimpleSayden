@@ -262,7 +262,10 @@ public class Creature extends Thing{
 		
 		if(world.fire(x+mx, y+my) > 0){
 			modifyHp(-(int)world.fire(x+mx, y+my) / 10, "Incinerado");
-			notify("Estas siendo consumido por las llamas!");
+			if(isPlayer)
+				notify("Estas siendo consumido por las llamas!");
+			else
+				notifyArround(Constants.capitalize(nameElLa()) + " es consumido por las llamas!");
 		}
 		
 		Creature other = world.creature(x+mx, y+my);
@@ -562,13 +565,13 @@ public class Creature extends Thing{
 	}
 	
 	private Item leaveCorpse(){
-		Item corpse = new Item('%', 'M', originalColor, "cadaver de " + nameWStacks() + "", null, 100);
+		Item corpse = new Item('%', 'M', originalColor, "cadaver de " + nameWStacks() + "", null, 0);
 		
 		corpse.setData(Constants.CHECK_CONSUMABLE, true);
 		corpse.setData(Constants.CHECK_CORPSE, true);
-		corpse.setQuaffEffect(new Effect("indigesto", 1, false){
+		corpse.setQuaffEffect(new Effect("alimentado", 1, false){
 			public void start(Creature creature){
-				creature.modifyHp((int) (maxHp * 0.5f), "Severa indigestion");
+				creature.modifyHp((int) 5, "Severa indigestion");
 			}
 		});
 		

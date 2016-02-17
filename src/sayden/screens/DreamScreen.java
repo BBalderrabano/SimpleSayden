@@ -85,16 +85,6 @@ public class DreamScreen implements Screen {
 		int left = getScrollX();
 		int top = getScrollY(); 
 		
-		if(elapsedTurns == 3 && !displayTip){
-			player.notify("-- muevete a la casilla de un enemigo (gris) para atacarlo --");
-			displayTip = true;
-		}else if(elapsedTurns == 1 && !displayTip){
-			player.notify("Sueñas con una batalla");
-			displayTip = true;
-		}else{
-			displayTip = false;
-		}
-		
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
 		
@@ -300,13 +290,19 @@ public class DreamScreen implements Screen {
 	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
-//		if(displayTip){
-//			if(key.getKeyCode() == KeyEvent.VK_ENTER){
-//				elapsedTurns++;
-//				displayTip = false;
-//			}
-//			return this;
-//		}
+		if(displayTip){
+			if(key.getKeyCode() == KeyEvent.VK_ENTER){
+				elapsedTurns++;
+				displayTip = false;
+			}
+			return this;
+		}
+		
+		if(elapsedTurns == 3 && !displayTip){
+			player.notify("-- muevete a la casilla de un enemigo (gris) para atacarlo --");
+		}else if(elapsedTurns == 1 && !displayTip){
+			player.notify("Sueñas con una batalla");
+		}
 		
 		if (subscreen() != null) {
 			if(player.subscreen != null){

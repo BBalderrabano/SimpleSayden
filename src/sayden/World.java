@@ -167,11 +167,11 @@ public class World {
 		if(projectile != null)
 			return projectile.projectile().glyph();
 		
-		if(fire[x][y] > 0)
-			return (char)30;
-		
 		if (creature != null && !creature.getBooleanData(Constants.FLAG_INVISIBLE))
 			return creature.glyph();
+		
+		if(fire[x][y] > 0)
+			return (char)30;
 		
 		if (item(x,y) != null)
 			return item(x,y).glyph();

@@ -1,6 +1,7 @@
 package sayden;
 
 public class Effect {
+	
 	protected int duration;
 	protected boolean quaffable = true;	//This variable is used to check if the effect activates when thrown to a target
 	

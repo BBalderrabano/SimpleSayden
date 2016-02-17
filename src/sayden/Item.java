@@ -103,7 +103,7 @@ public class Item extends Thing{
 	public int durability() { return durability; }
 	public void modifyDurability(int amount) { 
 		if(this.durability > 1) { 
-			this.canBreake = true; 
+			this.canBreake = true;
 		}
 		
 		this.durability += amount; 
@@ -138,7 +138,7 @@ public class Item extends Thing{
 	public int reach() { return reach; }
 	public void modifyReach(int amount) { this.reach += amount; }
 	
-	public Item augmentItem(float augment){
+	public Item augmentItem(int augment){
 		//TODO: Implement
 		return this;
 	}
@@ -208,12 +208,10 @@ public class Item extends Thing{
 				+ details.substring(1);
 		
 		if(canBreake() && durability() <= 20){
-			details += " A punto de romperse.";
-		}else
-		if(canBreake() && durability() <= 50){
+			details += " Esta a punto de romperse.";
+		}else if(canBreake() && durability() <= 50){
 			details += " No se ve muy resistente.";
-		}else
-		if(canBreake() && durability() > 50){
+		}else if(canBreake() && durability() > 50){
 			details += " Puede romperse.";
 		}
 		
@@ -235,7 +233,8 @@ public class Item extends Thing{
 			details += " Puede ser "+useVerb+" como escudo.";
 		}
 		if(getBooleanData(Constants.CHECK_WEAPON)){
-			details += " Puede ser "+useVerb+" como arma" + (getBooleanData(Constants.CHECK_DUAL_WIELD) ? " en cualquier mano" : "") + ".";
+			details += " Puede ser "+useVerb+" como arma" 
+					+ (getBooleanData(Constants.CHECK_DUAL_WIELD) ? " en cualquier mano" : "") + ".";
 		}
 		if(stackable()){
 			details += " Puede acumularse "+maxStacks+" veces.";
