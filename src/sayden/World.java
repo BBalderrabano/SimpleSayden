@@ -170,7 +170,7 @@ public class World {
 		if(fire[x][y] > 0)
 			return (char)30;
 		
-		if (creature != null)
+		if (creature != null && !creature.getBooleanData(Constants.FLAG_INVISIBLE))
 			return creature.glyph();
 		
 		if (item(x,y) != null)
@@ -186,7 +186,7 @@ public class World {
 		if(projectile != null)
 			return projectile.projectile().color();
 		
-		if (creature != null)
+		if (creature != null && !creature.getBooleanData(Constants.FLAG_INVISIBLE))
 			return creature.color();
 		
 		if(fire[x][y] > 0)

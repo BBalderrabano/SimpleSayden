@@ -83,7 +83,7 @@ public class Projectile {
 		if(target != null){
 			pickTarget(target);
 		}else{
-			if(projectile.getBooleanData(Constants.CHECK_AMMUNITION)){
+			if(projectile.getBooleanData(Constants.CHECK_PROJECTILE_AUTOTARGET)){
 				for(Point p : new Point(x, y).neighbors8()){
 					if(world.creature(p.x, p.y) == null || world.creature(p.x, p.y) == origin)
 						continue;
@@ -98,7 +98,7 @@ public class Projectile {
 		}
 		interrupted = true;
 		
-		if(projectile.getBooleanData(Constants.CHECK_AMMUNITION)){
+		if(projectile.getBooleanData(Constants.CHECK_PROJECTILE_DISSAPEAR)){
 			world.remove(projectile);
 		}
 	}

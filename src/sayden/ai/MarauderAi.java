@@ -21,6 +21,13 @@ public class MarauderAi extends CreatureAi {
 	public boolean onGetAttacked(int amount, String position, Creature attacker, Item item){
 		if(attacker.isPlayer() && !creature.getBooleanData("SeenPlayer")){
 			creature.setData("SeenPlayer", true);
+			
+			for(Creature c : creature.getCreaturesWhoSeeMe()){
+				if(c.getData(Constants.RACE) != creature.getData(Constants.RACE))
+					continue;
+				
+				c.setData("SeenPlayer", true);
+			}
 		}
 				
 		return super.onGetAttacked(amount, position, attacker);
@@ -60,7 +67,7 @@ public class MarauderAi extends CreatureAi {
 			
 			creature.setData("SeenPlayer", true);
 
-			if(canThrowAt(player) && getWeaponToThrow() != null){
+			if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3){
 				creature.throwItem(getWeaponToThrow(), player.x, player.y);
 				return;
 			}
@@ -68,11 +75,20 @@ public class MarauderAi extends CreatureAi {
 				hunt(player);
 				return;
 			}else{
-				creature.setData("SeenPlayer", true);
 				flee(player);
 				return;
 			}
-		}	
+		}else{
+			for(Creature c : creature.getCreaturesWhoSeeMe()){
+				if(c.getData(Constants.RACE) != "paseacuevas")
+					continue;
+				
+				if(creature.position().distance(c.position()) <= 5){
+					flee(c);
+					break;
+				}
+			}
+		}
 		
 		wander();
 	}

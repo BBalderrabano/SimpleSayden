@@ -102,11 +102,11 @@ public class Item extends Thing{
 	private int durability = 1;
 	public int durability() { return durability; }
 	public void modifyDurability(int amount) { 
-		this.durability += amount; 
-		
 		if(this.durability > 1) { 
 			this.canBreake = true; 
-		} 
+		}
+		
+		this.durability += amount; 
 	}
 	
 	private int level = 0;

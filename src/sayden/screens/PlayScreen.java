@@ -108,6 +108,10 @@ public class PlayScreen implements Screen {
 					factory.newRockBug(player);
 				}
 				
+				for (int i = 0; i < randomNumber(0, 3); i++){
+					factory.newHidden(player);
+				}
+				
 				for(int i = 0; i < 2; i++){
 					factory.newCaveBrute(player);
 				}
@@ -119,6 +123,10 @@ public class PlayScreen implements Screen {
 			case 2:
 				for (int i = 0; i < 15; i++){
 					factory.newRockBug(player);
+				}
+				
+				for (int i = 0; i < randomNumber(0, 5); i++){
+					factory.newHidden(player);
 				}
 				
 				for(int i = 0; i < randomNumber(1, 3); i++){
@@ -138,6 +146,10 @@ public class PlayScreen implements Screen {
 					factory.newRockBug(player);
 				}
 				
+				for (int i = 0; i < randomNumber(0, 5); i++){
+					factory.newHidden(player);
+				}
+				
 				for(int i = 0; i < randomNumber(6, 12); i++){
 					factory.newMarauder(player);
 				}
@@ -151,8 +163,12 @@ public class PlayScreen implements Screen {
 				}
 			break;
 			case 4:
-				for (int i = 0; i < 15; i++){
+				for (int i = 0; i < 5; i++){
 					factory.newRockBug(player);
+				}
+				
+				for (int i = 0; i < randomNumber(2, 10); i++){
+					factory.newHidden(player);
 				}
 				
 				for(int i = 0; i < randomNumber(8, 12); i++){
@@ -420,7 +436,7 @@ public class PlayScreen implements Screen {
 						player.y - getScrollY(), null);
 						break;
 				case KeyEvent.VK_ENTER:
-						descendStairs();
+						enterKeyHandler();
 						break;
 			}
 			
@@ -438,5 +454,16 @@ public class PlayScreen implements Screen {
 		}
 		
 		return this;
+	}
+	
+	private void enterKeyHandler(){
+		descendStairs();
+		
+		for(Point p : player.position().neighbors8()){
+			player.open(p.x, p.y);
+		}
+		
+		if(player.item(player.x, player.y) != null)
+			player.pickup();
 	}
 }

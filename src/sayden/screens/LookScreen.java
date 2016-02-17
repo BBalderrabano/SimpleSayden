@@ -48,6 +48,10 @@ public class LookScreen extends TargetBasedScreen {
 		creature = player.creature(x, y);
 		
 		if (creature != null){
+			if(creature.getBooleanData(Constants.FLAG_INVISIBLE)){
+				creature = null;
+				return;
+			}
 			caption = Constants.capitalize(creature.nameUnUna()) + " " + creature.statusEffects();
 			caption = PlayScreen.splitPhraseByLimit(caption, Constants.WORLD_WIDTH).get(0);
 			return;

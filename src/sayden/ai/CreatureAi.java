@@ -342,7 +342,7 @@ public class CreatureAi {
 		creature.moveBy(no_diagonal.x, no_diagonal.y);
 	}
 	
-	private Point eliminateDiagonal(int mx, int my, int x_distance, int y_distance){
+	public Point eliminateDiagonal(int mx, int my, int x_distance, int y_distance){
 		if(mx != 0 && my != 0){
 			if(canMove(0, my) && y_distance > x_distance)
 				mx = 0;

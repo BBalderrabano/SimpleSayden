@@ -12,6 +12,7 @@ import sayden.ai.BigMarauderAi;
 import sayden.ai.BlacksMithAi;
 import sayden.ai.DreamFighterAi;
 import sayden.ai.FungusAi;
+import sayden.ai.HiddenAi;
 import sayden.ai.MageAi;
 import sayden.ai.MarauderAi;
 import sayden.ai.PaseacuevasAi;
@@ -119,7 +120,6 @@ public class StuffFactory {
 		Creature rabbit = new Creature(world, 'r', 'M', AsciiPanel.brightWhite, "conejo", 5);
 		
 		rabbit.setStartingMovementSpeed(Speed.VERY_SLOW);
-		rabbit.modifyStealth(4);
 		
 		world.addAtEmptyLocation(rabbit);
 		new RabbitAi(rabbit);
@@ -233,10 +233,12 @@ public class StuffFactory {
 		marauder.inventory().add(newMarauderPoison(false));
 		
 		if(Math.random() < .3f)
-			marauder.inventory().add(newMarauderVest(false));
+			marauder.equip(newMarauderVest(false));
 		if(Math.random() < .3f)
-			marauder.inventory().add(newMarauderHood(false));
-		
+			marauder.equip(newMarauderHood(false));
+		if(Math.random() < .3f)
+			marauder.inventory().add(randomThrowableWeapon(false, false));
+			
 		marauder.inventory().add(randomWeapon(null, false, true, false, false, false));
 		
 		world.addAtEmptyLocation(marauder );
@@ -280,6 +282,22 @@ public class StuffFactory {
 		world.addAtEmptyLocation(rockBug );
 		new RockBugAi(rockBug, player, this);
 		return rockBug;
+	}
+	
+	public Creature newHidden(Creature player){
+		Creature hidden = new Creature(world, 'a', 'M', AsciiPanel.yellow, "acechador", 6);
+		
+		hidden.modifyDefenseValue(DamageType.BLUNT, 4);
+		hidden.modifyDefenseValue(DamageType.PIERCING, 2);
+		
+		hidden.modifyAttackValue(DamageType.PIERCING, 6);
+		hidden.modifyAttackSpeed(Speed.VERY_FAST);
+		hidden.modifyMovementSpeed(Speed.SLOW);
+		hidden.setVisionRadius(6);
+		
+		world.addAtEmptyLocation(hidden);
+		new HiddenAi(hidden, player);
+		return hidden;
 	}
 
 	/* ########################################################################################
@@ -336,6 +354,7 @@ public class StuffFactory {
 	
 	public Item newKnife(boolean spawn){
 		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo", DROP_1_CHANCE);
+		knife.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
 		knife.modifyAttackValue(DamageType.PIERCING, 1);
 		knife.modifyAttackValue(DamageType.RANGED, 1);
 		knife.setData(Constants.CHECK_WEAPON, true);
@@ -349,8 +368,8 @@ public class StuffFactory {
 	public Item newDagger(boolean spawn){
 		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga", DROP_1_CHANCE);
 		item.modifyAttackValue(DamageType.PIERCING, 2);
-		item.modifyAttackSpeed(Speed.FAST);
 		item.setData(Constants.CHECK_WEAPON, true);
+		item.modifyAttackSpeed(Speed.FAST);
 		item.modifyBloodModifyer(0.7f);
 		item.makeStackable(3);
 		world.addAtEmptyLocation(item, spawn);
@@ -415,6 +434,7 @@ public class StuffFactory {
 	
 	public Item newJavelin(boolean spawn){
 		Item item = new Item((char)244, 'F', AsciiPanel.white, "javalina", "javalina", DROP_2_CHANCE);
+		item.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
 		item.modifyAttackValue(DamageType.PIERCING, 4);
 		item.modifyAttackValue(DamageType.RANGED, 2);
 		
@@ -567,6 +587,7 @@ public class StuffFactory {
 	
 	public Item newThrowAxe(boolean spawn){
 		Item item = new Item((char)243, 'M', AsciiPanel.yellow, "hacha alada", "hacha alada", DROP_1_CHANCE);
+		item.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
 		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
@@ -1040,9 +1061,9 @@ public class StuffFactory {
 			items.add(newBastardSword(false));
 			items.add(newAxe(false));
 			items.add(newHammer(false));
+			items.add(newLance(false));
 		}
 		if(includeUncommon){
-			items.add(newLance(false));
 			items.add(newBallAndChain(false));
 			items.add(newCimitarra(false));
 			items.add(newCurveDagger(false));

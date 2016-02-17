@@ -6,6 +6,7 @@ import asciiPanel.AsciiPanel;
 public enum Tile {
 	UNKNOWN( ' ', AsciiPanel.white, "(desconocido)", 100),
 	FLOOR( (char)250, AsciiPanel.yellow, "Terreno de tierra y rocas.", 20),
+	FLOOR_MOVED( (char)250, AsciiPanel.brightYellow, "Terreno removido recientemente.", 20),
 	WALL( (char)177, AsciiPanel.yellow, "Muro de tierra y piedras.", 100),
 	BOUNDS( 'x', AsciiPanel.brightBlack, "Mas alla de los limites del mapa.", 100),
 	STAIRS_DOWN( '>', AsciiPanel.white, "Una escalera de piedra que va hacia abajo.", 100),

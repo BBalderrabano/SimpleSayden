@@ -387,7 +387,8 @@ public class Creature extends Thing{
 		}
 		
 		thrown.modifyBloodModifyer(weapon().bloodModifyer());
-		thrown.setData(Constants.CHECK_AMMUNITION, true);
+		thrown.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
+		thrown.setData(Constants.CHECK_PROJECTILE_DISSAPEAR, true);
 		
 		doAction("dispara %s hacia %s", weapon.nameElLaWNoStacks(), other.nameElLa());
 		
@@ -437,6 +438,7 @@ public class Creature extends Thing{
 			}
 		}
 		
+		//TODO: RESOLVER ESTO!! Solo chequea 1 daño y luego se va....
 		if(shieldBlock && other.shield() != null){
 			for(DamageType d : DamageType.ALL_TYPES()){
 				if(d.id == DamageType.RANGED.id)
@@ -693,7 +695,7 @@ public class Creature extends Thing{
 		}
 	}
 	
-	private List<Creature> getCreaturesWhoSeeMe(){
+	public List<Creature> getCreaturesWhoSeeMe(){
 		List<Creature> others = new ArrayList<Creature>();
 		int r = 9;
 		for (int ox = -r; ox < r+1; ox++){

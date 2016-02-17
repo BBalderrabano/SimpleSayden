@@ -39,8 +39,9 @@ public class Constants {
 	public static final String CHECK_MARAUDER_DISGUISE = "IsMarauderDisguise";
 	public static final String CHECK_DUAL_WIELD = "IsDualWieldable";
 	public static final String CHECK_RANGED = "IsRanged";
-	public static final String CHECK_AMMUNITION = "IsAmunition";
 	public static final String CHECK_UNAUGMENTABLE = "IsUnableToAugment";
+	public static final String CHECK_PROJECTILE_DISSAPEAR = "IsProjectile";
+	public static final String CHECK_PROJECTILE_AUTOTARGET = "IsAutotarget";
 	
 	public static final Color UNIDENTIFIED_COLOR = AsciiPanel.magenta;
 	public static final Color OVERLAY_COLOR = AsciiPanel.cyan;
@@ -52,6 +53,7 @@ public class Constants {
 	public static final String FLAG_ANGRY = "IsAngry";
 	public static final String FLAG_INTRODUCED = "IsIntroduced";
 	public static final String FLAG_DONE_TALKING = "IsDoneTalking";
+	public static final String FLAG_INVISIBLE = "IsInvisible";
 	
 	public static final String SPELL_HEAL = "Healed";
 	public static final String SPELL_PAIN = "Pain";
