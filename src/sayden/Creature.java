@@ -414,6 +414,8 @@ public class Creature extends Thing{
 		boolean shieldBlock = false;
 		String position = null;
 		
+		int min_attack = 1;
+		
 		if(x < other.x && y >= other.y){
 			shieldBlock = true;
 			position = Constants.CHEST_POS;
@@ -438,40 +440,27 @@ public class Creature extends Thing{
 			}
 		}
 		
-		//TODO: RESOLVER ESTO!! Solo chequea 1 daño y luego se va....
-		if(shieldBlock && other.shield() != null){
-			for(DamageType d : DamageType.ALL_TYPES()){
-				if(d.id == DamageType.RANGED.id)
-					continue;
-				
-				int attackValue = onlyObject ? object.attackValue(d) : attackValue(d);
-				
-				if(attackValue > other.shield().defenseValue(d)){
-					other.shield().modifyDurability(-1);
-					
-					if(other.shield().durability() < 1){
-						doAction("destroza " + other.shield().nameElLa() + " con el golpe");
-						other.inventory().remove(other.shield());
-						other.unequip(other.shield(), false);
-						return false;
-					}else{
-						if(other.isPlayer()){
-							other.notify("Tu escudo cruje por el impacto!");
-						}else if(isPlayer()){
-							notify(Constants.capitalize(other.shield().nameElLa()) + " " + other.nameDelDeLa()
-							+ " cruje con tu impacto!");
-						}
-					}
-				}
+		boolean isShielding = shieldBlock && other.shield() != null;
+		
+		if(onlyObject && object != null && object.getBooleanData(Constants.CHECK_RANGED) || 
+				!onlyObject && weapon() != null && weapon().getBooleanData(Constants.CHECK_RANGED)){
+			attack += 1 - other.defenseValue(DamageType.BLUNT);
+			
+			if(isShielding){
+				attack -= other.shield().defenseValue(DamageType.BLUNT);
+				min_attack = 0;
 			}
-			other.doAction("resiste el ataque "+nameDelDeLa()+" con " + other.shield().nameElLa());
-			return false;
 		}else{
 			for(DamageType d : DamageType.ALL_TYPES()){
 				if(d.id == DamageType.RANGED.id)
 					continue;
 				
 				int attackValue = onlyObject ? object.attackValue(d) : attackValue(d);
+				
+				if(isShielding){
+					attackValue -= other.shield().defenseValue(d);
+					min_attack = 0;
+				}
 				
 				if(weakSpotHit)
 					attack += Math.max(0, attackValue);
@@ -482,25 +471,20 @@ public class Creature extends Thing{
 		
 		int amount = attack;
 		
-		amount = Math.max(1, amount);
+		amount = Math.max(min_attack, amount);
 		
-//		if(other.isPlayer()){
-//			amount -= other.defenseValueTotal();									//Substract the total defense
-//		}else{
-//			//If we are hitting a creature substract the defending item and the inherit defense unless we get a weakSpot
-//			amount -= (defending_item == null ? 0 : defending_item.defenseValue()) + 
-//					(weakSpotHit ? 0 : other.defenseValue());
-//		}
-		
-//		Object[] params2 = new Object[params.length+1];
-//		for (int i = 0; i < params.length; i++){
-//			params2[i] = params[i];
-//		}
-//		
-//		params2[params2.length - 1] = amount;
-		
-		if(weapon() != null && weapon().getBooleanData(Constants.CHECK_RANGED))
-			amount = 1;
+		if(amount < 1){
+			
+			impactWeapon();
+			
+			if(isPlayer()){
+				doAction("resiste tu ataque");
+			}else{
+				other.doAction("resiste el ataque " + nameDelDeLa());
+			}
+			return false;
+			
+		}
 		
 		other.ai().onGetAttacked(amount, position, this);
 	
@@ -508,6 +492,17 @@ public class Creature extends Thing{
 		
 		other.makeBleed(drained_blood);
 		
+		impactWeapon();
+		
+		if(isShielding && amount >= 1){
+			other.shield().modifyDurability(-1);
+			other.notifyArround(Constants.capitalize(other.shield().nameElLaWNoStacks()) + " cruje con el impacto!");
+		}
+		
+		return true;
+	}
+
+	private void impactWeapon(){
 		if(weapon() != null && weapon().canBreake()){
 			weapon().modifyDurability(-1);
 			
@@ -517,10 +512,8 @@ public class Creature extends Thing{
 				unequip(weapon(), false);
 			}
 		}
-		
-		return true;
 	}
-
+	
 	public void makeBleed(float amount){
 		modifyBlood(-amount);
 		world.propagate(x, y, amount, Constants.BLOOD_FLUID);

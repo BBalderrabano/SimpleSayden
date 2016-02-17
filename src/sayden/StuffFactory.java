@@ -91,6 +91,7 @@ public class StuffFactory {
 		
 		dreamer.equip(randomWeapon(null, false, false, true, true, true));
 		dreamer.equip(randomArmor(null, false, true, true, true, false));
+		dreamer.equip(newRoundShield(false));
 		
 		dreamer.addEffect(new Effect("soñando", 99999));
 		
@@ -310,6 +311,8 @@ public class StuffFactory {
 	private int DROP_3_CHANCE = 80;
 	private int DROP_4_CHANCE = 40;
 	private int DROP_5_CHANCE = 10;
+	
+	private int DROP_RANGED_HANDICAP = 60;
 	
 	public Item newRock(boolean spawn){
 		ArrayList<Item> rockItems = new ArrayList<Item>();
@@ -704,7 +707,7 @@ public class StuffFactory {
 	}
 	
 	public Item newShortBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto", DROP_1_CHANCE);
+		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto", DROP_1_CHANCE + DROP_RANGED_HANDICAP);
 		item.modifyAttackValue(DamageType.RANGED, 1);
 		item.modifyAttackValue(DamageType.PIERCING, 3);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -719,7 +722,7 @@ public class StuffFactory {
 	}
 	
 	public Item newCompositeBow(boolean spawn){
-		Item item = new Item(')', 'M', Color.gray, "arco compuesto", "arco compuesto", DROP_1_CHANCE);
+		Item item = new Item(')', 'M', Color.gray, "arco compuesto", "arco compuesto", DROP_1_CHANCE + DROP_RANGED_HANDICAP);
 		item.modifyAttackValue(DamageType.RANGED, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 4);
 		item.modifyAttackSpeed(Speed.NORMAL);
@@ -734,7 +737,7 @@ public class StuffFactory {
 	}
 	
 	public Item newLongBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.white, "arco largo", "arco largo", DROP_2_CHANCE);
+		Item item = new Item(')', 'M', AsciiPanel.white, "arco largo", "arco largo", DROP_2_CHANCE + DROP_RANGED_HANDICAP);
 		item.modifyAttackValue(DamageType.RANGED, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 6);
 		item.modifyAttackSpeed(Speed.SLOW);
@@ -749,7 +752,7 @@ public class StuffFactory {
 	}
 	
 	public Item newCrossbow(boolean spawn){
-		Item item = new Item(')', 'F', Color.gray, "ballesta", "ballesta", DROP_3_CHANCE);
+		Item item = new Item(')', 'F', Color.gray, "ballesta", "ballesta", DROP_3_CHANCE + DROP_RANGED_HANDICAP);
 		item.modifyAttackValue(DamageType.RANGED, 4);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -763,7 +766,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHeavyCrossbow(boolean spawn){
-		Item item = new Item(')', 'F', Color.darkGray, "ballesta pesada", "ballesta pesada", DROP_4_CHANCE);
+		Item item = new Item(')', 'F', Color.darkGray, "ballesta pesada", "ballesta pesada", DROP_4_CHANCE + DROP_RANGED_HANDICAP);
 		item.modifyAttackValue(DamageType.RANGED, 6);
 		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.modifyAttackSpeed(Speed.FAST);
@@ -778,7 +781,7 @@ public class StuffFactory {
 	}
 	
 	public Item newHunterBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.green, "arco cazador", "arco cazador", DROP_3_CHANCE);
+		Item item = new Item(')', 'M', AsciiPanel.green, "arco cazador", "arco cazador", DROP_3_CHANCE + DROP_RANGED_HANDICAP);
 		item.modifyAttackValue(DamageType.RANGED, 2);
 		item.modifyAttackValue(DamageType.PIERCING, 8);
 		item.modifyAttackSpeed(Speed.SLOW);
