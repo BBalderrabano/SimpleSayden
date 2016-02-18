@@ -8,9 +8,7 @@ public class SaveFile implements Serializable{
 	 */
 	private static final long serialVersionUID = -3618908745075930225L;
 	
-	public SaveFile(){
-		
-	}
+	public SaveFile(){}
 	
 	private int version;
 
