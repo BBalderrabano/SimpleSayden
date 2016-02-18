@@ -27,6 +27,7 @@ public class ApplicationMain extends JFrame implements KeyListener {
 		super();
 		
 		if(checkUpdates){
+			System.out.println("Checking for updates");
 			updater.checkForUpdates();
 		}
 		
@@ -43,6 +44,10 @@ public class ApplicationMain extends JFrame implements KeyListener {
 		setResizable(false);
 		
 		repaint();
+		
+		String version = "v1."+updater.currentRevision();
+		
+		terminal.write(version, terminal.getWidthInCharacters() - (version.length() + 1), terminal.getHeightInCharacters() - 1);
 		
 		t.scheduleAtFixedRate(new TimerTask(){
 			@Override

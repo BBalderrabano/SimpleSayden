@@ -35,7 +35,7 @@ public class ApplicationUpdater extends JFrame{
     void downloadLatestVersion(){
         URL url;
         try {
-            url = new URL(updateurl);
+            url = new URL(updateurl + "Sayden.jar");
             HttpURLConnection hConnection = (HttpURLConnection) url
                     .openConnection();
             HttpURLConnection.setFollowRedirects(true);
@@ -70,7 +70,6 @@ public class ApplicationUpdater extends JFrame{
     	BufferedWriter bw = null;
     	
         try {
-            //create a temporary file
             File version_file = new File("src/version.txt");
 
             bw = new BufferedWriter(new FileWriter(version_file));
@@ -79,7 +78,6 @@ public class ApplicationUpdater extends JFrame{
             e.printStackTrace();
         } finally {
             try {
-                // Close the writer regardless of what happens...
             	bw.close();
             } catch (Exception e) {
             }
