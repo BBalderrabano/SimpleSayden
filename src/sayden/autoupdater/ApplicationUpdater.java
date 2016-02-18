@@ -24,11 +24,13 @@ public class ApplicationUpdater extends JFrame{
 	
 	String updateurl;
 	String saveFileName;
+	String fileSave = "files/";
+	
     JProgressBar progress;
 
     public ApplicationUpdater(String url, String save_file){
         this.updateurl = url;
-        this.saveFileName = save_file;
+        this.saveFileName = fileSave + save_file;
     }
     
     void downloadLatestVersion(){
@@ -41,7 +43,7 @@ public class ApplicationUpdater extends JFrame{
             if (HttpURLConnection.HTTP_OK == hConnection.getResponseCode()) {
                 InputStream in = hConnection.getInputStream();
                 BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream("Sayden.jar"));
+                        new FileOutputStream(fileSave + "Sayden.jar"));
                 int filesize = hConnection.getContentLength();
                 progress.setMaximum(filesize);
                 byte[] buffer = new byte[4096];
@@ -102,7 +104,7 @@ public class ApplicationUpdater extends JFrame{
 		SaveFile saveFile = null;
 		
 		try {
-			saveFile = (SaveFile) SerializationUtil.deserialize(saveFileName);
+			saveFile = (SaveFile) SerializationUtil.deserialize(updateurl + saveFileName);
         } catch (ClassNotFoundException e) {
             System.out.println("No se encontro una partida guardada.");
             return 0;
@@ -135,7 +137,7 @@ public class ApplicationUpdater extends JFrame{
 			
 		    try {
 		        @SuppressWarnings("unused")
-				Process foo = Runtime.getRuntime().exec("java -jar Sayden.jar final");
+				Process foo = Runtime.getRuntime().exec("java -jar files/Sayden.jar final");
 		    } catch (IOException e) {
 		        e.printStackTrace();
 		    }
