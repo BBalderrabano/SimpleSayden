@@ -1,20 +1,23 @@
 package sayden;
 
-import javax.swing.JFrame;
-import asciiPanel.AsciiPanel;
-import sayden.autoupdater.ApplicationUpdater;
-import sayden.screens.Screen;
-import sayden.screens.StartScreen;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.swing.JFrame;
+
+import asciiPanel.AsciiPanel;
+import sayden.autoupdater.ApplicationUpdater;
+import sayden.screens.Screen;
+import sayden.screens.StartScreen;
+
 public class ApplicationMain extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1060623638149583738L;
 	
-	ApplicationUpdater updater = new ApplicationUpdater("https://raw.githubusercontent.com/BBalderrabano/SimpleSayden/master/deploy/");
+	ApplicationUpdater updater = new ApplicationUpdater(
+			"https://raw.githubusercontent.com/BBalderrabano/SimpleSayden/master/deploy/",
+			"savedata.ser");
 	
 	private AsciiPanel terminal;
 	private Screen screen;
@@ -27,7 +30,7 @@ public class ApplicationMain extends JFrame implements KeyListener {
 		super();
 		
 		if(checkUpdates){
-			System.out.println("Checking for updates");
+			System.out.println("Chequeando actualizaciones");
 			updater.checkForUpdates();
 		}
 		

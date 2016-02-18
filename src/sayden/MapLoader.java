@@ -1,6 +1,5 @@
 package sayden;
 
-import java.io.File;
 import java.util.Random;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -69,10 +68,9 @@ public class MapLoader {
 	 *  dentro del juego. Esto incluye npcs y los tiles usados en cada mapa.*/
 	private boolean checkFile(String mapName, StuffFactory factory){
 		 try {
-			File file = new File("maps/"+mapName+".xml");
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file);
+			Document doc = db.parse(this.getClass().getResourceAsStream("/"+mapName+".xml"));
 			doc.getDocumentElement().normalize();
 
 			NodeList nodeLst = doc.getElementsByTagName("version");

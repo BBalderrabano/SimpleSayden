@@ -1,8 +1,6 @@
 package sayden.autoupdater;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -11,7 +9,6 @@ import java.net.URL;
 import java.awt.Dimension;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.InputStream;
 
 import javax.swing.JFrame;
@@ -26,10 +23,12 @@ public class ApplicationUpdater extends JFrame{
 	private static final long serialVersionUID = -851907197857929462L;
 	
 	String updateurl;
+	String saveFileName;
     JProgressBar progress;
 
-    public ApplicationUpdater(String url){
-        updateurl = url;
+    public ApplicationUpdater(String url, String save_file){
+        this.updateurl = url;
+        this.saveFileName = save_file;
     }
     
     void downloadLatestVersion(){
@@ -57,7 +56,8 @@ public class ApplicationUpdater extends JFrame{
                 if(filesize!=numWritten)
                     System.out.println("Wrote "+numWritten+" bytes, should have been "+filesize);
                 else
-                    System.out.println("Downloaded successfully.");
+                    System.out.println("Descarga exitosa!");
+                
                 out.close();
                 in.close();
             }
@@ -67,21 +67,15 @@ public class ApplicationUpdater extends JFrame{
     }
 	
     public void setRevision(int version){
-    	BufferedWriter bw = null;
+    	SaveFile save = new SaveFile();
+    	save.setVersion(version);
     	
-        try {
-            File version_file = new File("src/version.txt");
-
-            bw = new BufferedWriter(new FileWriter(version_file));
-            bw.write(version + "");
-        } catch (Exception e) {
+    	try {
+            SerializationUtil.serialize(save, saveFileName);
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-            	bw.close();
-            } catch (Exception e) {
-            }
-    	}
+            return;
+        }
     }
     
 	public int latestRevision(){
@@ -104,24 +98,27 @@ public class ApplicationUpdater extends JFrame{
     }
 	
 	public int currentRevision(){
-        BufferedReader is;
-        try {
-            is = new BufferedReader(
-                    new InputStreamReader(ClassLoader.getSystemResource("src/version.txt").openStream()));
-            int rev = Integer.valueOf(is.readLine());
-            return rev;
-        } catch(NullPointerException e){
-        }catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 1<<31-1;
+		
+		SaveFile saveFile = null;
+		
+		try {
+			saveFile = (SaveFile) SerializationUtil.deserialize(saveFileName);
+        } catch (ClassNotFoundException e) {
+            System.out.println("No se encontro una partida guardada.");
+            return 0;
+        } catch (IOException e) {
+            System.out.println("No se encontro una partida guardada.");
+			return 0;
+		}
+		
+		return saveFile.getVersion();
     }
 
 	public void checkForUpdates() {
 		int latestRevision = latestRevision();
 		
 		if(latestRevision > currentRevision()){
-			
+			System.out.println("Actualizacion encontrada...");
 			this.setPreferredSize(new Dimension(300, 80));
 			this.setSize(new Dimension(300, 80));
 			this.setTitle("Actualizador");
