@@ -107,7 +107,7 @@ public class ApplicationUpdater extends JFrame{
         BufferedReader is;
         try {
             is = new BufferedReader(
-                    new InputStreamReader(ClassLoader.getSystemResource("version.txt").openStream()));
+                    new InputStreamReader(ClassLoader.getSystemResource("src/version.txt").openStream()));
             int rev = Integer.valueOf(is.readLine());
             return rev;
         } catch(NullPointerException e){
