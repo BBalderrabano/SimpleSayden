@@ -29,10 +29,10 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	public ApplicationMain(boolean checkUpdates){
 		super();
 		
-		if(checkUpdates){
-			System.out.println("Chequeando actualizaciones");
-			updater.checkForUpdates();
-		}
+//		if(checkUpdates){
+//			System.out.println("Chequeando actualizaciones");
+//			updater.checkForUpdates();
+//		}
 		
 		terminal = new AsciiPanel(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
 		

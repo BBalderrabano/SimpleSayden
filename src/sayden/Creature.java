@@ -443,7 +443,7 @@ public class Creature extends Thing{
 			}
 		}
 		
-		boolean isShielding = shieldBlock && other.shield() != null;
+		boolean isShielding = other.shield() != null && shieldBlock;
 		
 		if(onlyObject && object != null && object.getBooleanData(Constants.CHECK_RANGED) || 
 				!onlyObject && weapon() != null && weapon().getBooleanData(Constants.CHECK_RANGED)){
@@ -481,9 +481,9 @@ public class Creature extends Thing{
 			impactWeapon();
 			
 			if(isPlayer()){
-				doAction("resiste tu ataque");
+				other.doAction("resiste tu ataque");
 			}else{
-				other.doAction("resiste el ataque " + nameDelDeLa());
+				other.doAction("resiste el ataque " + other.nameDelDeLa());
 			}
 			return false;
 			
@@ -497,7 +497,7 @@ public class Creature extends Thing{
 		
 		impactWeapon();
 		
-		if(isShielding && amount >= 1){
+		if(other.shield() != null && isShielding && amount >= 1){
 			other.shield().modifyDurability(-1);
 			other.notifyArround(Constants.capitalize(other.shield().nameElLaWNoStacks()) + " cruje con el impacto!");
 		}
