@@ -30,7 +30,7 @@ public class ApplicationUpdater extends JFrame{
 
     public ApplicationUpdater(String url, String save_file){
         this.updateurl = url;
-        this.saveFileName = fileSave + save_file;
+        this.saveFileName = fileSave+ "" + save_file;
     }
     
     void downloadLatestVersion(){
@@ -104,7 +104,7 @@ public class ApplicationUpdater extends JFrame{
 		SaveFile saveFile = null;
 		
 		try {
-			saveFile = (SaveFile) SerializationUtil.deserialize(updateurl + saveFileName);
+			saveFile = (SaveFile) SerializationUtil.deserialize(saveFileName);
         } catch (ClassNotFoundException e) {
             System.out.println("No se encontro una partida guardada.");
             return 0;
