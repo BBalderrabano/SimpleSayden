@@ -2,6 +2,7 @@ package sayden;
 
 import javax.swing.JFrame;
 import asciiPanel.AsciiPanel;
+import sayden.autoupdater.ApplicationUpdater;
 import sayden.screens.Screen;
 import sayden.screens.StartScreen;
 
@@ -13,7 +14,7 @@ import java.util.TimerTask;
 public class ApplicationMain extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1060623638149583738L;
 	
-	private ApplicationUpdater updater = new ApplicationUpdater();
+	ApplicationUpdater updater = new ApplicationUpdater("https://raw.githubusercontent.com/BBalderrabano/SimpleSayden/master/deploy/");
 	
 	private AsciiPanel terminal;
 	private Screen screen;
@@ -22,10 +23,12 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	
 	private Timer t = new Timer();
 	
-	public ApplicationMain(){
+	public ApplicationMain(boolean checkUpdates){
 		super();
 		
-		updater.checkUpdate();
+		if(checkUpdates){
+			updater.checkForUpdates();
+		}
 		
 		terminal = new AsciiPanel(Constants.WORLD_WIDTH, Constants.WORLD_HEIGHT);
 		
@@ -75,7 +78,7 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	public void keyTyped(KeyEvent e) {}
 	
 	public static void main(String[] args) {
-		ApplicationMain app = new ApplicationMain();
+		ApplicationMain app = new ApplicationMain(args.length < 1);
 		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		app.setVisible(true);
 	}
