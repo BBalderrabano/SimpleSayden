@@ -7,6 +7,8 @@ import java.util.List;
 import asciiPanel.AsciiPanel;
 
 public class Constants {
+	public static final boolean PRODUCTION = true;
+	
 	public static final int WORLD_WIDTH = 80;
 	public static final int WORLD_HEIGHT = 24;
 	

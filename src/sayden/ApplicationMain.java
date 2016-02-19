@@ -29,7 +29,7 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	public ApplicationMain(boolean checkUpdates){
 		super();
 		
-		if(checkUpdates){
+		if(Constants.PRODUCTION && checkUpdates){
 			System.out.println("Chequeando actualizaciones");
 			updater.checkForUpdates();
 		}

@@ -57,20 +57,25 @@ public class DreamScreen implements Screen {
 		createCreatures(factory);
 		world.updateFloor();
 
-		SaveFile saveFile = null;
-		
-		try {
-			saveFile = (SaveFile) SerializationUtil.deserialize(Constants.SAVE_FILE_FULL_NAME);
-        } catch (ClassNotFoundException e) {
-        } catch (IOException e) {
-		}
-		
-		if(!saveFile.isFirstDream()){
-			player.notify("-- usa [wasd] para moverte --");
-			saveFile.setFirstDream(true);
-			saveFile.serialize();
+
+		if(Constants.PRODUCTION){
+			SaveFile saveFile = null;
+			
+			try {
+				saveFile = (SaveFile) SerializationUtil.deserialize(Constants.SAVE_FILE_FULL_NAME);
+	        } catch (ClassNotFoundException e) {
+	        } catch (IOException e) {
+			}
+			
+			if(!saveFile.isFirstDream()){
+				player.notify("-- usa [wasd] para moverte --");
+				saveFile.setFirstDream(true);
+				saveFile.serialize();
+			}else{
+				player.notify("-- presiona [ESC] para despertar --");
+			}
 		}else{
-			player.notify("-- presiona [ESC] para despertar --");
+			player.notify("-- usa [wasd] para moverte --");
 		}
 	}
 
