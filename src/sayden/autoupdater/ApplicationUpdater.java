@@ -14,6 +14,8 @@ import java.io.InputStream;
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
+import sayden.Constants;
+
 
 public class ApplicationUpdater extends JFrame{
 	
@@ -24,7 +26,7 @@ public class ApplicationUpdater extends JFrame{
 	
 	String updateurl;
 	String saveFileName;
-	String fileSave = "files/";
+	String fileSave = Constants.SAVE_FILE_DIRECTORY;
 	
     JProgressBar progress;
 
@@ -71,13 +73,7 @@ public class ApplicationUpdater extends JFrame{
     public void setRevision(int version){
     	SaveFile save = new SaveFile();
     	save.setVersion(version);
-    	
-    	try {
-            SerializationUtil.serialize(save, saveFileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+    	save.serialize();
     }
     
 	public int latestRevision(){

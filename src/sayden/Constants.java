@@ -10,6 +10,10 @@ public class Constants {
 	public static final int WORLD_WIDTH = 80;
 	public static final int WORLD_HEIGHT = 24;
 	
+	public static final String SAVE_FILE_NAME = "savedata.ser";
+	public static final String SAVE_FILE_DIRECTORY  = "files/";
+	public static final String SAVE_FILE_FULL_NAME = SAVE_FILE_DIRECTORY + "" + SAVE_FILE_NAME;
+	
 	public static final int STEALTH_MIN_STEPS = 1;
 	public static final int STEALTH_MIN_RADIUS = 1;
 	public static final int STEALTH_LEVEL_MAX = 8;

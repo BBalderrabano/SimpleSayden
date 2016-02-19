@@ -2,6 +2,7 @@ package sayden.screens;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import sayden.StuffFactory;
 import sayden.Tile;
 import sayden.World;
 import sayden.WorldBuilder;
+import sayden.autoupdater.SaveFile;
+import sayden.autoupdater.SerializationUtil;
 
 public class DreamScreen implements Screen {
 	private World world;
@@ -54,7 +57,21 @@ public class DreamScreen implements Screen {
 		createCreatures(factory);
 		world.updateFloor();
 
-		player.notify("-- usa [wasd] para moverte --");
+		SaveFile saveFile = null;
+		
+		try {
+			saveFile = (SaveFile) SerializationUtil.deserialize(Constants.SAVE_FILE_FULL_NAME);
+        } catch (ClassNotFoundException e) {
+        } catch (IOException e) {
+		}
+		
+		if(!saveFile.isFirstDream()){
+			player.notify("-- usa [wasd] para moverte --");
+			saveFile.setFirstDream(true);
+			saveFile.serialize();
+		}else{
+			player.notify("-- presiona [ESC] para despertar --");
+		}
 	}
 
 	private void createWorld(){
