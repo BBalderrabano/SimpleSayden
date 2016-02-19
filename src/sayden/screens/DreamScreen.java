@@ -70,7 +70,12 @@ public class DreamScreen implements Screen {
 			if(!saveFile.isFirstDream()){
 				player.notify("-- usa [wasd] para moverte --");
 				saveFile.setFirstDream(true);
-				saveFile.serialize();
+				
+				try {
+					SerializationUtil.serialize(saveFile, Constants.SAVE_FILE_FULL_NAME);
+				} catch (IOException e) {
+					System.out.println("[ERROR] Hubo un fallo al guardar datos");
+				}
 			}else{
 				player.notify("-- presiona [ESC] para despertar --");
 			}

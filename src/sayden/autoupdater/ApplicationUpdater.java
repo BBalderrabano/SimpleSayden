@@ -73,7 +73,11 @@ public class ApplicationUpdater extends JFrame{
     public void setRevision(int version){
     	SaveFile save = new SaveFile();
     	save.setVersion(version);
-    	save.serialize();
+    	try {
+			SerializationUtil.serialize(save, Constants.SAVE_FILE_FULL_NAME);
+		} catch (IOException e) {
+			System.out.println("[ERROR] Hubo un fallo al guardar datos");
+		}
     }
     
 	public int latestRevision(){
