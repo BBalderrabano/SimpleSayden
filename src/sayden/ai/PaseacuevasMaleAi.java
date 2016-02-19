@@ -46,17 +46,17 @@ public class PaseacuevasMaleAi extends CreatureAi {
 			}
 		}
 		
-		if(!creature.getBooleanData("SeenPlayer") && canSee(player.x, player.y) 
-				&& Math.random() * 100 < 30 && female.getData("checkPoint") == null){
+		if(!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER) && canSee(player.x, player.y) 
+				&& Math.random() * 100 < 30 && female.getData(Constants.CHECKPOINT) == null){
 			
 			creature.doAction("alerta a la matriarca de tu presencia!");
 			
-			creature.setData("SeenPlayer", true);
-			female.setData("checkPoint", new Point(player.x, player.y));
+			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
+			female.setData(Constants.CHECKPOINT, new Point(player.x, player.y));
 			
 			creature.addEffect(new Effect("alerta", 12){
 				public void end(Creature creature){
-					creature.unsetData("SeenPlayer");
+					creature.unsetData(Constants.FLAG_SEEN_PLAYER);
 				}
 			});
 			return;

@@ -26,9 +26,9 @@ public class PaseacuevasAi extends CreatureAi {
 		super.onUpdate();
 		
 		if(males.isEmpty()){
-			if(!creature.getBooleanData("SeenPlayer")){
+			if(!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
 				goBerzerk();
-				creature.setData("SeenPlayer", true);
+				creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 			}
 			hunt(player);
 			return;
@@ -41,28 +41,28 @@ public class PaseacuevasAi extends CreatureAi {
 		}
 		
 		//If we can see the player
-		if((canSee(player.x, player.y) || creature.getBooleanData("SeenPlayer"))
+		if((canSee(player.x, player.y) || creature.getBooleanData(Constants.FLAG_SEEN_PLAYER))
 				&& creature.position().distance(player.position()) > 2){
 			hunt(player);
 			
-			if(!creature.getBooleanData("SeenPlayer")){
+			if(!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
 				creature.doAction("pega un alarido y carga contra ti!");
 				goBerzerk();
 			}
 			
-			creature.setData("SeenPlayer", true);
+			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 			return;
 		}else if(canSee(player.x, player.y)){
 			hunt(player);
 			return;
 		}
 		
-		Point checkPoint = (Point) creature.getData("checkPoint");
+		Point checkPoint = (Point) creature.getData(Constants.CHECKPOINT);
 		
 		//We got to the checkpoint
 		if(checkPoint != null && checkPoint.distance(creature.position()) <= 2){
 			checkPoint = null;
-			creature.unsetData("checkPoint");
+			creature.unsetData(Constants.CHECKPOINT);
 			return;
 		}else if(checkPoint != null){
 			hunt(checkPoint);
@@ -87,7 +87,7 @@ public class PaseacuevasAi extends CreatureAi {
 			public void end(Creature creature){
 				creature.modifyMovementSpeed(creature.startingMovementSpeed());
 				creature.changeColor(creature.originalColor());
-				creature.unsetData("SeenPlayer");
+				creature.unsetData(Constants.FLAG_SEEN_PLAYER);
 			}
 		});
 	}

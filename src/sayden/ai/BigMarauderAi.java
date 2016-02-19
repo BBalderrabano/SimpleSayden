@@ -42,8 +42,8 @@ public class BigMarauderAi extends CreatureAi {
 	
 	@Override
 	public boolean onGetAttacked(int amount, String position, Creature attacker){
-		if(attacker.isPlayer() && !creature.getBooleanData("SeenPlayer")){
-			creature.setData("SeenPlayer", true);
+		if(attacker.isPlayer() && !creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
+			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 		}
 		
 		if(position == Constants.HEAD_POS){
@@ -120,11 +120,11 @@ public class BigMarauderAi extends CreatureAi {
 		if(canSee(player.x, player.y)){
 			if(player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
 					player.helment() != null && player.helment().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
-						!creature.getBooleanData("SeenPlayer")){
+						!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
 				return;
 			}
 			
-			creature.setData("SeenPlayer", true);
+			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 			
 			if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3 && Math.random() < 0.2){
 				creature.throwItem(getWeaponToThrow(), player.x, player.y);

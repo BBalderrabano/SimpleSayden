@@ -13,10 +13,10 @@ public class MarauderAi extends CreatureAi {
 	private Creature player;
 	private ArrayList<Creature> pack;
 	
-	boolean playerHidden = player != null &&
+	boolean playerHidden() { return player != null &&
 			player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
 			player.helment() != null && player.helment().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
-			!creature.getBooleanData("SeenPlayer");
+			!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER); }
 	
 	public MarauderAi(Creature creature, Creature player) {
 		super(creature);
@@ -28,14 +28,14 @@ public class MarauderAi extends CreatureAi {
 	}
 	
 	public boolean onGetAttacked(int amount, String position, Creature attacker, Item item){
-		if(attacker.isPlayer() && playerHidden){
-			creature.setData("SeenPlayer", true);
+		if(attacker.isPlayer() && playerHidden()){
+			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 			
 			for(Creature c : creature.getCreaturesWhoSeeMe()){
 				if(c.getData(Constants.RACE) != creature.getData(Constants.RACE))
 					continue;
 				
-				c.setData("SeenPlayer", true);
+				c.setData(Constants.FLAG_SEEN_PLAYER, true);
 			}
 			
 			creature.doAction("alerta de tu presencia!");
@@ -70,37 +70,35 @@ public class MarauderAi extends CreatureAi {
 			return;
 		}
 		if(canSee(player.x, player.y)){
-			if(playerHidden){
-				return;
-			}
-			
-			pack.remove(player);
-			creature.setData("SeenPlayer", true);
-
-			if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3){
-				creature.throwItem(getWeaponToThrow(), player.x, player.y);
-				return;
-			}
-			if(creature.hp() >= creature.totalMaxHp() * 0.3f){
-				hunt(player);
-				return;
-			}else{
-				flee(player);
-				return;
+			if(!playerHidden()){
+				pack.remove(player);
+				creature.setData(Constants.FLAG_SEEN_PLAYER, true);
+	
+				if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3){
+					creature.throwItem(getWeaponToThrow(), player.x, player.y);
+					return;
+				}
+				if(creature.hp() >= creature.totalMaxHp() * 0.3f){
+					hunt(player);
+					return;
+				}else{
+					flee(player);
+					return;
+				}
 			}
 		}else{
 			for(Creature c : creature.getCreaturesWhoSeeMe()){
 				if((c.getData(Constants.RACE) == creature.getData(Constants.RACE)) 
-						|| (c.isPlayer() && playerHidden))
+						|| (c.isPlayer() && playerHidden()))
 					pack.add(c);
 				
 				if(c.getData(Constants.RACE) == "paseacuevas" && creature.position().distance(c.position()) <= 5
-						&& pack.size() < 4){
+						&& pack.size() < 4 && !pack.contains(player)){
 					flee(c);
-					break;
-				}else if(c.getData(Constants.RACE) == "paseacuevas" && pack.size() >= 4){
+					return;
+				}else if(c.getData(Constants.RACE) == "paseacuevas" && (pack.size() >= 4 || pack.contains(player))){
 					hunt(c);
-					break;
+					return;
 				}
 			}
 		}
@@ -117,8 +115,9 @@ public class MarauderAi extends CreatureAi {
 			}
 		}
 		
-		if(furthest != null){
+		if(furthest != null && dist > 2){
 			hunt(furthest);
+			return;
 		}
 		
 		wander();

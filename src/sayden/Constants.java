@@ -48,12 +48,13 @@ public class Constants {
 	
 	public static final String RACE = "Race";
 	
-	public static final boolean DEBUG_MODE = false;
+	public static final String CHECKPOINT = "checkPoint";
 	
 	public static final String FLAG_ANGRY = "IsAngry";
 	public static final String FLAG_INTRODUCED = "IsIntroduced";
 	public static final String FLAG_DONE_TALKING = "IsDoneTalking";
 	public static final String FLAG_INVISIBLE = "IsInvisible";
+	public static final String FLAG_SEEN_PLAYER = "SeenPlayer";
 	
 	public static final String SPELL_HEAL = "Healed";
 	public static final String SPELL_PAIN = "Pain";

@@ -146,7 +146,7 @@ public class Projectile {
 			world.addAtEmptySpace(projectile, x, y);
 		}
 		
-		target.ai().setCheckPoint(start);
+		target.setData(Constants.CHECKPOINT, true);
 		target.modifyHp(-totalDamage, "Impactado por " + name);
 		
 		float drained_blood = (totalDamage * Constants.BLOOD_AMOUNT_MULTIPLIER) * projectile.bloodModifyer();
