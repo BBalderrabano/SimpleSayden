@@ -283,6 +283,9 @@ public class CreatureAi {
 	public void flee(Creature target){
 		List<Point> points = new Path(creature, target.x, target.y).points();
 		
+		if(points == null || points.isEmpty())
+			return;
+		
 		int mx = points.get(0).x - creature.x;
 		int my = points.get(0).y - creature.y;
 		int x_distance = Math.abs(creature.x - target.x);

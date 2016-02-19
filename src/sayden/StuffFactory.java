@@ -73,13 +73,9 @@ public class StuffFactory {
 							new Point(36, 12)};
 		int selectedStart = (int) (Math.random() * startPos.length);
 		
-		player.equip(newMarauderHood(false));
-		player.equip(newMarauderVest(false));
-		
-		
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y);
 
-		if(Math.random() < 0.1f){
+		if(Math.random() < 0.2f){
 			player.inventory().add(newAlcoholBottle(false));
 		}
 		

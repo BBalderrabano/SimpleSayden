@@ -27,21 +27,28 @@ public class MarauderAi extends CreatureAi {
 		creature.setData(Constants.RACE, "merodeador");
 	}
 	
-	public boolean onGetAttacked(int amount, String position, Creature attacker, Item item){
-		if(attacker.isPlayer() && playerHidden()){
+	public boolean onGetAttacked(int amount, String position, Creature attacker){
+		if(attacker.isPlayer()){
 			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
-			
-			for(Creature c : creature.getCreaturesWhoSeeMe()){
-				if(c.getData(Constants.RACE) != creature.getData(Constants.RACE))
-					continue;
-				
-				c.setData(Constants.FLAG_SEEN_PLAYER, true);
-			}
-			
-			creature.doAction("alerta de tu presencia!");
+			alertPrescence();
 		}
 				
 		return super.onGetAttacked(amount, position, attacker);
+	}
+	
+	private void alertPrescence(){
+		boolean alert = false;
+		
+		for(Creature c : creature.getCreaturesWhoSeeMe()){
+			if(c.getData(Constants.RACE) != creature.getData(Constants.RACE) || c.getBooleanData(Constants.FLAG_SEEN_PLAYER))
+				continue;
+			
+			alert = true;
+			c.setData(Constants.FLAG_SEEN_PLAYER, true);
+		}
+		
+		if(alert)
+			creature.doAction("alerta de tu presencia!");
 	}
 	
 	public void onDecease(Item corpse){
@@ -74,7 +81,9 @@ public class MarauderAi extends CreatureAi {
 			if(!playerHidden()){
 				pack.remove(player);
 				creature.setData(Constants.FLAG_SEEN_PLAYER, true);
-	
+				
+				alertPrescence();
+				
 				if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3){
 					creature.throwItem(getWeaponToThrow(), player.x, player.y);
 					return;
@@ -93,9 +102,9 @@ public class MarauderAi extends CreatureAi {
 						|| (c.isPlayer() && playerHidden()))
 					pack.add(c);
 				
-				if(c.getData(Constants.RACE) == "paseacuevas" && creature.position().distance(c.position()) <= 5
+				if(c.getData(Constants.RACE) == "paseacuevas"
 						&& pack.size() < 4 && !pack.contains(player)){
-					flee(c);
+					distanceFrom(c, 4);
 					return;
 				}else if(c.getData(Constants.RACE) == "paseacuevas" && (pack.size() >= 4 || pack.contains(player))){
 					hunt(c);
