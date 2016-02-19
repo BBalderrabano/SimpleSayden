@@ -1,5 +1,7 @@
 package sayden.ai;
 
+import java.util.ArrayList;
+
 import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
@@ -9,17 +11,24 @@ import sayden.Item;
 public class MarauderAi extends CreatureAi {
 
 	private Creature player;
+	private ArrayList<Creature> pack;
+	
+	boolean playerHidden = player != null &&
+			player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
+			player.helment() != null && player.helment().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
+			!creature.getBooleanData("SeenPlayer");
 	
 	public MarauderAi(Creature creature, Creature player) {
 		super(creature);
 		this.player = player;
 		this.setWeakSpot(Constants.HEAD_POS);
+		this.pack = new ArrayList<Creature>();
 		
 		creature.setData(Constants.RACE, "merodeador");
 	}
 	
 	public boolean onGetAttacked(int amount, String position, Creature attacker, Item item){
-		if(attacker.isPlayer() && !creature.getBooleanData("SeenPlayer")){
+		if(attacker.isPlayer() && playerHidden){
 			creature.setData("SeenPlayer", true);
 			
 			for(Creature c : creature.getCreaturesWhoSeeMe()){
@@ -28,6 +37,8 @@ public class MarauderAi extends CreatureAi {
 				
 				c.setData("SeenPlayer", true);
 			}
+			
+			creature.doAction("alerta de tu presencia!");
 		}
 				
 		return super.onGetAttacked(amount, position, attacker);
@@ -59,12 +70,11 @@ public class MarauderAi extends CreatureAi {
 			return;
 		}
 		if(canSee(player.x, player.y)){
-			if(player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
-					player.helment() != null && player.helment().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
-						!creature.getBooleanData("SeenPlayer")){
+			if(playerHidden){
 				return;
 			}
 			
+			pack.remove(player);
 			creature.setData("SeenPlayer", true);
 
 			if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3){
@@ -80,14 +90,35 @@ public class MarauderAi extends CreatureAi {
 			}
 		}else{
 			for(Creature c : creature.getCreaturesWhoSeeMe()){
-				if(c.getData(Constants.RACE) != "paseacuevas")
-					continue;
+				if((c.getData(Constants.RACE) == creature.getData(Constants.RACE)) 
+						|| (c.isPlayer() && playerHidden))
+					pack.add(c);
 				
-				if(creature.position().distance(c.position()) <= 5){
+				if(c.getData(Constants.RACE) == "paseacuevas" && creature.position().distance(c.position()) <= 5
+						&& pack.size() < 4){
 					flee(c);
+					break;
+				}else if(c.getData(Constants.RACE) == "paseacuevas" && pack.size() >= 4){
+					hunt(c);
 					break;
 				}
 			}
+		}
+		
+		int dist = 0;
+		Creature furthest = null;
+		
+		for(Creature ally : pack){
+			if(creature.position().distance(ally.position()) > dist){
+				dist = (int) creature.position().distance(ally.position());
+				furthest = ally;
+			}else{
+				continue;
+			}
+		}
+		
+		if(furthest != null){
+			hunt(furthest);
 		}
 		
 		wander();

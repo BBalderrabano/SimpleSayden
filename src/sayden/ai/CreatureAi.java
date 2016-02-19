@@ -20,6 +20,9 @@ public class CreatureAi {
 	public Point checkPoint() { return checkPoint; }
 	public void setCheckPoint(Point p) { this.checkPoint = p; }
 	
+	protected Creature target;
+	public Creature target() { return target; }
+	
 	public CreatureAi(Creature creature){
 		this.creature = creature;
 		this.creature.setCreatureAi(this);

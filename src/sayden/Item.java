@@ -102,7 +102,7 @@ public class Item extends Thing{
 	private int durability = 1;
 	public int durability() { return durability; }
 	public void modifyDurability(int amount) { 
-		if(this.durability > 1) { 
+		if(amount > 1) { 
 			this.canBreake = true;
 		}
 		

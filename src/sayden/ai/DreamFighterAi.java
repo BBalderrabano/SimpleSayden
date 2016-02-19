@@ -6,8 +6,8 @@ import sayden.Point;
 
 public class DreamFighterAi extends CreatureAi {
 
-	private Creature target;
 	private Creature player;
+	public Creature target() { return target == null ? player : target; }
 	
 	public DreamFighterAi(Creature creature, Creature player, boolean isAlly) {
 		super(creature);
