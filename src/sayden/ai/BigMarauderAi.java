@@ -17,6 +17,11 @@ public class BigMarauderAi extends CreatureAi {
 	private String armDamage = "ArmDamage";
 	private String armBroken = "ArmBroken";
 	
+	boolean playerHidden() { return player != null &&
+			player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
+			player.helment() != null && player.helment().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
+			!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER); }
+	
 	public BigMarauderAi(Creature creature, Creature player) {
 		super(creature);
 		this.player = player;
@@ -118,22 +123,21 @@ public class BigMarauderAi extends CreatureAi {
 		}
 		
 		if(canSee(player.x, player.y)){
-			if(player.armor() != null && player.armor().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
-					player.helment() != null && player.helment().getBooleanData(Constants.CHECK_MARAUDER_DISGUISE) &&
-						!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
+			if(!playerHidden()){
+				creature.setData(Constants.FLAG_SEEN_PLAYER, true);
+				
+				if(canThrowAt(player) && getWeaponToThrow() != null && 
+						creature.position().distance(player.position()) > 3 && Math.random() < 0.2){
+					creature.throwItem(getWeaponToThrow(), player.x, player.y);
+					return;
+				}
+				
+				hunt(player);
 				return;
 			}
-			
-			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
-			
-			if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3 && Math.random() < 0.2){
-				creature.throwItem(getWeaponToThrow(), player.x, player.y);
-				return;
-			}
-			
-			hunt(player);
-			return;
 		}	
+		
+		visitCheckPoint();
 		
 		wander();
 	}

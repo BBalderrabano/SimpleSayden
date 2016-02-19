@@ -69,6 +69,7 @@ public class MarauderAi extends CreatureAi {
 			useBetterEquipment();
 			return;
 		}
+		
 		if(canSee(player.x, player.y)){
 			if(!playerHidden()){
 				pack.remove(player);
@@ -102,6 +103,8 @@ public class MarauderAi extends CreatureAi {
 				}
 			}
 		}
+		
+		visitCheckPoint();
 		
 		int dist = 0;
 		Creature furthest = null;

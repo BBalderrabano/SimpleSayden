@@ -6,7 +6,6 @@ import asciiPanel.AsciiPanel;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Effect;
-import sayden.Point;
 
 public class PaseacuevasAi extends CreatureAi {
 
@@ -57,17 +56,8 @@ public class PaseacuevasAi extends CreatureAi {
 			return;
 		}
 		
-		Point checkPoint = (Point) creature.getData(Constants.CHECKPOINT);
+		visitCheckPoint();
 		
-		//We got to the checkpoint
-		if(checkPoint != null && checkPoint.distance(creature.position()) <= 2){
-			checkPoint = null;
-			creature.unsetData(Constants.CHECKPOINT);
-			return;
-		}else if(checkPoint != null){
-			hunt(checkPoint);
-			return;
-		}
 		for(Creature c : males){
 			//If we are far from the males lets just go towards them
 			if(c.position().distance(creature.position()) >= 5){

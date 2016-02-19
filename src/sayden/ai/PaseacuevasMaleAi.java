@@ -65,6 +65,9 @@ public class PaseacuevasMaleAi extends CreatureAi {
 			creature.throwItem(getWeaponToThrow(), player.x, player.y);
 			return;
 		}
+		
+		visitCheckPoint();
+		
 		if(creature.position().distance(female.position()) >= 8){
 			hunt(female);
 			return;

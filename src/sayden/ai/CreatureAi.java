@@ -355,6 +355,17 @@ public class CreatureAi {
 		
 		return new Point(mx, my);
 	}
+	
+	public void visitCheckPoint(){
+		Point check = (Point) creature.getData(Constants.CHECKPOINT);
+		
+		if(check != null){
+			hunt(check);
+			
+			if(creature.position().distance(check) <= 2)
+				creature.unsetData(Constants.CHECKPOINT);
+		}
+	}
 
 	protected boolean canUseBetterEquipment() {
 		int currentWeaponRating = creature.weapon() == null ? 0 : creature.weapon().totalAttackValue();
