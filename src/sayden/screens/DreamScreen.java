@@ -74,8 +74,6 @@ public class DreamScreen implements Screen {
 			}else{
 				player.notify("-- presiona [ESC] para despertar --");
 			}
-		}else{
-			player.notify("-- usa [wasd] para moverte --");
 		}
 	}
 
