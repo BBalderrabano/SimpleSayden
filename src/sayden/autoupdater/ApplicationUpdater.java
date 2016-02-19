@@ -118,8 +118,12 @@ public class ApplicationUpdater extends JFrame{
 
 	public void checkForUpdates() {
 		int latestRevision = latestRevision();
+		int currentRevision = currentRevision();
 		
-		if(latestRevision > currentRevision()){
+		System.out.println("Version local: " + currentRevision);
+		System.out.println("Version servidor: " + latestRevision);
+		
+		if(latestRevision > currentRevision){
 			System.out.println("Actualizacion encontrada...");
 			this.setPreferredSize(new Dimension(300, 80));
 			this.setSize(new Dimension(300, 80));
