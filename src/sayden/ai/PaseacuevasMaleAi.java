@@ -61,7 +61,7 @@ public class PaseacuevasMaleAi extends CreatureAi {
 			});
 			return;
 		}
-		if (canThrowAt(player) && female.hp() < female.totalMaxHp() && Math.random() > 0.3f){
+		if (canThrowAt(player, true) && female.hp() < female.totalMaxHp() && Math.random() > 0.3f){
 			creature.throwItem(getWeaponToThrow(), player.x, player.y);
 			return;
 		}

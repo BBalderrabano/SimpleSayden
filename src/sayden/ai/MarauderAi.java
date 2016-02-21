@@ -84,7 +84,7 @@ public class MarauderAi extends CreatureAi {
 				
 				alertPrescence();
 				
-				if(canThrowAt(player) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3){
+				if(canThrowAt(player, true) && getWeaponToThrow() != null && creature.position().distance(player.position()) > 3){
 					creature.throwItem(getWeaponToThrow(), player.x, player.y);
 					return;
 				}

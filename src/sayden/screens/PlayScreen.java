@@ -116,7 +116,11 @@ public class PlayScreen implements Screen {
 					factory.newCaveBrute(player);
 				}
 				
-				for(int i = 0; i < 8; i++){
+				for(int i = 0; i < randomNumber(0, 5); i++){
+					factory.newCaveLost(player);
+				}
+				
+				for(int i = 0; i < 18; i++){
 					factory.newMarauder(player);
 				}
 			break;
@@ -133,7 +137,7 @@ public class PlayScreen implements Screen {
 					factory.newCaveBrute(player);
 				}
 				
-				for(int i = 0; i < randomNumber(0, 3); i++){
+				for(int i = 0; i < randomNumber(0, 5); i++){
 					factory.newCaveLost(player);
 				}
 				
@@ -349,8 +353,7 @@ public class PlayScreen implements Screen {
 		}
 		
 		for (int i = 0; i < messages.size(); i++){
-			String nTildeFix = messages.get(i).replace('ñ', (char)164).replace('Ñ', (char)165).replaceAll("!!", (char)19+"");
-			colorize(terminal, nTildeFix, top + i);
+			colorize(terminal, messages.get(i), top + i);
 		}
 		if (subscreen() == null)
 			messages.clear();
@@ -389,9 +392,13 @@ public class PlayScreen implements Screen {
 	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
-		if (player.hp() < 1)
-			return new LoseScreen(player);
-		
+		if (player.hp() < 1){
+			if(key.getKeyCode() == KeyEvent.VK_ENTER || key.getKeyCode() == KeyEvent.VK_ESCAPE
+					|| key.getKeyCode() == KeyEvent.VK_SPACE)
+				return new LoseScreen(player);
+			else
+				return this;
+		}
 		if (subscreen() != null) {
 			if(player.subscreen != null){
 				player.subscreen = subscreen().respondToUserInput(key);

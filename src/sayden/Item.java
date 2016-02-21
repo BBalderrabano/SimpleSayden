@@ -118,7 +118,7 @@ public class Item extends Thing{
 		int to_return = 0;
 		this.countHit++; 
 		
-		if(countHit >= 20){
+		if(countHit >= 25){
 			level++;
 			countHit = 0;
 			to_return = level;
@@ -244,6 +244,6 @@ public class Item extends Thing{
 			details += " Posee alcance de hasta " + reach + " casillas.";
 		}
 		
-		return details.replace('ñ', (char)164).replace('Ñ', (char)165);
+		return details;
 	}
 }

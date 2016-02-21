@@ -220,9 +220,20 @@ public class CreatureAi {
 		return Tile.UNKNOWN;
 	}
 
-	protected boolean canThrowAt(Creature other) {
-		return creature.canSee(other.x, other.y)
-			&& getWeaponToThrow() != null;
+	protected boolean canThrowAt(Creature other, boolean safetyCheck) {
+		boolean canThrow = creature.canSee(other.x, other.y) && getWeaponToThrow() != null;
+		
+		if(safetyCheck && canThrow){
+			Line line = new Line(creature.x, creature.y, other.x, other.y);
+			for(Point p : line.getPoints()){
+				Creature c = creature.creature(p.x, p.y);
+				
+				if(c != null && c != creature && c.getData(Constants.RACE) == creature.getData(Constants.RACE)){
+					return false;
+				}
+			}
+		}
+		return canThrow;
 	}
 
 	protected Item getWeaponToThrow() {

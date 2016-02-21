@@ -25,14 +25,12 @@ public class ApplicationUpdater extends JFrame{
 	private static final long serialVersionUID = -851907197857929462L;
 	
 	String updateurl;
-	String saveFileName;
 	String fileSave = Constants.SAVE_FILE_DIRECTORY;
 	
     JProgressBar progress;
 
-    public ApplicationUpdater(String url, String save_file){
+    public ApplicationUpdater(String url){
         this.updateurl = url;
-        this.saveFileName = fileSave+ "" + save_file;
     }
     
     void downloadLatestVersion(){
@@ -104,7 +102,7 @@ public class ApplicationUpdater extends JFrame{
 		SaveFile saveFile = null;
 		
 		try {
-			saveFile = (SaveFile) SerializationUtil.deserialize(saveFileName);
+			saveFile = (SaveFile) SerializationUtil.deserialize(Constants.SAVE_FILE_FULL_NAME);
         } catch (ClassNotFoundException e) {
             System.out.println("No se encontro una partida guardada.");
             return 0;
@@ -120,8 +118,8 @@ public class ApplicationUpdater extends JFrame{
 		int latestRevision = latestRevision();
 		int currentRevision = currentRevision();
 		
-		System.out.println("Version local: " + currentRevision);
-		System.out.println("Version servidor: " + latestRevision);
+		System.out.println("Version local: 1." + currentRevision);
+		System.out.println("Version servidor: 1." + latestRevision);
 		
 		if(latestRevision > currentRevision){
 			System.out.println("Actualizacion encontrada...");

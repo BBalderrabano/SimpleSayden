@@ -39,7 +39,7 @@ public class DreamFighterAi extends CreatureAi {
 			creature.pickup();
 		}
 		if(target != null && canSee(target.x, target.y)){
-			if (canThrowAt(target) && !target.isAlly(creature)){
+			if (canThrowAt(target, true) && !target.isAlly(creature)){
 				creature.throwItem(getWeaponToThrow(), target.x, target.y);
 				return;
 			}

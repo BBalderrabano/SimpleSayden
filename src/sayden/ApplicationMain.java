@@ -16,8 +16,7 @@ public class ApplicationMain extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1060623638149583738L;
 	
 	ApplicationUpdater updater = new ApplicationUpdater(
-			"https://raw.githubusercontent.com/BBalderrabano/SimpleSayden/master/deploy/",
-			Constants.SAVE_FILE_NAME);
+			"https://raw.githubusercontent.com/BBalderrabano/SimpleSayden/master/deploy/");
 	
 	private AsciiPanel terminal;
 	private Screen screen;
