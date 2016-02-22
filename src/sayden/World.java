@@ -57,7 +57,6 @@ public class World {
 		for(int y = 0; y < maxHeight; y++){
 			for(int x = 0; x < maxWidth; x++){
 				tiles[x][y] = newWorld.tile(x, y);
-				
 				if(tiles[x][y] == Tile.STAIRS_DOWN){
 					tiles[x][y] = Tile.STAIRS_UP;
 				}

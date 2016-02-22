@@ -70,7 +70,7 @@ public enum Tile {
 		this.fireResistance = resistance;
 		this.backgroundColor = Color.BLACK;
 	}
-	
+
 	public boolean isGround() {
 		return this != WALL && this != BOUNDS && this != STONE_WALL && this != DOOR_CLOSE
 				&& this != WOOD_WALL && this != TREE;

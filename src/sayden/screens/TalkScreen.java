@@ -68,7 +68,9 @@ public class TalkScreen extends InventoryBasedScreen {
 				if(!options.isEmpty()){
 					int x_offset = Constants.WORLD_WIDTH - getLargestOption() - 1;
 	
-					terminal.writeCenter(question, top);
+					String qNTildeFix = question.replace('ñ', (char)164).replace('Ñ', (char)165);
+					
+					terminal.writeCenter(qNTildeFix, top);
 					
 					for(int i = 0; i < options.size(); i++){
 						if(optionIndex == i){

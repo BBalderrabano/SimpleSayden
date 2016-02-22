@@ -976,7 +976,7 @@ public class Creature extends Thing{
 					|| effectString.indexOf(effects.get(i).statusName()) != -1)
 				continue;
 			
-			effectString += " " + effects.get(i).statusName();
+			effectString += " " + effects.get(i).statusName().replace('ñ', (char)164);
 		}
 		
 		if(stealthLevel > Constants.STEALTH_MIN_STEPS)

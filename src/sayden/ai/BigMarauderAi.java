@@ -126,7 +126,7 @@ public class BigMarauderAi extends CreatureAi {
 			if(!playerHidden()){
 				creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 				
-				if(canThrowAt(player, false) && getWeaponToThrow() != null && 
+				if(canThrowAt(player) && getWeaponToThrow() != null && 
 						creature.position().distance(player.position()) > 3 && Math.random() < 0.2){
 					creature.throwItem(getWeaponToThrow(), player.x, player.y);
 					return;
