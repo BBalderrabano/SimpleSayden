@@ -21,7 +21,7 @@ public class PaseacuevasLostAi extends CreatureAi {
 		
 		if(creature.y < y && creature.x == x){
 			creature.modifyAttackValue(DamageType.SLICE, 3);
-			success = super.onAttack(x, y, other);
+			success = super.onAttack(other);
 			
 			if(success){
 				creature.doAction(other.isPlayer() ? "alcanza tu cuello!" : "alcanza el cuello " + other.nameDelDeLa() + "!");
@@ -36,7 +36,7 @@ public class PaseacuevasLostAi extends CreatureAi {
 			
 			creature.modifyAttackValue(DamageType.SLICE, -3);
 		}else{
-			success = super.onAttack(x, y, other);
+			success = super.onAttack(other);
 		}
 		
 		return success;

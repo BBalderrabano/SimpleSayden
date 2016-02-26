@@ -7,7 +7,7 @@ import java.util.List;
 import asciiPanel.AsciiPanel;
 
 public class Constants {
-	public static final boolean PRODUCTION = true;
+	public static final boolean PRODUCTION = false;
 	
 	public static final int WORLD_WIDTH = 80;
 	public static final int WORLD_HEIGHT = 24;
@@ -51,6 +51,8 @@ public class Constants {
 	
 	public static final Color UNIDENTIFIED_COLOR = AsciiPanel.magenta;
 	public static final Color OVERLAY_COLOR = AsciiPanel.cyan;
+	public static final Color THROWN_BKG_COLOR = AsciiPanel.cyan;
+	public static final Color WOUND_COLOR = new Color(255, 191, 0);
 	
 	public static final String RACE = "Race";
 	

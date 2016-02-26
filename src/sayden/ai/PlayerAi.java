@@ -55,6 +55,8 @@ public class PlayerAi extends CreatureAi {
 			if (item != null){
 				creature.notify("Hay " + item.nameUnUna() + " aqui.");
 			}
+			
+			creature.woundMove(x, y);
 		} else if (tile.isDiggable()) {
 			creature.dig(x, y);
 		} else if (tile.isDoor()) {
@@ -67,14 +69,12 @@ public class PlayerAi extends CreatureAi {
 	
 	public void onUpdate(){	}
 	
-	public boolean onAttack(int x, int y, Creature other){
+	public boolean onAttack(Creature other){
 		if(creature.getData("Race") == other.getData("Race") && !other.getBooleanData(Constants.FLAG_ANGRY)){
 			other.ai().onTalk(creature);
 			return false;
 		}
 		
-//		creature.addTime(creature.dualStrike() ? 	creature.offWeapon().attackSpeed().velocity() : 
-//													creature.getAttackSpeed().velocity());
 		creature.modifyActionPoints(creature.dualStrike() ? creature.offWeapon().attackSpeed().velocity() : 
 															creature.getAttackSpeed().velocity());
 		
@@ -102,6 +102,8 @@ public class PlayerAi extends CreatureAi {
 				}
 			}
 		}
+		
+		creature.woundHit(success);
 		
 		return success;
 	}

@@ -75,10 +75,11 @@ public class CreatureAi {
 		if (tile.isGround()){
 			creature.x = x;
 			creature.y = y;
+			creature.woundMove(x, y);
 		}
 	}
 	
-	public boolean onAttack(int x, int y, Creature other){
+	public boolean onAttack(Creature other){
 		if(creature.isAlly(other) &&
 				!creature.getBooleanData(Constants.FLAG_ANGRY) &&
 				!other.getBooleanData(Constants.FLAG_ANGRY) || 
@@ -105,7 +106,9 @@ public class CreatureAi {
 			other.stopCasting();
 			creature.stopCasting();
 		}
-				
+		
+		creature.woundHit(success);
+						
 		return success;
 	}
 	

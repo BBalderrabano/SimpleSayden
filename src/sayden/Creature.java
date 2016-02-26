@@ -209,6 +209,42 @@ public class Creature extends Thing{
 	private List<Effect> effects;
 	public List<Effect> effects(){ return effects; }
 	
+	private List<Wound> wounds;
+	public List<Wound> wounds(){ return wounds; }
+	public boolean isWounded(Wound wound){
+		for(Wound w : wounds){
+			if(w.statusName() != wound.statusName())
+				continue;
+			
+			return true;
+		}
+		return false;
+	}
+	public void inflictWound(Wound newWound){
+		if(newWound == null || isWounded(newWound))
+			return;
+		
+		newWound.start(this);
+		wounds.add(newWound);
+	}
+	
+	public void woundHit(boolean success){
+		for(Wound w : wounds){
+			if(w.isDone())
+				continue;
+			
+			w.hit(this, success);
+		}
+	}
+	
+	public void woundMove(int mx, int my){
+		for(Wound w : wounds){
+			if(w.isDone())
+				continue;
+			w.move(this, mx, my);
+		}
+	}
+	
 	private List<Spell> spells;
 	public List<Spell> learnedSpells(){ return spells; }
 	
@@ -245,6 +281,7 @@ public class Creature extends Thing{
 		this.defenseValues.addAll(DamageType.ALL_TYPES());
 		this.effects = new ArrayList<Effect>();
 		this.spells = new ArrayList<Spell>();
+		this.wounds = new ArrayList<Wound>();
 	}
 	
 	public void moveBy(int mx, int my){
@@ -325,7 +362,7 @@ public class Creature extends Thing{
 			}
 			ai.onEnter(x+mx, y+my, tile);
 		}else{
-			ai.onAttack(x+mx, y+my, other);
+			ai.onAttack(other);
 		}
 		
 		if(world.tile(x-mx, y-my) == Tile.DOOR_OPEN){
@@ -625,17 +662,27 @@ public class Creature extends Thing{
 	}
 	
 	private void updateEffects(){
-		List<Effect> done = new ArrayList<Effect>();
+		List<Effect> doneEff = new ArrayList<Effect>();
+		List<Effect> doneWound = new ArrayList<Effect>();
 		
 		for (Effect effect : effects){
 			effect.update(this);
 			if (effect.isDone()) {
 				effect.end(this);
-				done.add(effect);
+				doneEff.add(effect);
 			}
 		}
 		
-		effects.removeAll(done);
+		for (Wound wound : wounds){
+			wound.update(this);
+			if (wound.isDone()) {
+				wound.end(this);
+				doneWound.add(wound);
+			}
+		}
+		
+		wounds.removeAll(doneWound);
+		effects.removeAll(doneEff);
 	}
 	
 	private void regenerateHealth(){

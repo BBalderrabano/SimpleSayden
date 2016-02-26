@@ -95,9 +95,9 @@ public class BigMarauderAi extends CreatureAi {
 	}
 	
 	@Override
-	public boolean onAttack(int x, int y, Creature other){
+	public boolean onAttack(Creature other){
 		if(creature.getBooleanData(armBroken) || creature.queAttack() == null){
-			return super.onAttack(x, y, other);
+			return super.onAttack(other);
 		}
 		return false;
 	}

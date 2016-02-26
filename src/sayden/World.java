@@ -4,8 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import asciiPanel.AsciiPanel;
-
 public class World {
 	private Tile[][] tiles;
 	public Tile[][] tiles() { return tiles; }
@@ -204,7 +202,7 @@ public class World {
 		Projectile projectile = projectile(x, y);
 		
 		if(projectile != null)
-			return AsciiPanel.cyan;
+			return Constants.THROWN_BKG_COLOR;
 			
 		if (x < 0 || x >= width || y < 0 || y >= height)
 			return Tile.BOUNDS.backgroundColor();

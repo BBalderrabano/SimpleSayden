@@ -92,7 +92,7 @@ public class PlayScreen implements Screen {
 	
 	private void populateTown(StuffFactory factory){
 		for (int i = 0; i < Math.random() * 10; i++){
-			factory.newRabbit();
+			factory.newRabbit(player);
 		}
 		player.notify("Despiertas en un pueblo abandonado.");
 	}
@@ -300,6 +300,8 @@ public class PlayScreen implements Screen {
 	        	color = AsciiPanel.brightBlue;
 	        }else if(colorCheck.equals("06")){
 	        	color = AsciiPanel.brightMagenta;
+	        }else if(colorCheck.equals("07")){
+	        	color = Constants.WOUND_COLOR;
 	        }
 	        
 	        finalText = text.replace(requiredString, formattedString.substring(0, formattedString.length() - 2) );

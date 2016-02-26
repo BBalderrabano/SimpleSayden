@@ -116,13 +116,13 @@ public class StuffFactory {
 		return dreamFighter;
 	}
 	
-	public Creature newRabbit(){
+	public Creature newRabbit(Creature player){
 		Creature rabbit = new Creature(world, 'r', 'M', AsciiPanel.brightWhite, "conejo", 5);
 		
 		rabbit.setStartingMovementSpeed(Speed.VERY_SLOW);
 		
 		world.addAtEmptyLocation(rabbit);
-		new RabbitAi(rabbit);
+		new RabbitAi(rabbit, player);
 		return rabbit;
 	}
 	
@@ -230,7 +230,7 @@ public class StuffFactory {
 		marauder.setStartingMovementSpeed(Speed.NORMAL);
 		marauder.setVisionRadius(6);
 		
-		marauder.inventory().add(newMarauderPoison(false));
+		marauder.inventory().add(newPotionOfPoison(false));
 		
 		if(Math.random() < .3f)
 			marauder.equip(newMarauderVest(false));
@@ -661,7 +661,7 @@ public class StuffFactory {
 		rockMace.modifyAttackSpeed(Speed.FAST);
 		
 		rockMace.modifyBloodModifyer(0.4f);
-		rockMace.modifyDurability((int) (Math.random() * (30 - 10)) + 10);
+		rockMace.modifyDurability((int) (Math.random() * (15 - 5)) + 5);
 		world.addAtEmptyLocation(rockMace, spawn);
 		return rockMace;
 	}
@@ -680,12 +680,12 @@ public class StuffFactory {
 	
 	public Item newBigMace(boolean spawn){
 		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra", DROP_2_CHANCE);
-		bigMace.modifyAttackValue(DamageType.BLUNT, 8);
-		bigMace.modifyAttackSpeed(Speed.SLOW);
-		bigMace.modifyMovementSpeed(Speed.FAST);
 		bigMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
-		bigMace.modifyBloodModifyer(0.8f);
+		bigMace.modifyAttackValue(DamageType.BLUNT, 8);
 		bigMace.setData(Constants.CHECK_WEAPON, true);
+		bigMace.modifyMovementSpeed(Speed.FAST);
+		bigMace.modifyAttackSpeed(Speed.SLOW);
+		bigMace.modifyBloodModifyer(0.8f);
 		world.addAtEmptyLocation(bigMace, spawn);
 		return bigMace;
 	}
@@ -1240,14 +1240,19 @@ public class StuffFactory {
 	public Item newPotionOfPoison(boolean spawn){
 		String appearance = potionAppearances.get(3);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de veneno", appearance, 70);
-		item.setQuaffEffect(new Effect("envenenado", 10){
+		item.setQuaffEffect(new Effect("envenenado", 8){
 			public void start( Creature creature){
-				creature.doAction(item, "siente |enfermo04|");
+				if(creature.defenseValue(DamageType.POISON) >= 2){
+					creature.doAction(item, "resiste el veneno");
+					this.duration = 0;
+				}else{
+					creature.doAction(item, "siente |enfermo04|");
+				}
 			}
 			
 			public void update(Creature creature){
 				super.update(creature);
-				creature.receiveDamage(1, DamageType.POISON, "Vomitas tus viceras", true);
+				creature.receiveDamage(2, DamageType.POISON, "Vomitas tus viceras", true);
 			}
 		});
 		item.makeStackable(5);
@@ -1287,32 +1292,6 @@ public class StuffFactory {
 			public void end(Creature creature){
 				creature.modifyVisionRadius(-3);
 				creature.doAction("pierde el estado de alerta");
-			}
-		});
-		item.makeStackable(5);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newMarauderPoison(boolean spawn){
-		String appearance = potionAppearances.get(6);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de merodeador", appearance, 100);
-		item.setQuaffEffect(new Effect("envenenado", 8, true){
-			public void start(Creature creature){
-				if(creature.getStringData(Constants.RACE) == "merodeador"){
-					creature.doAction("es inmune al veneno de su gente");
-				}else{
-					if(creature.isPlayer())
-						creature.doAction(item, "empapa en |veneno04|!");
-					else
-						creature.doAction(item, "empapa en |veneno04|!");
-				}
-			}
-			public void update(Creature creature){
-				super.update(creature);
-				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
-				}
 			}
 		});
 		item.makeStackable(5);
