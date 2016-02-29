@@ -68,7 +68,7 @@ public class World {
 		for(Creature c : creatures){
 			if(c.isPlayer())
 				continue;
-			c.modifyActionPoints(amount);
+			c.modifyActionPoints(amount, false);
 		}
 		for(Projectile p : projectiles){
 			p.modifyActionPoints(amount);

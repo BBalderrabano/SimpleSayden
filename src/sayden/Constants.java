@@ -21,7 +21,7 @@ public class Constants {
 	public static final int STEALTH_LEVEL_MAX = 8;
 	public static final float STELTH_INCREMENTAL = 0.5f;
 	
-	public static final String CHEST_POS = "CHEST";
+	public static final String BACK_POS = "BACK";
 	public static final String ARM_POS = "ARMS";
 	public static final String LEG_POS = "LEGS";
 	public static final String HEAD_POS = "HEAD";
@@ -67,7 +67,10 @@ public class Constants {
 	public static final String SPELL_HEAL = "Healed";
 	public static final String SPELL_PAIN = "Pain";
 	
-	public static final String WOUND_HEADACHE = "HasHeadache";
+	public static final String SPELL_WOUND_HEADACHE = "HasHeadache";
+	
+	//Used to tell the game that this creature doesnt need a leveled weapon to deal its wounds
+	public static final String DEALS_WOUNDS = "OverrideWound";	
 	
 	public static String capitalize(String text){
 		return Character.toUpperCase(text.charAt(0))+""+text.substring(1);

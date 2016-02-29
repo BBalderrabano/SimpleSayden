@@ -7,6 +7,7 @@ import sayden.Creature;
 import sayden.FieldOfView;
 import sayden.Item;
 import sayden.Tile;
+import sayden.Wound;
 
 public class PlayerAi extends CreatureAi {
 
@@ -64,7 +65,7 @@ public class PlayerAi extends CreatureAi {
 		}
 		
 //		creature.addTime(creature.getMovementSpeed().velocity());
-		creature.modifyActionPoints(creature.getMovementSpeed().velocity());
+		creature.modifyActionPoints(creature.getMovementSpeed().velocity(), false);
 	}
 	
 	public void onUpdate(){	}
@@ -76,14 +77,14 @@ public class PlayerAi extends CreatureAi {
 		}
 		
 		creature.modifyActionPoints(creature.dualStrike() ? creature.offWeapon().attackSpeed().velocity() : 
-															creature.getAttackSpeed().velocity());
+															creature.getAttackSpeed().velocity(), false);
 		
 		boolean success = creature.meleeAttack(other);
 		
 		if(success){
 			if(other.hp() > 1 && other.queSpell() != null){
 				other.stopCasting();
-				other.modifyActionPoints(-other.getActionPoints());
+				other.modifyActionPoints(-other.getActionPoints(), false);
 			}
 			if(creature.weapon() != null && !creature.weapon().getBooleanData(Constants.CHECK_RANGED) && 
 					!creature.weapon().getBooleanData(Constants.CHECK_UNAUGMENTABLE)){
@@ -103,7 +104,26 @@ public class PlayerAi extends CreatureAi {
 			}
 		}
 		
-		creature.woundHit(success);
+		String position = "";
+		
+		if(creature.x < other.x && creature.y >= other.y){
+			position = Constants.BACK_POS;
+		}else if(creature.y < other.y && creature.x <= other.x){
+			position = Constants.HEAD_POS;
+		}else if(creature.x > other.x && creature.y <= other.y){
+			position = Constants.ARM_POS;
+		}else if(creature.y > other.y && creature.x >= other.x){
+			position = Constants.LEG_POS;
+		}
+		
+		if(creature.weapon() != null && creature.weapon().inflictsWounds() && success){
+			Wound inflictWound = creature.weapon().pickWeightedWound(position);
+			if(inflictWound != null)
+				other.inflictWound(inflictWound);
+		}
+		
+		creature.woundOnHit(success, position);
+		other.woundOnGetHit(success, position);
 		
 		return success;
 	}

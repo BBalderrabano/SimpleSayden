@@ -26,7 +26,12 @@ public class Projectile {
 	public boolean isInterrupted() { return interrupted; }
 	
 	private boolean isDone = false;
-	public boolean isDone() { return isDone || this.step >= path.getPoints().size(); }
+	public boolean isDone() { 
+		return isDone || this.step >= path.getPoints().size()
+				|| (speed == Speed.NORMAL && this.step >= 6)
+				|| (speed == Speed.SLOW && this.step >= 4)
+				|| ((speed == Speed.VERY_SLOW || speed == Speed.SUPER_SLOW) && this.step >= 2); 
+	}
 	
 	public Projectile(World world, Line line, Speed velocity, Item projectile, Creature origin){
 		this.world = world;
@@ -154,7 +159,7 @@ public class Projectile {
 		
 		if(target.hp() > 1 && target.queSpell() != null){
 			target.stopCasting();
-			target.modifyActionPoints(-target.getActionPoints());
+			target.modifyActionPoints(-target.getActionPoints(), false);
 		}
 	}
 }

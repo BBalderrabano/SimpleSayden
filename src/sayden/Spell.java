@@ -4,13 +4,13 @@ public class Spell extends Thing{
 	public static final Effect HEADACHE(){
 		return new Effect("jaqueca", 200){
 			public void start(Creature creature){
-				creature.setData(Constants.WOUND_HEADACHE, true);
+				creature.setData(Constants.SPELL_WOUND_HEADACHE, true);
 			}
 			public void update(Creature creature){
 				super.update(creature);
 			}
 			public void end(Creature creature){
-				creature.unsetData(Constants.WOUND_HEADACHE);
+				creature.unsetData(Constants.SPELL_WOUND_HEADACHE);
 			}
 		};
 	}
@@ -68,7 +68,7 @@ public class Spell extends Thing{
 	public void onCast(Creature caster, Creature other) {
 		double temp = Math.random();
 		
-		caster.modifyActionPoints(-castSpeed().velocity());
+		caster.modifyActionPoints(-castSpeed().velocity(), false);
 		
 		if(negativeEffect != null && caster.getBooleanData(flag) && temp < (chance * 0.01)){
 			

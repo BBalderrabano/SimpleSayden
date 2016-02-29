@@ -60,7 +60,7 @@ public class RockBugAi extends CreatureAi {
 				creature.pickup();
 				creature.doAction("consume la roca ganando fuerzas");
 				creature.modifyHp(healthBonus, "Indigestion rocosa");
-				creature.modifyActionPoints(-creature.getMovementSpeed().velocity());
+				creature.modifyActionPoints(-creature.getMovementSpeed().velocity(), false);
 				addBonusDamage();
 				return;
 			}
@@ -72,12 +72,12 @@ public class RockBugAi extends CreatureAi {
 						}
 						creature.modifyHp(healthBonus, "Indigestion rocosa");
 						
-						if(Math.random() < destroyWallChance && isFull() && !digesting){
+						if(Math.random() < destroyWallChance && isFull()){
 							creature.dig(p.x, p.y);
 							rocksEaten++;
 						}
 						
-						creature.modifyActionPoints(-creature.getMovementSpeed().velocity());
+						creature.modifyActionPoints(-creature.getMovementSpeed().velocity(), false);
 						addBonusDamage();
 						return;
 					}else{
@@ -97,6 +97,9 @@ public class RockBugAi extends CreatureAi {
 	}
 	
 	void addBonusDamage(){
+		if(!digesting)
+			return;
+		
 		creature.addEffect(new Effect("fortalecido", attackBonusDuration){
 			public void start(Creature creature){
 				creature.modifyAttackValue(DamageType.BLUNT, 6);

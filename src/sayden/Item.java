@@ -2,6 +2,7 @@ package sayden;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Item extends Thing{
@@ -88,6 +89,40 @@ public class Item extends Thing{
 	private List<Spell> writtenSpells;
 	public List<Spell> writtenSpells() { return writtenSpells; }
 	
+	private List<Wound> wounds;
+	public List<Wound> wounds() { return wounds; }
+	public boolean inflictsWounds() { return wounds != null && wounds.size() > 0 && level >= 2; }
+	
+	public Wound pickWeightedWound(String position){
+		Collections.shuffle(wounds);
+		
+		double totalWeight = 0.0d;
+		
+		for (Wound i : wounds)
+		{
+			if(i.position() != null && i.position() != position)
+				continue;
+		    totalWeight += i.weight();
+		}
+
+		int randomIndex = -1;
+		double random = Math.random() * totalWeight;
+		for (int i = 0; i < wounds.size(); ++i)
+		{
+			if(wounds.get(i).position() != null && wounds.get(i).position() != position)
+				continue;
+			
+		    random -= wounds.get(i).weight();
+		    if (random <= 0.0d)
+		    {
+		        randomIndex = i;
+		        break;
+		    }
+		}
+		
+		return randomIndex < 0 ? null : wounds.get(randomIndex);
+	}
+	
 	private Speed attackSpeed;
 	public Speed attackSpeed() { return attackSpeed; }
 	public void modifyAttackSpeed(Speed speed) { this.attackSpeed = speed; } 
@@ -111,7 +146,7 @@ public class Item extends Thing{
 	
 	private int level = 0;
 	public int level() { return level; }
-	public boolean canWound() { return level >= 2; }
+	public void modifyLevel(int amount) { this.level += amount; }
 	
 	private int countHit = 0;
 	public int countHit() { 
@@ -164,6 +199,7 @@ public class Item extends Thing{
 		this.name = name;
 		this.appearance = appearance;
 		this.writtenSpells = new ArrayList<Spell>();
+		this.wounds = new ArrayList<Wound>();
 		this.attackValues = new ArrayList<DamageType>();
 		this.attackValues.addAll(DamageType.ALL_TYPES());
 		this.defenseValues = new ArrayList<DamageType>();
@@ -182,6 +218,7 @@ public class Item extends Thing{
 		this.color = clone.color();
 		this.name = clone.name;
 		this.appearance = clone.appearance;
+		this.wounds = clone.wounds();
 		this.bonusMaxHp = clone.bonusMaxHp();
 		this.quaffEffect = clone.quaffEffect();
 		this.writtenSpells = clone.writtenSpells();

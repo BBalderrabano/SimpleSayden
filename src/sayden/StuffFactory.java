@@ -79,6 +79,10 @@ public class StuffFactory {
 			player.inventory().add(newAlcoholBottle(false));
 		}
 		
+		if(!Constants.PRODUCTION){
+			player.inventory().add(newMace(false));
+		}
+		
 		new PlayerAi(player, messages, fov);
 		return player;
 	}
@@ -120,6 +124,10 @@ public class StuffFactory {
 		Creature rabbit = new Creature(world, 'r', 'M', AsciiPanel.brightWhite, "conejo", 5);
 		
 		rabbit.setStartingMovementSpeed(Speed.VERY_SLOW);
+		
+		if(!Constants.PRODUCTION){
+			rabbit.equip(newMace(false));
+		}
 		
 		world.addAtEmptyLocation(rabbit);
 		new RabbitAi(rabbit, player);
@@ -606,6 +614,10 @@ public class StuffFactory {
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.FAST);
 		item.modifyBloodModifyer(0.4f);
+		if(!Constants.PRODUCTION){
+			item.wounds().add(Wound.BLUNT_HEAD_CONCUSSION);
+			item.modifyLevel(2);
+		}
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}

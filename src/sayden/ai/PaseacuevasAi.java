@@ -65,6 +65,14 @@ public class PaseacuevasAi extends CreatureAi {
 				return;
 			}
 		}
+		
+		for(Creature c : creature.getCreaturesWhoSeeMe()){
+			//Paseacuevas dont like to be next to each other...
+			if(c.name == creature.name){
+				distanceFrom(c, 10);
+			}
+		}
+		
 		wander();
 	}
 	

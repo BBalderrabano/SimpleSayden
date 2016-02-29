@@ -102,12 +102,21 @@ public class Creature extends Thing{
 
 	private int actionPoints;
 	public int getActionPoints() { return actionPoints;	}
-	public void modifyActionPoints(int actionPoints) {	
+	public void modifyActionPoints(int amount, boolean affectPlayer) {
 		if(isPlayer()){
-			world.modifyActionPoints(actionPoints);
+			world.modifyActionPoints(amount);
+			
+			if(affectPlayer){
+				this.actionPoints += amount;
+			}
 			return;
 		}
-		this.actionPoints += actionPoints; 	
+		this.actionPoints += amount; 
+		
+		if(amount < 0){
+			regenerateHealth();
+			updateEffects();
+		}
 	}
 
 	private Speed getSlowestAttackSpeed(){
@@ -211,7 +220,7 @@ public class Creature extends Thing{
 	
 	private List<Wound> wounds;
 	public List<Wound> wounds(){ return wounds; }
-	public boolean isWounded(Wound wound){
+	public boolean hasWound(Wound wound){
 		for(Wound w : wounds){
 			if(w.statusName() != wound.statusName())
 				continue;
@@ -221,19 +230,36 @@ public class Creature extends Thing{
 		return false;
 	}
 	public void inflictWound(Wound newWound){
-		if(newWound == null || isWounded(newWound))
+		if(newWound == null || hasWound(newWound) || hp < 1)
 			return;
 		
-		newWound.start(this);
-		wounds.add(newWound);
+		Wound clonedWound = null;
+		
+		try {
+			clonedWound = (Wound) newWound.clone();
+		} catch (CloneNotSupportedException e) {
+			return;
+		}
+		
+		clonedWound.start(this);
+		wounds.add(clonedWound);
 	}
 	
-	public void woundHit(boolean success){
+	public void woundOnHit(boolean success, String position){
 		for(Wound w : wounds){
 			if(w.isDone())
 				continue;
 			
-			w.hit(this, success);
+			w.onHit(this, success, position);
+		}
+	}
+	
+	public void woundOnGetHit(boolean success, String position){
+		for(Wound w : wounds){
+			if(w.isDone())
+				continue;
+			
+			w.onGetHit(this, success, position);
 		}
 	}
 	
@@ -283,12 +309,18 @@ public class Creature extends Thing{
 		this.spells = new ArrayList<Spell>();
 		this.wounds = new ArrayList<Wound>();
 	}
-	
+		
 	public void moveBy(int mx, int my){
+		if(getActionPoints() < 0 && isPlayer()){
+			mx = 0;
+			my = 0;
+			modifyActionPoints(-actionPoints, true);
+			notify("Te encuentras aturdido");
+		}
 		ai.onMoveBy(mx, my);
 		
 		if (mx==0 && my==0){
-			modifyActionPoints(-Math.max(1, movementSpeed.velocity()));
+			modifyActionPoints(-Math.max(1, movementSpeed.velocity()), false);
 			return;
 		}
 		
@@ -401,7 +433,7 @@ public class Creature extends Thing{
 			doAction("arroja %s", thrown.nameUnUnaWNoStacks());
 		}
 		
-		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()));
+		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()), false);
 		
 		ai.onThrowItem(thrown);
 		
@@ -432,7 +464,7 @@ public class Creature extends Thing{
 		
 		doAction("dispara %s hacia %s", weapon.nameElLaWNoStacks(), other.nameElLa());
 		
-		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()));
+		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()), false);
 		
 		if(weapon() != null && weapon().canBreake()){
 			weapon().modifyDurability(-1);
@@ -458,8 +490,8 @@ public class Creature extends Thing{
 		
 		if(x < other.x && y >= other.y){
 			shieldBlock = true;
-			position = Constants.CHEST_POS;
-			if(other.ai.getWeakSpot() == Constants.CHEST_POS){
+			position = Constants.BACK_POS;
+			if(other.ai.getWeakSpot() == Constants.BACK_POS){
 				weakSpotHit = true;
 			}
 		}else if(y < other.y && x <= other.x){
@@ -641,7 +673,7 @@ public class Creature extends Thing{
 			return;
 		}
 		
-		//Creatures use actionPoints until they cannot
+		//Creatures use actionPoints until they cannot, effects are updated AFTER their AP is substracted
 		
 		int maxTries = 0;
 		int startPoints = actionPoints;
@@ -650,8 +682,6 @@ public class Creature extends Thing{
 		while(actionPoints > 0 && maxTries < 2){
 			startPoints = actionPoints;
 			
-			regenerateHealth();
-			updateEffects();
 			ai.onUpdate();
 			
 			endPoints = actionPoints;
@@ -672,7 +702,6 @@ public class Creature extends Thing{
 				doneEff.add(effect);
 			}
 		}
-		
 		for (Wound wound : wounds){
 			wound.update(this);
 			if (wound.isDone()) {
@@ -1023,11 +1052,19 @@ public class Creature extends Thing{
 					|| effectString.indexOf(effects.get(i).statusName()) != -1)
 				continue;
 			
-			effectString += " " + effects.get(i).statusName().replace('ñ', (char)164);
+			effectString += " " + effects.get(i).statusName();
 		}
 		
 		if(stealthLevel > Constants.STEALTH_MIN_STEPS)
 			effectString += " escabullido";
+		
+		for(int i = 0; i < wounds.size(); i++){
+			if(wounds.get(i) == null || wounds.get(i).statusName() == null
+					|| effectString.indexOf(wounds.get(i).statusName()) != -1)
+				continue;
+			
+			effectString += " " + wounds.get(i).statusName() + "";
+		}
 		
 		return effectString;
 	}

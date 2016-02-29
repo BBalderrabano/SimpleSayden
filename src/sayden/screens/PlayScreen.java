@@ -351,8 +351,7 @@ public class PlayScreen implements Screen {
 		}
 		
 		for (int i = 0; i < messages.size(); i++){
-			String nTildeFix = messages.get(i).replace('ñ', (char)164).replace('Ñ', (char)165).replaceAll("!!", (char)19+"");
-			colorize(terminal, nTildeFix, top + i);
+			colorize(terminal, messages.get(i).replaceAll("!!", (char)19+""), top + i);
 		}
 		if (subscreen() == null)
 			messages.clear();

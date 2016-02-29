@@ -24,6 +24,7 @@ public class MarauderAi extends CreatureAi {
 		this.setWeakSpot(Constants.HEAD_POS);
 		this.pack = new ArrayList<Creature>();
 		
+		creature.setData(Constants.DEALS_WOUNDS, true);
 		creature.setData(Constants.RACE, "merodeador");
 	}
 	
