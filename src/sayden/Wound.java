@@ -27,11 +27,22 @@ public class Wound extends Effect implements Cloneable{
 	private String position;
 	public String position() { return position; }
 	
+	private Wound requiresExistantWound;
+	public Wound requiresExistantWound() { return requiresExistantWound; }
+	
 	public Wound(String statusName, int duration, int inflictChance, String position){
 		super(statusName, duration);
 		
 		this.weight = inflictChance;
 		this.position = position;
+	}
+	
+	public Wound(String statusName, int duration, int inflictChance, String position, Wound requiredWound){
+		super(statusName, duration);
+		
+		this.weight = inflictChance;
+		this.position = position;
+		this.requiresExistantWound = requiredWound;
 	}
 	
 	public void update(Creature creature){

@@ -93,14 +93,15 @@ public class Item extends Thing{
 	public List<Wound> wounds() { return wounds; }
 	public boolean inflictsWounds() { return wounds != null && wounds.size() > 0 && level >= 2; }
 	
-	public Wound pickWeightedWound(String position){
+	public Wound pickWeightedWound(String position, Creature target){
 		Collections.shuffle(wounds);
 		
 		double totalWeight = 0.0d;
 		
 		for (Wound i : wounds)
 		{
-			if(i.position() != null && i.position() != position)
+			if((i.position() != null && i.position() != position) || 
+					(i.requiresExistantWound() != null && !target.hasWound(i)))
 				continue;
 		    totalWeight += i.weight();
 		}
@@ -109,7 +110,8 @@ public class Item extends Thing{
 		double random = Math.random() * totalWeight;
 		for (int i = 0; i < wounds.size(); ++i)
 		{
-			if(wounds.get(i).position() != null && wounds.get(i).position() != position)
+			if(wounds.get(i).position() != null && wounds.get(i).position() != position || 
+					(wounds.get(i).requiresExistantWound() != null && !target.hasWound(wounds.get(i))))
 				continue;
 			
 		    random -= wounds.get(i).weight();

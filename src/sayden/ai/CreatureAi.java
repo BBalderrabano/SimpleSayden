@@ -122,7 +122,7 @@ public class CreatureAi {
 		
 		if(creature.weapon() != null && creature.weapon().wounds().size() > 0 && success 
 				&& (creature.getBooleanData(Constants.DEALS_WOUNDS) || creature.weapon().level() >= 2)){
-			Wound inflictWound = creature.weapon().pickWeightedWound(position);
+			Wound inflictWound = creature.weapon().pickWeightedWound(position, other);
 			if(inflictWound != null)
 				other.inflictWound(inflictWound);
 		}

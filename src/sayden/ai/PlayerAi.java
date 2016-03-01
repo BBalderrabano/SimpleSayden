@@ -117,7 +117,7 @@ public class PlayerAi extends CreatureAi {
 		}
 		
 		if(creature.weapon() != null && creature.weapon().inflictsWounds() && success){
-			Wound inflictWound = creature.weapon().pickWeightedWound(position);
+			Wound inflictWound = creature.weapon().pickWeightedWound(position, other);
 			if(inflictWound != null)
 				other.inflictWound(inflictWound);
 		}
