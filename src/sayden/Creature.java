@@ -734,16 +734,22 @@ public class Creature extends Thing{
 	}
 
 	public void notify(String message, Object ... params){
+		if(message == null || message.isEmpty())
+			return;
 		ai.onNotify(String.format(message, params));
 	}
 	
 	public void notifyArround(String message, Object ... params){
+		if(message == null || message.isEmpty())
+			return;
 		for (Creature other : getCreaturesWhoSeeMe()){
 			other.notify(message, params);
 		}
 	}
 	
 	public void doAction(String message, Object ... params){
+		if(message == null || message.isEmpty())
+			return;
 		for (Creature other : getCreaturesWhoSeeMe()){
 			if (other == this){
 				other.notify(makeSecondPerson(message)+ ".", params);
@@ -754,7 +760,7 @@ public class Creature extends Thing{
 	}
 	
 	public void doAction(Item item, String message, Object ... params){
-		if (hp < 1)
+		if(message == null || message.isEmpty())
 			return;
 		
 		for (Creature other : getCreaturesWhoSeeMe()){

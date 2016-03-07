@@ -13,6 +13,7 @@ import sayden.ai.BlacksMithAi;
 import sayden.ai.DreamFighterAi;
 import sayden.ai.FungusAi;
 import sayden.ai.HiddenAi;
+import sayden.ai.LunaticAi;
 import sayden.ai.MageAi;
 import sayden.ai.MarauderAi;
 import sayden.ai.PaseacuevasAi;
@@ -166,6 +167,17 @@ public class StuffFactory {
 		world.addAtEmptySpace(priest, x, y );
 		new PriestAi(priest, player, this);
 		return priest;
+	}
+	
+	public Creature newLunatic(Creature player){
+		Creature lunatic = new Creature(world, 'l', 'M', Color.gray, "lunatico", 14);
+		lunatic.setStartingAttackSpeed(Speed.FAST);
+		lunatic.setStartingMovementSpeed(Speed.NORMAL);
+		lunatic.modifyAttackValue(DamageType.BLUNT, 1);
+		
+		world.addAtEmptyLocation(lunatic);
+		new LunaticAi(lunatic, player);
+		return lunatic;
 	}
 
 	public Creature newFungus(){
@@ -1336,7 +1348,7 @@ public class StuffFactory {
 					creature.notify("Tu plegaria no es escuchada...");
 					return;
 				}else{
-					creature.notify("Pliegas al cielo por vida");
+					creature.notify("Esbozas una plegaria a los cielos");
 				}
 				
 				creature.modifyHp(10, "Alcanzado por la palabra de vida");
