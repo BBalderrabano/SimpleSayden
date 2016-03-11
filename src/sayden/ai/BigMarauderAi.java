@@ -52,14 +52,13 @@ public class BigMarauderAi extends CreatureAi {
 		}
 		
 		if(position == Constants.HEAD_POS){
-			
+			attacker.notify("No alcanzas la cabeza "+creature.nameDelDeLa()+"!");
+
 			if(attacker.isPlayer()){
 				creature.doAction("esquiva tu ataque");
 			}else{
 				creature.doAction("esquiva el ataque " + attacker.nameDelDeLa());
 			}
-			
-			attacker.notify("No alcanzas la cabeza "+creature.nameDelDeLa()+"!");
 			return false;
 		}
 		
@@ -68,7 +67,7 @@ public class BigMarauderAi extends CreatureAi {
 			
 			super.onGetAttacked(amount, position, attacker);
 			
-			if(!creature.getBooleanData("LegBroken") && creature.getIntegerData("LegDamage") > 20 && Math.random() < 0.3f){
+			if(!creature.getBooleanData("LegBroken") && creature.getIntegerData("LegDamage") > 15 && Math.random() < 0.3f){
 				creature.doAction("siente las piernas fallandole...");
 				creature.modifyMovementSpeed(Speed.SUPER_SLOW);
 				creature.makeBleed(40);
@@ -91,7 +90,7 @@ public class BigMarauderAi extends CreatureAi {
 			
 		}
 		
-		return true;
+		return super.onGetAttacked(amount, position, attacker);
 	}
 	
 	@Override

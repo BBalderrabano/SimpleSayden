@@ -17,7 +17,7 @@ public class LunaticAi extends CreatureAi {
 	public boolean onAttack(Creature other){
 		if(creature.y < other.y && creature.x <= other.x){
 			if(Math.random() > 0.5){
-				creature.doAction("muerde un pedazo de tu rostro!");
+				creature.doAction("muerde un pedazo %s!", other.isPlayer() ? "de tu rostro" : "del rostro " + other.nameDelDeLa());
 				creature.doAction("estalla en una maniatica carcajada");
 				creature.addEffect(new Effect("", 3){
 					public void update(Creature creature){
@@ -33,8 +33,10 @@ public class LunaticAi extends CreatureAi {
 			}
 		}else if(creature.y > other.y && creature.x >= other.x){
 			if(Math.random() > 0.5){
-				creature.doAction("golpea con %s tu entrepierna!", creature.weapon() == null ? "fuerza" : "su "+creature.weapon().name());
-				creature.doAction(Math.random() > 0.5 ? "rechina sus dientes" : null);
+				creature.doAction("golpea con %s %s!", 
+						creature.weapon() == null ? "fuerza" : "su "+creature.weapon().name(), 
+						other.isPlayer() ? "tu entrepierna" : "la entrepierna " + other.nameDelDeLa());
+				creature.doAction(Math.random() > 0.5 ? "rechina sus dientes, " : "contorsiona su rostro en una mueca salvaje");
 				other.modifyActionPoints(-Speed.NORMAL.velocity(), true);
 				other.notify("Pierdes el aliento");
 			}

@@ -58,6 +58,7 @@ public class Constants {
 	
 	public static final String CHECKPOINT = "checkPoint";
 	
+	public static final String UNIVERSAL_ALLY = "IsUniversalAlly";	
 	public static final String FLAG_ANGRY = "IsAngry";
 	public static final String FLAG_INTRODUCED = "IsIntroduced";
 	public static final String FLAG_DONE_TALKING = "IsDoneTalking";
@@ -70,8 +71,8 @@ public class Constants {
 	public static final String SPELL_WOUND_HEADACHE = "HasHeadache";
 	
 	//Used to tell the game that this creature doesnt need a leveled weapon to deal its wounds
-	public static final String DEALS_WOUNDS = "OverrideWound";	
-	
+	public static final String DEALS_WOUNDS = "OverrideWound";
+
 	public static String capitalize(String text){
 		return Character.toUpperCase(text.charAt(0))+""+text.substring(1);
 	}

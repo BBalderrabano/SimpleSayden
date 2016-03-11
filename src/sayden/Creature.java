@@ -20,7 +20,7 @@ public class Creature extends Thing{
 	private Spell queSpell;
 	private Creature queSpellCreature;
 	
-	public boolean isAlly(Creature target) { return getData(Constants.RACE) == target.getData(Constants.RACE); }
+	public boolean isAlly(Creature target) { return getData(Constants.RACE) == target.getData(Constants.RACE) || target.getBooleanData(Constants.UNIVERSAL_ALLY); }
 	
 	public Spell queSpell() { return queSpell; }
 	public Creature queSpellCreature() { return queSpellCreature; }

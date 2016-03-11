@@ -65,6 +65,8 @@ public class PlayScreen implements Screen {
 			
 			factory.movePlayer(player, messages, fov, world);
 			
+			world.createRegions();
+			
 			if(!world.tile(player.x, player.y).isGround()){
 				Point targetPoint = new Point(player.x, player.y);
 				
@@ -108,8 +110,12 @@ public class PlayScreen implements Screen {
 					factory.newRockBug(player);
 				}
 				
-				for (int i = 0; i < randomNumber(0, 3); i++){
+				for (int i = 0; i < 2; i++){
 					factory.newHidden(player);
+				}
+				
+				for (int i = 0; i < 2; i++){
+					factory.newDog(player, null);
 				}
 				
 				for(int i = 0; i < 2; i++){
@@ -125,19 +131,23 @@ public class PlayScreen implements Screen {
 					factory.newRockBug(player);
 				}
 				
-				for (int i = 0; i < randomNumber(0, 5); i++){
+				for (int i = 0; i < 2; i++){
+					factory.newDog(player, null);
+				}
+				
+				for (int i = 0; i < 4; i++){
 					factory.newHidden(player);
 				}
 				
-				for(int i = 0; i < randomNumber(1, 3); i++){
+				for(int i = 0; i < 3; i++){
 					factory.newCaveBrute(player);
 				}
 				
-				for(int i = 0; i < randomNumber(0, 3); i++){
+				for(int i = 0; i < 3; i++){
 					factory.newCaveLost(player);
 				}
 				
-				for(int i = 0; i < randomNumber(6, 12); i++){
+				for(int i = 0; i < randomNumber(8, 12); i++){
 					factory.newMarauder(player);
 				}
 			break;
@@ -146,32 +156,36 @@ public class PlayScreen implements Screen {
 					factory.newRockBug(player);
 				}
 				
-				for (int i = 0; i < randomNumber(0, 5); i++){
+				for (int i = 0; i < 2; i++){
+					factory.newDog(player, null);
+				}
+				
+				for (int i = 0; i < 6; i++){
 					factory.newHidden(player);
 				}
 				
-				for(int i = 0; i < randomNumber(6, 12); i++){
+				for(int i = 0; i < randomNumber(8, 14); i++){
 					factory.newMarauder(player);
 				}
 				
-				for(int i = 0; i < randomNumber(5, 8); i++){
+				for(int i = 0; i < randomNumber(3, 6); i++){
 					factory.newCaveLost(player);
 				}
 				
-				for(int i = 0; i < randomNumber(0, 2); i++){
+				for(int i = 0; i < randomNumber(1, 3); i++){
 					factory.newHugeMarauder(player);
 				}
 			break;
 			case 4:
-				for (int i = 0; i < 5; i++){
+				for (int i = 0; i < 15; i++){
 					factory.newRockBug(player);
 				}
 				
-				for (int i = 0; i < randomNumber(2, 10); i++){
+				for (int i = 0; i < 6; i++){
 					factory.newHidden(player);
 				}
 				
-				for(int i = 0; i < randomNumber(8, 12); i++){
+				for(int i = 0; i < randomNumber(12, 18); i++){
 					factory.newMarauder(player);
 				}
 				
@@ -179,7 +193,28 @@ public class PlayScreen implements Screen {
 					factory.newCaveLost(player);
 				}
 				
-				for(int i = 0; i < randomNumber(0, 4); i++){
+				for(int i = 0; i < randomNumber(3, 6); i++){
+					factory.newHugeMarauder(player);
+				}
+			break;
+			default:
+				for (int i = 0; i < 15; i++){
+					factory.newRockBug(player);
+				}
+				
+				for (int i = 0; i < 6; i++){
+					factory.newHidden(player);
+				}
+				
+				for(int i = 0; i < randomNumber(12, 18); i++){
+					factory.newMarauder(player);
+				}
+				
+				for(int i = 0; i < randomNumber(5, 8); i++){
+					factory.newCaveLost(player);
+				}
+				
+				for(int i = 0; i < randomNumber(3, 8); i++){
 					factory.newHugeMarauder(player);
 				}
 			break;

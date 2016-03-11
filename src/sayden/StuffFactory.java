@@ -10,6 +10,7 @@ import java.util.Map;
 import asciiPanel.AsciiPanel;
 import sayden.ai.BigMarauderAi;
 import sayden.ai.BlacksMithAi;
+import sayden.ai.DogAi;
 import sayden.ai.DreamFighterAi;
 import sayden.ai.FungusAi;
 import sayden.ai.HiddenAi;
@@ -179,6 +180,17 @@ public class StuffFactory {
 		new LunaticAi(lunatic, player);
 		return lunatic;
 	}
+	
+	public Creature newDog(Creature player, Creature owner){
+		Creature dog = new Creature(world, 'd', 'M', new Color(165,42,42), "perro", 8);
+		dog.setStartingAttackSpeed(Speed.FAST);
+		dog.setStartingMovementSpeed(Speed.FAST);
+		dog.modifyAttackValue(DamageType.SLICE, 4);
+		
+		world.addAtEmptyLocation(dog);
+		new DogAi(dog, player, owner);
+		return dog;
+	}
 
 	public Creature newFungus(){
 		Creature fungus = new Creature(world, 'f', 'M', AsciiPanel.green, "hongo", 10);
@@ -258,7 +270,10 @@ public class StuffFactory {
 			marauder.equip(newMarauderHood(false));
 		if(Math.random() < .3f)
 			marauder.inventory().add(randomThrowableWeapon(false, false));
-			
+		
+		if(Math.random() < .1f)
+			newDog(player, marauder);
+		
 		marauder.inventory().add(randomWeapon(null, false, true, false, false, false));
 		
 		world.addAtEmptyLocation(marauder );

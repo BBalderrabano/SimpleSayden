@@ -25,12 +25,12 @@ public class PaseacuevasAi extends CreatureAi {
 		super.onUpdate();
 		
 		if(males.isEmpty()){
-			if(!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
-				goBerzerk();
-				creature.setData(Constants.FLAG_SEEN_PLAYER, true);
-			}
-			hunt(player);
-			return;
+//			if(!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
+//				goBerzerk();
+//				creature.setData(Constants.FLAG_SEEN_PLAYER, true);
+//			}
+//			hunt(player);
+//			return;
 		}else{
 			for(int i = 0; i < males.size(); i++){
 				if(males.get(i).hp() < 1){

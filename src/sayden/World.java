@@ -43,8 +43,49 @@ public class World {
 		this.blood = new float[tiles.length][tiles[0].length];
 		this.fire = new float[tiles.length][tiles[0].length];
 		this.visited = new boolean[tiles.length][tiles[0].length];
+		this.regions = new int[tiles.length][tiles[0].length];
 	}
 	
+	private int[][] regions;
+	private int visitedRegions = 1;
+	
+	public void createRegions(){
+		for(int x = 0; x < width; x++){
+			for(int y = 0; y < height; y++){
+				if(tiles[x][y].isGround() && regions[x][y] == 0){
+					connectRegion(visitedRegions++, x, y);
+				}
+			}
+		}
+	}
+	
+	private void connectRegion(int region, int x, int y){
+		int size = 1;
+		
+		ArrayList<Point> open = new ArrayList<Point>();
+		
+		open.add(new Point(x,y));
+		regions[x][y] = region;
+		
+		while (!open.isEmpty()){
+			Point p = open.remove(0);
+			
+			for (Point neighbor : p.neighbors8()){
+				if (neighbor.x < 0 || neighbor.y < 0 || neighbor.x >= width || neighbor.y >= height)
+					continue;
+				
+				if (regions[neighbor.x][neighbor.y] > 0
+						|| !tiles[neighbor.x][neighbor.y].isGround())
+					continue;
+
+				size++;
+				regions[neighbor.x][neighbor.y] = region;
+				open.add(neighbor);
+			}
+		}
+		System.out.println(size);
+	}
+
 	public void overrideFloor(World newWorld){
 		int maxHeight = Math.max(height, newWorld.height());
 		int maxWidth = Math.max(width, newWorld.width());

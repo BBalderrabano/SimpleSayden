@@ -1,28 +1,20 @@
 package sayden;
 
-import java.util.ArrayList;
-
 public class WorldBuilder {
 	private int width;
 	private int height;
 	private Tile[][] tiles;
-	private int[][] regions;
-	private int nextRegion;
 
 	public WorldBuilder(int width, int height) {
 		this.width = width;
 		this.height = height;
 		this.tiles = new Tile[width][height];
-		this.regions = new int[width][height];
-		this.nextRegion = 1;
 	}
 	
 	public WorldBuilder(Tile[][] tiles) {
 		this.width = tiles.length;
 		this.height = tiles[0].length;
 		this.tiles = tiles;
-		this.regions = new int[width][height];
-		this.nextRegion = 1;
 	}
 
 	public World build() {
@@ -66,59 +58,6 @@ public class WorldBuilder {
 			tiles = tiles2;
 		}
 		return this;
-	}
-	
-	private WorldBuilder createRegions(){
-		regions = new int[width][height];
-		
-		for (int x = 0; x < width; x++){
-			for (int y = 0; y < height; y++){
-				if (tiles[x][y] != Tile.WALL && regions[x][y] == 0){
-					int size = fillRegion(nextRegion++, x, y);
-					
-					if (size < 25)
-						removeRegion(nextRegion - 1);
-				}
-			}
-		}
-		
-		return this;
-	}
-	
-	private void removeRegion(int region){
-		for (int x = 0; x < width; x++){
-			for (int y = 0; y < height; y++){
-				if (regions[x][y] == region){
-					regions[x][y] = 0;
-					tiles[x][y] = Tile.WALL;
-				}
-			}
-		}
-	}
-	
-	private int fillRegion(int region, int x, int y) {
-		int size = 1;
-		ArrayList<Point> open = new ArrayList<Point>();
-		open.add(new Point(x,y));
-		regions[x][y] = region;
-		
-		while (!open.isEmpty()){
-			Point p = open.remove(0);
-
-			for (Point neighbor : p.neighbors8()){
-				if (neighbor.x < 0 || neighbor.y < 0 || neighbor.x >= width || neighbor.y >= height)
-					continue;
-				
-				if (regions[neighbor.x][neighbor.y] > 0
-						|| tiles[neighbor.x][neighbor.y] == Tile.WALL)
-					continue;
-
-				size++;
-				regions[neighbor.x][neighbor.y] = region;
-				open.add(neighbor);
-			}
-		}
-		return size;
 	}
 	
 	private WorldBuilder addStairs() {
@@ -175,7 +114,6 @@ public class WorldBuilder {
 	public WorldBuilder makeCaves() {
 		return randomizeTiles()
 				.smooth(8)
-				.createRegions()
 				.addStairs();
 	}
 }

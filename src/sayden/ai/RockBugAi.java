@@ -60,7 +60,7 @@ public class RockBugAi extends CreatureAi {
 				creature.pickup();
 				creature.doAction("consume la roca ganando fuerzas");
 				creature.modifyHp(healthBonus, "Indigestion rocosa");
-				creature.modifyActionPoints(-creature.getMovementSpeed().velocity(), false);
+				creature.modifyActionPoints(-creature.getActionPoints(), false);
 				addBonusDamage();
 				return;
 			}
@@ -77,7 +77,7 @@ public class RockBugAi extends CreatureAi {
 							rocksEaten++;
 						}
 						
-						creature.modifyActionPoints(-creature.getMovementSpeed().velocity(), false);
+						creature.modifyActionPoints(-creature.getActionPoints(), false);
 						addBonusDamage();
 						return;
 					}else{
