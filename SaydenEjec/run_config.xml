@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Users\Bruno\Desktop\Sayden\Sayden exe\files\Sayden.jar</jar>
+  <outfile>C:\Users\Bruno\Desktop\Sayden\Sayden exe\Sayden.exe</outfile>
+  <errTitle>No tenes Java y queres jugar al Sayden?</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Users\Bruno\Downloads\favicon.ico</icon>
+  <singleInstance>
+    <mutexName>El Sayden es tan genial que solo podes correr uno a la vez</mutexName>
+    <windowTitle>NOPE</windowTitle>
+  </singleInstance>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <bundledJreAsFallback>false</bundledJreAsFallback>
+    <minVersion>1.6.0_1</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <runtimeBits>64/32</runtimeBits>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>1.20.RC1</txtFileVersion>
+    <fileDescription>Roguelike con enfoque en el combate y la narrativa</fileDescription>
+    <copyright>Ojo que el juego tiene derechos de autor</copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.20.RC1</txtProductVersion>
+    <productName>Sayden</productName>
+    <companyName>Bruno Balderrabano</companyName>
+    <internalName>Sayden - Sueños</internalName>
+    <originalFilename>Sayden.exe</originalFilename>
+  </versionInfo>
+</launch4jConfig>
