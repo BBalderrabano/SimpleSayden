@@ -260,9 +260,28 @@ public class PlayScreen implements Screen {
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
 		
-		String stats = String.format(" %3d/%3d hp %s", player.hp(), player.totalMaxHp(), player.statusEffects());
-		terminal.write(stats, 1, 23);
+		String stats = String.format(" [ %s", player.statusEffects());
 		
+		terminal.write(stats, 0, 23);
+		terminal.setCursorX(1);
+		terminal.write('[', AsciiPanel.brightBlack);
+		
+		for(int i = 0; i < player.vigor(); i++){
+			float p = Math.min(1f, ((player.vigor() * 100.0f) / player.maxVigor()) / 100f);
+			
+			Color color1 = AsciiPanel.brightYellow;
+			Color color2 = AsciiPanel.red;
+			
+			int red = (int) (color2.getRed() * p + color1.getRed() * (1 - p));
+            int green = (int) (color2.getGreen() * p + color1.getGreen() * (1 - p));
+            int blue = (int) (color2.getBlue() * p + color1.getBlue() * (1 - p));
+
+            terminal.write('|', new Color(red, green, blue));
+		}
+		
+		terminal.setCursorX(terminal.getCursorX() + (player.maxVigor() - player.vigor()));
+		terminal.write(']', AsciiPanel.brightBlack);
+
 		if(pauseTooltip){
 			String tooltip = "-- esc o p ayuda --";
 			terminal.write(tooltip, terminal.getWidthInCharacters() - tooltip.length() - 2, 1);
@@ -274,6 +293,7 @@ public class PlayScreen implements Screen {
 	}
 	
 	private List<String> checkDuplicateMessages(List<String> messages){
+		//TODO: Implement
 		return messages;
 	}
 
@@ -425,7 +445,7 @@ public class PlayScreen implements Screen {
 	
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
-		if (player.hp() < 1)
+		if (!player.isAlive())
 			return new LoseScreen(player);
 		
 		if (subscreen() != null) {

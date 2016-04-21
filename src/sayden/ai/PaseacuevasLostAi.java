@@ -25,13 +25,13 @@ public class PaseacuevasLostAi extends CreatureAi {
 			
 			if(success){
 				creature.doAction(other.isPlayer() ? "alcanza tu cuello!" : "alcanza el cuello " + other.nameDelDeLa() + "!");
-				other.addEffect(new Effect("sangrando", 4){
-					public void update(Creature creature){
-						super.update(creature);
-						creature.receiveDamage(1, DamageType.BLEED, "Desangraste hasta morir...");
-						creature.makeBleed(30);
-					}
-				});
+//TODO:				other.addEffect(new Effect("sangrando", 4){
+//					public void update(Creature creature){
+//						super.update(creature);
+//						creature.receiveDamage(1, DamageType.SLICE, "Desangraste hasta morir...");
+//						creature.makeBleed(30);
+//					}
+//				});
 			}
 			
 			creature.modifyAttackValue(DamageType.SLICE, -3);

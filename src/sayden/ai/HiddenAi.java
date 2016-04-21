@@ -23,11 +23,9 @@ public class HiddenAi extends CreatureAi {
 		corpse.setQuaffEffect(new Effect("alimentado", 7, false){
 			public void start(Creature creature){
 				creature.notify("La carne del acechador es deliciosa!");
-				creature.modifyHp(3, "Indigestion de carne de acechador");
 			}
 			public void update(Creature creature){
 				super.update(creature);
-				creature.modifyHp(1, "Indigestion de carne de acechador");
 			}
 		});
 	}

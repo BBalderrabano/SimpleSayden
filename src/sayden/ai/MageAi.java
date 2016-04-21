@@ -15,7 +15,6 @@ public class MageAi extends CreatureAi {
 		creature.learnedSpells().add(new Spell("prueba", 'F', 
 			new Effect("penetrado", 1){
 				public void start(Creature creature){
-					creature.modifyHp(-1, "Pija en el orto");
 					creature.notify("Te metieron la pija en el orto.");
 				}
 			}, 

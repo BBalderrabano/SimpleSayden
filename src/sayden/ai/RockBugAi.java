@@ -39,11 +39,9 @@ public class RockBugAi extends CreatureAi {
 		corpse.setQuaffEffect(new Effect("alimentado", 7, false){
 			public void start(Creature creature){
 				creature.notify("Las viceras del comepiedras saben horripilante!");
-				creature.modifyHp(-3, "Indigestion de carne de comepiedra");
 			}
 			public void update(Creature creature){
 				super.update(creature);
-				creature.modifyHp(1, "Indigestion de carne de comepiedra");
 			}
 		});
 	}
@@ -51,7 +49,7 @@ public class RockBugAi extends CreatureAi {
 	public void onUpdate(){
 		super.onUpdate();
 		
-		if (creature.canSee(player.x, player.y) && creature.hp() >= creature.totalMaxHp() * .3f){
+		if (creature.canSee(player.x, player.y) && creature.vigor() <= creature.maxVigor() * .5f){
 			hunt(player);
 		}else{
 			Item rockCheck = creature.item(creature.x, creature.y);
@@ -59,7 +57,6 @@ public class RockBugAi extends CreatureAi {
 			if(rockCheck != null && rockCheck.nameWStacks().equals("roca")){
 				creature.pickup();
 				creature.doAction("consume la roca ganando fuerzas");
-				creature.modifyHp(healthBonus, "Indigestion rocosa");
 				creature.modifyActionPoints(-creature.getActionPoints(), false);
 				addBonusDamage();
 				return;
@@ -67,10 +64,9 @@ public class RockBugAi extends CreatureAi {
 			for(Point p : creature.position().neighbors4()){
 				if(creature.world().tile(p.x, p.y) == Tile.WALL){
 					if(Math.random() < healthOnEatChance){
-						if(creature.hp() < creature.totalMaxHp()){
+						if(creature.vigor() > 1){
 							creature.doAction("devora la pared ganando fuerzas");
 						}
-						creature.modifyHp(healthBonus, "Indigestion rocosa");
 						
 						if(Math.random() < destroyWallChance && isFull()){
 							creature.dig(p.x, p.y);

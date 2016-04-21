@@ -7,7 +7,6 @@ import sayden.Creature;
 import sayden.FieldOfView;
 import sayden.Item;
 import sayden.Tile;
-import sayden.Wound;
 
 public class PlayerAi extends CreatureAi {
 
@@ -56,8 +55,7 @@ public class PlayerAi extends CreatureAi {
 			if (item != null){
 				creature.notify("Hay " + item.nameUnUna() + " aqui.");
 			}
-			
-			creature.woundMove(x, y);
+
 		} else if (tile.isDiggable()) {
 			creature.dig(x, y);
 		} else if (tile.isDoor()) {
@@ -82,7 +80,7 @@ public class PlayerAi extends CreatureAi {
 		boolean success = creature.meleeAttack(other);
 		
 		if(success){
-			if(other.hp() > 1 && other.queSpell() != null){
+			if(other.isAlive() && other.queSpell() != null){
 				other.stopCasting();
 				other.modifyActionPoints(-other.getActionPoints(), false);
 			}
@@ -103,27 +101,6 @@ public class PlayerAi extends CreatureAi {
 				}
 			}
 		}
-		
-		String position = "";
-		
-		if(creature.x < other.x && creature.y >= other.y){
-			position = Constants.BACK_POS;
-		}else if(creature.y < other.y && creature.x <= other.x){
-			position = Constants.HEAD_POS;
-		}else if(creature.x > other.x && creature.y <= other.y){
-			position = Constants.ARM_POS;
-		}else if(creature.y > other.y && creature.x >= other.x){
-			position = Constants.LEG_POS;
-		}
-		
-		if(creature.weapon() != null && creature.weapon().inflictsWounds() && success){
-			Wound inflictWound = creature.weapon().pickWeightedWound(position, other);
-			if(inflictWound != null)
-				other.inflictWound(inflictWound);
-		}
-		
-		creature.woundOnHit(success, position);
-		other.woundOnGetHit(success, position);
 		
 		return success;
 	}

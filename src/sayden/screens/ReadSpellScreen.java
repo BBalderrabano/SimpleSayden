@@ -43,7 +43,7 @@ public class ReadSpellScreen implements Screen {
 		
 		if(lastSpell != null && hasSpell(lastSpell)){
 			String quickCast = "(Q) - Conjurar " + lastSpell.nameWStacks();
-			if(lastCreature != null && lastCreature.hp() >= 1)
+			if(lastCreature != null && lastCreature.isAlive())
 				quickCast += " sobre " + lastCreature.nameWStacks();
 			
 			terminal.write(quickCast, terminal.getWidthInCharacters() - quickCast.length() - 1, 0);
@@ -130,7 +130,7 @@ public class ReadSpellScreen implements Screen {
 		ArrayList<String> lines = getList();
 		
 		if(key.getKeyCode() == KeyEvent.VK_Q){
-			if(lastCreature != null && lastSpell != null && lastCreature.hp() >= 1 && hasSpell(lastSpell)){
+			if(lastCreature != null && lastSpell != null && lastCreature.isAlive() && hasSpell(lastSpell)){
 				player.castSpell(lastSpell, lastCreature.x, lastCreature.y);
 				return null;
 			}else if(lastSpell != null && hasSpell(lastSpell)){

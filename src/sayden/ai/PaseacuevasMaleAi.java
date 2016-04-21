@@ -23,11 +23,10 @@ public class PaseacuevasMaleAi extends CreatureAi {
 	public void onUpdate(){
 		super.onUpdate();
 		
-		if((female == null || female.hp() < 1) && !alone){
+		if((female == null || !female.isAlive()) && !alone){
 			creature.addEffect(new Effect("solitario", 25){
 				public void end(Creature creature){
 					creature.doAction("sucumbe ante su soledad");
-					creature.modifyHp(1000, "Existencialismo");
 					new PaseacuevasLostAi(creature, player);
 				}
 			});
@@ -61,7 +60,7 @@ public class PaseacuevasMaleAi extends CreatureAi {
 			});
 			return;
 		}
-		if (canThrowAt(player) && female.hp() < female.totalMaxHp() && Math.random() > 0.3f){
+		if (canThrowAt(player) && female.vigor() > 2 && Math.random() > 0.3f){
 			creature.throwItem(getWeaponToThrow(), player.x, player.y);
 			return;
 		}

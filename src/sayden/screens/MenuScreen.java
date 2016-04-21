@@ -109,7 +109,7 @@ public class MenuScreen extends InventoryBasedScreen {
 		Color bluntDefColor = AsciiPanel.white;
 		Color piercingDefColor = AsciiPanel.white;
 		
-		String hpValue = player.hp() + "/" + player.totalMaxHp();
+		String hpValue = player.vigor() + "/" + player.maxVigor();
 		String atkSpeed = player.getAttackSpeed().getName();
 		String mspSpeed = player.getMovementSpeed().getName();
 		
@@ -132,10 +132,10 @@ public class MenuScreen extends InventoryBasedScreen {
 			
 			if(!player.hasEquipped(interactingItem) && canEquip){
 				if(compareItem == null){
-					if(interactingItem.bonusMaxHp() > 0){
-						hpValue = player.hp() + "/" + (player.totalMaxHp() + interactingItem.bonusMaxHp());
-						hpColor = AsciiPanel.green;
-					}
+//					if(interactingItem.bonusMaxHp() > 0){
+//						hpValue = player.vigor() + "/" + (player.maxVigor() + interactingItem.bonusMaxHp());
+//						hpColor = AsciiPanel.green;
+//					}
 					//ATTACKS
 					if(interactingItem.attackValue(DamageType.SLICE) > 0){
 						sliceDamageValue = player.attackValue(DamageType.SLICE) + interactingItem.attackValue(DamageType.SLICE) + " ";
@@ -163,15 +163,15 @@ public class MenuScreen extends InventoryBasedScreen {
 						piercingDefColor = AsciiPanel.green;
 					}
 				}else{ 
-					if(interactingItem.bonusMaxHp() > compareItem.bonusMaxHp()){
-						hpValue = player.hp()+"/"+
-								(player.totalMaxHp() - compareItem.bonusMaxHp() + interactingItem.bonusMaxHp());
-						hpColor = AsciiPanel.green;
-					}else if(interactingItem.bonusMaxHp() < compareItem.bonusMaxHp()){
-						hpValue = player.hp()+"/"+
-								(player.totalMaxHp() - compareItem.bonusMaxHp() + interactingItem.bonusMaxHp());
-						hpColor = AsciiPanel.red;
-					}
+//					if(interactingItem.bonusMaxHp() > compareItem.bonusMaxHp()){
+//						hpValue = player.vigor()+"/"+
+//								(player.maxVigor() - compareItem.bonusMaxHp() + interactingItem.bonusMaxHp());
+//						hpColor = AsciiPanel.green;
+//					}else if(interactingItem.bonusMaxHp() < compareItem.bonusMaxHp()){
+//						hpValue = player.vigor()+"/"+
+//								(player.maxVigor() - compareItem.bonusMaxHp() + interactingItem.bonusMaxHp());
+//						hpColor = AsciiPanel.red;
+//					}
 					
 					//SLICE DAMAGE
 					if(interactingItem.attackValue(DamageType.SLICE) > compareItem.attackValue(DamageType.SLICE)){

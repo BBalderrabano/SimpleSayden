@@ -7,6 +7,7 @@ import sayden.Creature;
 import sayden.DamageType;
 import sayden.Effect;
 import sayden.Item;
+import sayden.Wound;
 
 public class MarauderAi extends CreatureAi {
 
@@ -28,13 +29,13 @@ public class MarauderAi extends CreatureAi {
 		creature.setData(Constants.RACE, "merodeador");
 	}
 	
-	public boolean onGetAttacked(int amount, String position, Creature attacker){
+	public boolean onGetAttacked(String position, Wound wound, Creature attacker, Item object){
 		if(attacker.isPlayer()){
 			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 			alertPrescence();
 		}
 				
-		return super.onGetAttacked(amount, position, attacker);
+		return super.onGetAttacked(position, wound, attacker, object);
 	}
 	
 	private void alertPrescence(){
@@ -57,12 +58,12 @@ public class MarauderAi extends CreatureAi {
 			public void start(Creature creature){
 				creature.notify("El cadaver del merodeador esta empapado de |veneno04|!");
 			}
-			public void update(Creature creature){
-				super.update(creature);
-				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
-				}
-			}
+//TODO:			public void update(Creature creature){
+//				super.update(creature);
+//				if(creature.getStringData(Constants.RACE) != "merodeador"){
+//					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
+//				}
+//			}
 		});
 	}
 	
@@ -89,7 +90,7 @@ public class MarauderAi extends CreatureAi {
 					creature.throwItem(getWeaponToThrow(), player.x, player.y);
 					return;
 				}
-				if(creature.hp() >= creature.totalMaxHp() * 0.3f){
+				if(creature.vigor() <= creature.maxVigor() * 0.5f){
 					hunt(player);
 					return;
 				}else{

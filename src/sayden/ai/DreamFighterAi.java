@@ -2,7 +2,9 @@ package sayden.ai;
 
 import sayden.Constants;
 import sayden.Creature;
+import sayden.Item;
 import sayden.Point;
+import sayden.Wound;
 
 public class DreamFighterAi extends CreatureAi {
 
@@ -17,19 +19,19 @@ public class DreamFighterAi extends CreatureAi {
 		creature.setData(Constants.RACE, isAlly ? "human" : "warrior");
 	}
 
-	public boolean onGetAttacked(int amount, String position, Creature attacker){
+	public boolean onGetAttacked(String position, Wound wound, Creature attacker, Item object){
 		if(attacker.isPlayer() && !creature.isAlly(attacker))
 			target = attacker;
 		
-		return super.onGetAttacked(amount, position, attacker);
+		return super.onGetAttacked(position, wound, attacker, object);
 	}
 	
 	public void onUpdate(){
 		super.onUpdate();
-		if(target == null || target.hp() < 1 || !canSee(target.x, target.y)){
+		if(target == null || !target.isAlive() || !canSee(target.x, target.y)){
 			for(Point p : creature.position().neighbors(creature.visionRadius())){
 				Creature c = creature.creature(p.x, p.y);
-				if(c != null && c.hp() > 1 && !c.isAlly(creature)) {
+				if(c != null && c.isAlive() && !c.isAlly(creature)) {
 					target = c;
 					break;
 				}

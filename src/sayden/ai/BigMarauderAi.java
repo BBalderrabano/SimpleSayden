@@ -8,6 +8,7 @@ import sayden.Item;
 import sayden.Point;
 import sayden.Speed;
 import sayden.World;
+import sayden.Wound;
 
 public class BigMarauderAi extends CreatureAi {
 
@@ -36,17 +37,17 @@ public class BigMarauderAi extends CreatureAi {
 			public void start(Creature creature){
 				creature.notify("El cadaver del merodeador esta empapado de |veneno04|!");
 			}
-			public void update(Creature creature){
-				super.update(creature);
-				if(creature.getStringData(Constants.RACE) != "merodeador"){
-					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
-				}
-			}
+//TODO:			public void update(Creature creature){
+//				super.update(creature);
+//				if(creature.getStringData(Constants.RACE) != "merodeador"){
+//					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
+//				}
+//			}
 		});
 	}
 	
 	@Override
-	public boolean onGetAttacked(int amount, String position, Creature attacker){
+	public boolean onGetAttacked(String position, Wound wound, Creature attacker, Item object){
 		if(attacker.isPlayer() && !creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){
 			creature.setData(Constants.FLAG_SEEN_PLAYER, true);
 		}
@@ -63,9 +64,9 @@ public class BigMarauderAi extends CreatureAi {
 		}
 		
 		if(position == Constants.LEG_POS){
-			creature.setData("LegDamage", creature.getIntegerData("LegDamage") + amount);
+			creature.setData("LegDamage", creature.getIntegerData("LegDamage") + 1);
 			
-			super.onGetAttacked(amount, position, attacker);
+			super.onGetAttacked(position, wound, attacker, object);
 			
 			if(!creature.getBooleanData("LegBroken") && creature.getIntegerData("LegDamage") > 15 && Math.random() < 0.3f){
 				creature.doAction("siente las piernas fallandole...");
@@ -77,9 +78,9 @@ public class BigMarauderAi extends CreatureAi {
 		}
 		
 		if(position == Constants.ARM_POS){
-			creature.setData(armDamage, creature.getIntegerData(armDamage) + amount);
+			creature.setData(armDamage, creature.getIntegerData(armDamage) + 1);
 			
-			super.onGetAttacked(amount, position, attacker);
+			super.onGetAttacked(position, wound, attacker, object);
 
 			if(!creature.getBooleanData(armBroken) && creature.getIntegerData(armDamage) > 15 && Math.random() < 0.3f){
 				creature.doAction("siente los brazos fallandole...");
@@ -90,7 +91,7 @@ public class BigMarauderAi extends CreatureAi {
 			
 		}
 		
-		return super.onGetAttacked(amount, position, attacker);
+		return super.onGetAttacked(position, wound, attacker, object);
 	}
 	
 	@Override
@@ -111,8 +112,8 @@ public class BigMarauderAi extends CreatureAi {
 				Creature c = world.creature(p.x, p.y);
 				if(c == null || c == creature)
 					continue;
-				int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante", true);
-				c.doAction("recibe un golpe por "+ damage + " de daño");
+//TODO:			int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante", true);
+				c.doAction("recibe un golpe por "+ 1 + " de daño");
 			}
 			creature.modifyActionPoints(-creature.getAttackSpeed().velocity(), false);
 			creature.setQueAttack(null);

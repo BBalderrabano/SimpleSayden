@@ -109,7 +109,6 @@ public class Projectile {
 	}
 	
 	private void pickTarget(Creature target){
-		String name = projectile.nameUnUna();
 		int totalDamage = 0;
 		
 		for(DamageType d : DamageType.ALL_TYPES()){
@@ -152,12 +151,11 @@ public class Projectile {
 		}
 		
 		target.setData(Constants.CHECKPOINT, path.getPoints().get(0));
-		target.modifyHp(-totalDamage, "Impactado por " + name);
 		
 		float drained_blood = (totalDamage * Constants.BLOOD_AMOUNT_MULTIPLIER) * projectile.bloodModifyer();
 		target.makeBleed(drained_blood);
 		
-		if(target.hp() > 1 && target.queSpell() != null){
+		if(target.isAlive() && target.queSpell() != null){
 			target.stopCasting();
 			target.modifyActionPoints(-target.getActionPoints(), false);
 		}

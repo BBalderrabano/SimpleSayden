@@ -32,10 +32,9 @@ public class DogAi extends CreatureAi {
 		if(canSee(player.x, player.y) && creature.position().distance(player.position()) <= 4 && creature.position().distance(player.position()) > 2){
 			creature.doAction("gruñe, clavandote su mirada");
 			creature.modifyActionPoints(-creature.getActionPoints(), false);
-		}else if(canSee(player.x, player.y) && creature.position().distance(player.position()) <= 2 &&
-				creature.hp() > creature.maxHp() * 0.3){
+		}else if(canSee(player.x, player.y) && creature.position().distance(player.position()) <= 2){
 			hunt(player);
-		}else if(creature.hp() <= creature.maxHp() * 0.3){
+		}else if(creature.vigor() >= creature.maxVigor() * 0.5){
 			if(owner != null && !canSee(owner.x, owner.y)){
 				hunt(owner);
 				if(creature.getData(Constants.CHECKPOINT) == null){

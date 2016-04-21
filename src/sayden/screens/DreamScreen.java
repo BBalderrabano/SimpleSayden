@@ -113,7 +113,7 @@ public class DreamScreen implements Screen {
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
 		
-		String stats = String.format(" %3d/%3d hp %s", player.hp(), player.totalMaxHp(), player.statusEffects());
+		String stats = String.format(" %3d/%3d hp %s", player.vigor(), player.maxVigor(), player.statusEffects());
 		terminal.write(stats, 1, 23);
 		
 		if (subscreen() != null)
@@ -383,7 +383,7 @@ public class DreamScreen implements Screen {
 			world.updateFloor();
 		}
 		
-		if (player.hp() < 1)
+		if (!player.isAlive())
 			return new PlayScreen();
 		
 		return this;

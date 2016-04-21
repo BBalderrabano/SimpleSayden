@@ -2,7 +2,6 @@ package sayden;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Item extends Thing{
@@ -18,10 +17,10 @@ public class Item extends Thing{
 	
 	private Color color;
 	public Color color() { return appearance != null && appearance != name  && name.indexOf("pocion") == -1 ? Constants.UNIDENTIFIED_COLOR : color; }
-
-	private int bonusMaxHp;
-	public int bonusMaxHp() { return bonusMaxHp; }
-	public void modifyBonusMaxHp(int amount) { bonusMaxHp += amount; }
+	
+	private ArrayList<Wound> possibleWounds;
+	public ArrayList<Wound> possibleWounds() { return possibleWounds; }
+	public void pushPossibleWounds(ArrayList<Wound> newWounds) { this.possibleWounds.addAll(newWounds); }
 	
 	private ArrayList<DamageType> attackValues;
 	public ArrayList<DamageType> attackValues() { return attackValues; }
@@ -88,42 +87,6 @@ public class Item extends Thing{
 	
 	private List<Spell> writtenSpells;
 	public List<Spell> writtenSpells() { return writtenSpells; }
-	
-	private List<Wound> wounds;
-	public List<Wound> wounds() { return wounds; }
-	public boolean inflictsWounds() { return wounds != null && wounds.size() > 0 && level >= 2; }
-	
-	public Wound pickWeightedWound(String position, Creature target){
-		Collections.shuffle(wounds);
-		
-		double totalWeight = 0.0d;
-		
-		for (Wound i : wounds)
-		{
-			if((i.position() != null && i.position() != position) || 
-					(i.requiresExistantWound() != null && !target.hasWound(i)))
-				continue;
-		    totalWeight += i.weight();
-		}
-
-		int randomIndex = -1;
-		double random = Math.random() * totalWeight;
-		for (int i = 0; i < wounds.size(); ++i)
-		{
-			if(wounds.get(i).position() != null && wounds.get(i).position() != position || 
-					(wounds.get(i).requiresExistantWound() != null && !target.hasWound(wounds.get(i))))
-				continue;
-			
-		    random -= wounds.get(i).weight();
-		    if (random <= 0.0d)
-		    {
-		        randomIndex = i;
-		        break;
-		    }
-		}
-		
-		return randomIndex < 0 ? null : wounds.get(randomIndex);
-	}
 	
 	private Speed attackSpeed;
 	public Speed attackSpeed() { return attackSpeed; }
@@ -201,7 +164,7 @@ public class Item extends Thing{
 		this.name = name;
 		this.appearance = appearance;
 		this.writtenSpells = new ArrayList<Spell>();
-		this.wounds = new ArrayList<Wound>();
+		this.possibleWounds = new ArrayList<Wound>();
 		this.attackValues = new ArrayList<DamageType>();
 		this.attackValues.addAll(DamageType.ALL_TYPES());
 		this.defenseValues = new ArrayList<DamageType>();
@@ -220,8 +183,6 @@ public class Item extends Thing{
 		this.color = clone.color();
 		this.name = clone.name;
 		this.appearance = clone.appearance;
-		this.wounds = clone.wounds();
-		this.bonusMaxHp = clone.bonusMaxHp();
 		this.quaffEffect = clone.quaffEffect();
 		this.writtenSpells = clone.writtenSpells();
 		this.attackValues = clone.attackValues();
@@ -229,6 +190,7 @@ public class Item extends Thing{
 		this.bloodModifyer = clone.bloodModifyer();
 		this.movementSpeed = clone.movementSpeed();
 		this.attackSpeed = clone.attackSpeed();
+		this.possibleWounds = clone.possibleWounds();
 		this.maxStacks = clone.maxStacks;
 		this.stacks = 1;
 		this.spawnWeight = clone.spawnWeight();

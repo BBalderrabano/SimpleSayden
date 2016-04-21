@@ -66,7 +66,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newPlayer(List<String> messages, FieldOfView fov){
-		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 50);
+		Creature player = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "jugador", 7);
 				
 		player.setStartingMovementSpeed(Speed.VERY_FAST);
 		player.setStartingAttackSpeed(Speed.VERY_FAST);
@@ -90,7 +90,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newDreamer(List<String> messages, FieldOfView fov, int start_x, int start_y){
-		Creature dreamer = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "soñador", 50);
+		Creature dreamer = new Creature(world, '@', 'M', AsciiPanel.brightWhite, "soñador", 20);
 		
 		dreamer.setStartingMovementSpeed(Speed.VERY_FAST);
 		dreamer.setStartingAttackSpeed(Speed.VERY_FAST);
@@ -109,9 +109,9 @@ public class StuffFactory {
 		Creature dreamFighter = null;
 		
 		if(isAlly)
-			dreamFighter = new Creature(world, '@', 'M', AsciiPanel.blue, "aliado", 50);
+			dreamFighter = new Creature(world, '@', 'M', AsciiPanel.blue, "aliado", 20);
 		else
-			dreamFighter = new Creature(world, '@', 'M', Color.gray, "enemigo", 50);
+			dreamFighter = new Creature(world, '@', 'M', Color.gray, "enemigo", 20);
 		
 		dreamFighter.setVisionRadius(6);
 		dreamFighter.equip(randomWeapon(null, false, false, true, false, true));
@@ -126,10 +126,6 @@ public class StuffFactory {
 		Creature rabbit = new Creature(world, 'r', 'M', AsciiPanel.brightWhite, "conejo", 5);
 		
 		rabbit.setStartingMovementSpeed(Speed.VERY_SLOW);
-		
-		if(!Constants.PRODUCTION){
-			rabbit.equip(newMace(false));
-		}
 		
 		world.addAtEmptyLocation(rabbit);
 		new RabbitAi(rabbit, player);
@@ -379,7 +375,6 @@ public class StuffFactory {
 			public void start(Creature creature){
 				creature.doAction(alcohol, "bebe la botella completa");
 				if(Math.random() > .8){
-					creature.modifyHp(-3, "Alcoholismo");
 					creature.notify("El alcohol se te sube a la cabeza");
 				}
 			}
@@ -641,10 +636,7 @@ public class StuffFactory {
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.FAST);
 		item.modifyBloodModifyer(0.4f);
-		if(!Constants.PRODUCTION){
-			item.wounds().add(Wound.BLUNT_HEAD_CONCUSSION);
-			item.modifyLevel(2);
-		}
+
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
@@ -892,11 +884,6 @@ public class StuffFactory {
 	public Item newBread(boolean spawn){
 		Item item = new Item('%', 'M', AsciiPanel.yellow, "pan", null, 50);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
-		item.setQuaffEffect(new Effect("alimentado", 1, false){
-			public void start(Creature creature){
-				creature.modifyHp(5, "Comiste demasiado");
-			}
-		});
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
@@ -904,11 +891,6 @@ public class StuffFactory {
 	public Item newFruit(boolean spawn){
 		Item item = new Item('%', 'F', AsciiPanel.brightRed, "manzana", null, 60);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
-		item.setQuaffEffect(new Effect("alimentado", 1, false){
-			public void start(Creature creature){
-				creature.modifyHp(8, "Comiste demasiado");
-			}
-		});
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
@@ -919,11 +901,6 @@ public class StuffFactory {
 		item.modifyBloodModifyer(0.1f);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
-		item.setQuaffEffect(new Effect("alimentado", 1, false){
-			public void start(Creature creature){
-				creature.modifyHp(10, "El pan estaba tan duro que te mato");
-			}
-		});
 		item.description = "Es dura como una roca.";
 		world.addAtEmptyLocation(item, spawn);
 		return item;
@@ -1233,10 +1210,6 @@ public class StuffFactory {
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de vida", appearance, 60);
 		item.setQuaffEffect(new Effect("reanimado", 1){
 			public void start(Creature creature){
-				if (creature.hp() == creature.totalMaxHp())
-					return;
-				
-				creature.modifyHp(15, "Killed by a health potion?");
 				creature.doAction(item, "siente reanimado");
 			}
 		});
@@ -1268,7 +1241,6 @@ public class StuffFactory {
 			
 			public void update(Creature creature){
 				super.update(creature);
-				creature.modifyHp(1, "Killed by a slow health potion?");
 			}
 		});
 		item.makeStackable(5);
@@ -1281,17 +1253,16 @@ public class StuffFactory {
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de veneno", appearance, 70);
 		item.setQuaffEffect(new Effect("envenenado", 8){
 			public void start( Creature creature){
-				if(creature.defenseValue(DamageType.POISON) >= 2){
-					creature.doAction(item, "resiste el veneno");
-					this.duration = 0;
-				}else{
-					creature.doAction(item, "siente |enfermo04|");
-				}
+//TODO:				if(creature.defenseValue(DamageType.POISON) >= 2){
+//					creature.doAction(item, "resiste el veneno");
+//					this.duration = 0;
+//				}else{
+//					creature.doAction(item, "siente |enfermo04|");
+//				}
 			}
 			
 			public void update(Creature creature){
 				super.update(creature);
-				creature.receiveDamage(2, DamageType.POISON, "Vomitas tus viceras", true);
 			}
 		});
 		item.makeStackable(5);
@@ -1358,15 +1329,13 @@ public class StuffFactory {
 		
 		item.addWrittenSpell("plegaria de vida", 'F', new Effect("reanimado", 1){
 			public void start(Creature creature){
-				if (creature.hp() == creature.totalMaxHp() ||
-						creature.getBooleanData("Blasfemous")){
+				if (creature.getBooleanData("Blasfemous")){
 					creature.notify("Tu plegaria no es escuchada...");
 					return;
 				}else{
 					creature.notify("Esbozas una plegaria a los cielos");
 				}
 				
-				creature.modifyHp(10, "Alcanzado por la palabra de vida");
 				creature.doAction(item, "siente mas recuperado!");
 			}
 		}, 15, 88, Constants.SPELL_HEAL, new Effect("blasfemo", 20){
@@ -1382,9 +1351,8 @@ public class StuffFactory {
 		item.addWrittenSpell("conjuro doloroso", 'M', new Effect("adolorido", 1){
 			public void start(Creature creature){
 				creature.notify("Pronuncias la palabra del dolor");
-				int amount = creature.receiveDamage(6, DamageType.MAGIC, "Muere abrumado de un dolor insoportable", false);
 				
-				if(amount > 0){
+				if(10 > 0){
 					creature.doAction(item, "retuerce en agonia!");
 				}else{
 					creature.doAction(item, "resigna al dolor");
@@ -1393,7 +1361,6 @@ public class StuffFactory {
 		}, 4, 90, Constants.SPELL_PAIN,  new Effect("adolorido", 1){
 			public void start(Creature creature){
 				creature.notify("Sientes en tu piel el dolor que infliges");
-				creature.receiveDamage(8, DamageType.MAGIC, "Muere abrumado de un dolor insoportable", false);
 			}
 		},Speed.FAST, true);
 		

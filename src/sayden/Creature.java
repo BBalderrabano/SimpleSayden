@@ -2,6 +2,7 @@ package sayden;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import asciiPanel.AsciiPanel;
@@ -46,18 +47,46 @@ public class Creature extends Thing{
 	public CreatureAi ai() { return ai; }
 	public void setCreatureAi(CreatureAi ai) { this.ai = ai; }
 	
-	private int maxHp;
-	public int maxHp() { return maxHp; }
-	public int totalMaxHp() { return maxHp
-			+ (armor == null ? 0 : armor.bonusMaxHp())
-			+ (weapon == null ? 0 : weapon.bonusMaxHp())
-			+ (helment == null ? 0 : helment.bonusMaxHp())
-			+ (shield == null ? 0 : shield.bonusMaxHp()); }
+	public int vigor() { 
+		int vigor = 0;
+		
+		for(Wound w : inflictedWounds){
+			vigor += w.vigor;
+		}
+		
+		return vigor; 
+	}
 	
-	public void modifyMaxHp(int amount) { maxHp += amount; }
+	private ArrayList<Wound> inflictedWounds;
+	public ArrayList<Wound> inflictedWounds() { return inflictedWounds; }
+	public void inflictWound(Wound wound){
+		if(wound == null)
+			return;
+		
+		Wound cloned = null;
+		
+		try {
+			cloned = (Wound) wound.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		if(cloned == null){
+			return;
+		}
+
+		cloned.start(this);
+		inflictedWounds.add(cloned);
+	}
 	
-	private int hp;
-	public int hp() { return hp; }
+	private int maxVigor;
+	public int maxVigor() { return maxVigor; }
+	public void setMaxVigor(int amount) { this.maxVigor += amount; }
+	
+	private boolean isAlive;
+	public boolean isAlive() { return isAlive; }
+	public void modifyAlive(boolean isAlive) { this.isAlive = isAlive; }
 	
 	private float blood;
 	public float blood() { return blood; }
@@ -114,8 +143,8 @@ public class Creature extends Thing{
 		this.actionPoints += amount; 
 		
 		if(amount < 0){
-			regenerateHealth();
 			updateEffects();
+			updateWounds();
 		}
 	}
 
@@ -211,65 +240,8 @@ public class Creature extends Thing{
 	private Item helment;
 	public Item helment() { return helment; }
 	
-	private int regenHpCooldown;
-	private int regenHpPer1000;
-	public void modifyRegenHpPer1000(int amount) { regenHpPer1000 += amount; }
-	
 	private List<Effect> effects;
 	public List<Effect> effects(){ return effects; }
-	
-	private List<Wound> wounds;
-	public List<Wound> wounds(){ return wounds; }
-	public boolean hasWound(Wound wound){
-		for(Wound w : wounds){
-			if(w.statusName() != wound.statusName())
-				continue;
-			
-			return true;
-		}
-		return false;
-	}
-	public void inflictWound(Wound newWound){
-		if(newWound == null || hasWound(newWound) || hp < 1)
-			return;
-		
-		Wound clonedWound = null;
-		
-		try {
-			clonedWound = (Wound) newWound.clone();
-		} catch (CloneNotSupportedException e) {
-			return;
-		}
-		
-		clonedWound.start(this);
-		wounds.add(clonedWound);
-	}
-	
-	public void woundOnHit(boolean success, String position){
-		for(Wound w : wounds){
-			if(w.isDone())
-				continue;
-			
-			w.onHit(this, success, position);
-		}
-	}
-	
-	public void woundOnGetHit(boolean success, String position){
-		for(Wound w : wounds){
-			if(w.isDone())
-				continue;
-			
-			w.onGetHit(this, success, position);
-		}
-	}
-	
-	public void woundMove(int mx, int my){
-		for(Wound w : wounds){
-			if(w.isDone())
-				continue;
-			w.move(this, mx, my);
-		}
-	}
 	
 	private List<Spell> spells;
 	public List<Spell> learnedSpells(){ return spells; }
@@ -284,7 +256,7 @@ public class Creature extends Thing{
 	
 	public Screen subscreen;
 	
-	public Creature(World world, char glyph, char gender, Color color, String name, int maxHp){
+	public Creature(World world, char glyph, char gender, Color color, String name, int vigor){
 		super();
 		this.movementSpeed = Speed.NORMAL;
 		this.attackSpeed = Speed.NORMAL;
@@ -294,20 +266,19 @@ public class Creature extends Thing{
 		this.gender = gender;
 		this.color = color;
 		this.originalColor = color;
-		this.maxHp = maxHp;
-		this.hp = maxHp;
-		this.blood = maxHp * 10;
+		this.maxVigor = vigor;
+		this.blood = vigor * 10;
 		this.visionRadius = 6;
 		this.name = name;
 		this.inventory = new Inventory(20);
-		this.regenHpPer1000 = 10;
+		this.inflictedWounds = new ArrayList<Wound>();
 		this.attackValues = new ArrayList<DamageType>();
 		this.attackValues.addAll(DamageType.ALL_TYPES());
 		this.defenseValues = new ArrayList<DamageType>();
 		this.defenseValues.addAll(DamageType.ALL_TYPES());
 		this.effects = new ArrayList<Effect>();
 		this.spells = new ArrayList<Spell>();
-		this.wounds = new ArrayList<Wound>();
+		this.isAlive = true;
 	}
 		
 	public void moveBy(int mx, int my){
@@ -330,7 +301,7 @@ public class Creature extends Thing{
 		Tile tile = world.tile(x+mx, y+my);
 		
 		if(world.fire(x+mx, y+my) > 0){
-			modifyHp(-(int)world.fire(x+mx, y+my) / 10, "Incinerado");
+			//TODO: modifyHp(-(int)world.fire(x+mx, y+my) / 10, "Incinerado");
 			if(isPlayer)
 				notify("Estas siendo consumido por las llamas!");
 			else
@@ -486,6 +457,9 @@ public class Creature extends Thing{
 		boolean shieldBlock = false;
 		String position = null;
 		
+		int highestDamage = -100;
+		DamageType highestDamageType = null;
+		
 		int min_attack = 1;
 		
 		if(x < other.x && y >= other.y){
@@ -534,10 +508,21 @@ public class Creature extends Thing{
 					min_attack = 0;
 				}
 				
-				if(weakSpotHit)
+				if(weakSpotHit){
 					attack += Math.max(0, attackValue);
-				else
+					
+					if(Math.max(0, attackValue) > highestDamage){
+						highestDamage = Math.max(0, attackValue);
+						highestDamageType = d;
+					}
+				}else{
 					attack += Math.max(0, attackValue - other.defenseValue(d));
+					
+					if(Math.max(0, attackValue - other.defenseValue(d)) > highestDamage){
+						highestDamage = Math.max(0, attackValue);
+						highestDamageType = d;
+					}
+				}
 			}
 		}
 		
@@ -558,7 +543,38 @@ public class Creature extends Thing{
 			
 		}
 		
-		other.ai().onGetAttacked(amount, position, this);
+		ArrayList<Wound> checkWounds = new ArrayList<Wound>();
+		
+		if(highestDamageType == null)
+			highestDamageType = DamageType.BLUNT;
+		
+		for(Wound w : ai.possibleWounds()){
+			if(w.canBePicked(this, other, position, highestDamageType)){
+				checkWounds.add(w);
+			}
+		}
+		
+		for(Wound w : other.ai().possibleFatality()){
+			if(w.canBePicked(this, other, position, highestDamageType)){
+				checkWounds.add(w);
+			}
+		}
+		
+		if(object != null){
+			for(Wound w : object.possibleWounds()){
+				if(w.canBePicked(this, other, position, highestDamageType)){
+					checkWounds.add(w);
+				}
+			}
+		}
+		
+		for(Wound w : Wound.DEFAULT_WOUNDS()){
+			if(w.canBePicked(this, other, position, highestDamageType)){
+				checkWounds.add(w);
+			}
+		}
+
+		other.ai().onGetAttacked(position, pickWeightedWound(checkWounds), this, object);
 	
 		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
 		
@@ -574,6 +590,26 @@ public class Creature extends Thing{
 		return true;
 	}
 
+	public Wound pickWeightedWound(ArrayList<Wound> wounds){
+		Collections.shuffle(wounds);
+		
+		double totalWeight = 0.0d;
+
+		int randomIndex = -1;
+		double random = Math.random() * totalWeight;
+		for (int i = 0; i < wounds.size(); ++i)
+		{	
+		    random -= wounds.get(i).weight;
+		    if (random <= 0.0d)
+		    {
+		        randomIndex = i;
+		        break;
+		    }
+		}
+		
+		return randomIndex < 0 ? null : wounds.get(randomIndex);
+	}
+	
 	private void impactWeapon(){
 		if(weapon() != null && weapon().canBreake()){
 			weapon().modifyDurability(-1);
@@ -591,58 +627,36 @@ public class Creature extends Thing{
 		world.propagate(x, y, amount, Constants.BLOOD_FLUID);
 	}
 	
-	public int receiveDamage(int amount, DamageType damage, String causeOfDeath){
-		return receiveDamage(amount, damage, causeOfDeath, true);
-	}
-	
-	public int receiveDamage(int amount, DamageType damage, String causeOfDeath, boolean canKill){
-		int attack = Math.abs(amount);
-		
-		if(damage != null){
-			for(DamageType d : DamageType.ALL_TYPES()){
-				if(d.id == DamageType.RANGED.id || d.id != damage.id)
-					continue;
-				attack -= Math.max(0, defenseValue(d));
-			}
-		}
-		
-		if(hp() - attack < 1) { attack -= Math.abs(hp() - attack) + 1; }
-		
-		modifyHp(-Math.max(0, attack), causeOfDeath);
-		
-		return Math.max(0, attack);
-	}
-	
-	public void modifyHp(int amount, String causeOfDeath) { 
-		hp += amount;
-		this.causeOfDeath = causeOfDeath;
-		
-		if(amount > 0){
-			blood += amount * (Constants.BLOOD_AMOUNT_MULTIPLIER * 0.5f);
-		}
-		if (hp > maxHp) {
-			hp = maxHp;
-		} else if (hp < 1) {
-			doAction("muere");
-			if(!isPlayer()){
-				ai.onDecease(leaveCorpse());
-				world.remove(this);
-			}else{
-				glyph = '%';
-			}
-		}
-	}
+//	public void modifyHp(int amount, String causeOfDeath) { 
+//		hp += amount;
+//		this.causeOfDeath = causeOfDeath;
+//		
+//		if(amount > 0){
+//			blood += amount * (Constants.BLOOD_AMOUNT_MULTIPLIER * 0.5f);
+//		}
+//		if (hp > maxHp) {
+//			hp = maxHp;
+//		} else if (hp < 1) {
+//			doAction("muere");
+//			if(!isPlayer()){
+//				ai.onDecease(leaveCorpse());
+//				world.remove(this);
+//			}else{
+//				glyph = '%';
+//			}
+//		}
+//	}
 	
 	private Item leaveCorpse(){
 		Item corpse = new Item('%', 'M', originalColor, "cadaver de " + nameWStacks() + "", null, 0);
 		
 		corpse.setData(Constants.CHECK_CONSUMABLE, true);
 		corpse.setData(Constants.CHECK_CORPSE, true);
-		corpse.setQuaffEffect(new Effect("alimentado", 1, false){
-			public void start(Creature creature){
-				creature.modifyHp((int) 5, "Severa indigestion");
-			}
-		});
+//TODO:	corpse.setQuaffEffect(new Effect("alimentado", 1, false){
+//			public void start(Creature creature){
+//				creature.modifyHp((int) 5, "Severa indigestion");
+//			}
+//		});
 		
 		world.addAtEmptySpace(corpse, x, y);
 		
@@ -663,11 +677,11 @@ public class Creature extends Thing{
 	}
 	
 	public void update(){	
-		if(hp < 1)
+		if(!isAlive())
 			return;
 		
 		if(isPlayer()){
-			regenerateHealth();
+			updateWounds();
 			updateEffects();
 			ai.onUpdate();
 			return;
@@ -692,8 +706,7 @@ public class Creature extends Thing{
 	}
 	
 	private void updateEffects(){
-		List<Effect> doneEff = new ArrayList<Effect>();
-		List<Effect> doneWound = new ArrayList<Effect>();
+		ArrayList<Effect> doneEff = new ArrayList<Effect>();
 		
 		for (Effect effect : effects){
 			effect.update(this);
@@ -702,31 +715,22 @@ public class Creature extends Thing{
 				doneEff.add(effect);
 			}
 		}
-		for (Wound wound : wounds){
-			wound.update(this);
-			if (wound.isDone()) {
-				wound.end(this);
-				doneWound.add(wound);
-			}
-		}
-		
-		wounds.removeAll(doneWound);
+
 		effects.removeAll(doneEff);
 	}
 	
-	private void regenerateHealth(){
-		regenHpCooldown -= regenHpPer1000;
-		if (regenHpCooldown < 0){
-			if (hp < maxHp){
-				modifyHp(1, "Muerto por regenrarse vida?");
+	private void updateWounds(){
+		ArrayList<Wound> doneWounds = new ArrayList<Wound>();
+		
+		for (Wound w : inflictedWounds){
+			w.update(this);
+			if (w.isDone()) {
+				w.end(this);
+				doneWounds.add(w);
 			}
-			if(blood < 1){
-				doAction("ha perdido mucha sangre");
-				modifyMaxHp(-1);
-				blood = Constants.MIN_FLUID_AMOUNT;
-			}
-			regenHpCooldown += 1000;
 		}
+
+		inflictedWounds.removeAll(doneWounds);
 	}
 	
 	public boolean canEnter(int wx, int wy) {
@@ -905,23 +909,23 @@ public class Creature extends Thing{
 			return;
 		
 		if (item == armor){
-			if (hp > 0 && showText)
+			if (isAlive && showText)
 				doAction("remueve " + item.nameElLaWNoStacks());
 			armor = null;
 		} if(item == helment){
-			if (hp > 0 && showText)
+			if (isAlive && showText)
 				doAction("remueve " + item.nameElLaWNoStacks());
 			helment = null;
 		}  if(item == shield){
-			if (hp > 0 && showText)
+			if (isAlive && showText)
 				doAction("guarda " + item.nameElLaWNoStacks());
 			shield = null;
 		}  if (item == weapon) {
-			if (hp > 0 && showText) 
+			if (isAlive && showText) 
 				doAction("guarda " + item.nameElLaWNoStacks());
 			weapon = null;
 		} if (item == offWeapon) {
-			if (hp > 0 && showText) 
+			if (isAlive && showText) 
 				doAction("guarda " + item.nameElLaWNoStacks());
 			offWeapon = null;
 		}
@@ -1063,14 +1067,6 @@ public class Creature extends Thing{
 		
 		if(stealthLevel > Constants.STEALTH_MIN_STEPS)
 			effectString += " escabullido";
-		
-		for(int i = 0; i < wounds.size(); i++){
-			if(wounds.get(i) == null || wounds.get(i).statusName() == null
-					|| effectString.indexOf(wounds.get(i).statusName()) != -1)
-				continue;
-			
-			effectString += " " + wounds.get(i).statusName() + "";
-		}
 		
 		return effectString;
 	}

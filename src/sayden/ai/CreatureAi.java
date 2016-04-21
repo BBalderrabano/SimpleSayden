@@ -1,5 +1,6 @@
 package sayden.ai;
 
+import java.util.ArrayList;
 import java.util.List;
 import sayden.Constants;
 import sayden.Creature;
@@ -24,6 +25,8 @@ public class CreatureAi {
 		this.creature = creature;
 		this.creature.setCreatureAi(this);
 		this.weakSpot = Constants.NO_POS;
+		this.possibleWounds = new ArrayList<Wound>();
+		this.possibleFatality = new ArrayList<Wound>();
 	}
 	
 	public void setWeakSpot(String position){
@@ -33,6 +36,14 @@ public class CreatureAi {
 	public String getWeakSpot(){
 		return weakSpot == null || weakSpot.isEmpty() ? "none" : weakSpot;
 	}
+	
+	private ArrayList<Wound> possibleWounds;
+	public ArrayList<Wound> possibleWounds() { return possibleWounds; }
+	public void pushPossibleWounds(ArrayList<Wound> newWounds) { this.possibleWounds.addAll(newWounds); }
+	
+	private ArrayList<Wound> possibleFatality;
+	public ArrayList<Wound> possibleFatality() { return possibleFatality; }
+	public void pushPossibleFatality(ArrayList<Wound> newWounds) { this.possibleFatality.addAll(newWounds); }
 	
 	public void onCastSpell(Spell spell, int x2, int y2) {
 		// TODO Auto-generated method stub
@@ -76,7 +87,6 @@ public class CreatureAi {
 		if (tile.isGround()){
 			creature.x = x;
 			creature.y = y;
-			creature.woundMove(x, y);
 		}
 	}
 	
@@ -107,75 +117,67 @@ public class CreatureAi {
 			other.stopCasting();
 			creature.stopCasting();
 		}
-		
-		String position = "";
-		
-		if(creature.x < other.x && creature.y >= other.y){
-			position = Constants.BACK_POS;
-		}else if(creature.y < other.y && creature.x <= other.x){
-			position = Constants.HEAD_POS;
-		}else if(creature.x > other.x && creature.y <= other.y){
-			position = Constants.ARM_POS;
-		}else if(creature.y > other.y && creature.x >= other.x){
-			position = Constants.LEG_POS;
-		}
-		
-		if(creature.weapon() != null && creature.weapon().wounds().size() > 0 && success 
-				&& (creature.getBooleanData(Constants.DEALS_WOUNDS) || creature.weapon().level() >= 2)){
-			Wound inflictWound = creature.weapon().pickWeightedWound(position, other);
-			if(inflictWound != null)
-				other.inflictWound(inflictWound);
-		}
-		
-		creature.woundOnHit(success, position);
-		other.woundOnGetHit(success, position);
 						
 		return success;
 	}
 	
-	public boolean onGetAttacked(int amount, String position, Creature attacker){
-		String amountString = "";
+	public boolean onGetAttacked(String position, Wound wound, Creature attacker, Item object){
+		String isCrit = "";
 		
 		if(position == weakSpot){
-			amountString = amount + " (|critico01|)";
+			isCrit = " (|critico01|)";
 		}else{
-			amountString = amount + "";
+			isCrit = "";
 		}
 		
-		if(attacker.isPlayer()){
-			attacker.notifyArround("Atacas |(%s %s %s)01| %s |[%s %s %s]02| por %s", 
-					attacker.attackValue(DamageType.SLICE),
-					attacker.attackValue(DamageType.BLUNT),
-					attacker.attackValue(DamageType.PIERCING),
-					creature.nameAlALa(),
-					creature.defenseValue(DamageType.SLICE),
-					creature.defenseValue(DamageType.BLUNT),
-					creature.defenseValue(DamageType.PIERCING),
-					amountString);
-		}else if(creature.isPlayer()){
-			attacker.notifyArround("%s |(%s %s %s)01| te ataca |[%s %s %s]02| por %s", 
-					Constants.capitalize(attacker.nameElLa()),
-					attacker.attackValue(DamageType.SLICE),
-					attacker.attackValue(DamageType.BLUNT),
-					attacker.attackValue(DamageType.PIERCING),
-					creature.defenseValue(DamageType.SLICE),
-					creature.defenseValue(DamageType.BLUNT),
-					creature.defenseValue(DamageType.PIERCING),
-					amountString);
-		}else{
-			attacker.notifyArround("%s |(%s %s %s)01| ataca %s |[%s %s %s]02| por %s", 
-					Constants.capitalize(attacker.nameElLa()),
-					attacker.attackValue(DamageType.SLICE),
-					attacker.attackValue(DamageType.BLUNT),
-					attacker.attackValue(DamageType.PIERCING),
-					creature.nameAlALa(),
-					creature.defenseValue(DamageType.SLICE),
-					creature.defenseValue(DamageType.BLUNT),
-					creature.defenseValue(DamageType.PIERCING),
-					amountString);
+		if(wound.startFlavorText(creature, attacker)){
+			if(attacker.isPlayer()){
+				if(object != null){
+					attacker.notifyArround("Tu %s inflige %s %s%s", 
+							object.nameWNoStacks(),
+							wound.nameUnUna(),
+							creature.nameAlALa(),
+							isCrit);
+				}else{
+					attacker.notifyArround("Provocas %s %s%s", 
+						wound.nameUnUna(),
+						creature.nameAlALa(),
+						isCrit);
+				}
+				
+			}else if(creature.isPlayer()){
+				if(object != null){
+					attacker.notifyArround("%s te alcanza con su %s inflingiendote %s%s", 
+						Constants.capitalize(attacker.nameElLa()),
+						object.nameWNoStacks(),
+						wound.nameUnUna(),
+						isCrit);
+				}else{
+					attacker.notifyArround("%s te provoca %s%s", 
+						Constants.capitalize(attacker.nameElLa()),
+						wound.nameUnUna(),
+						isCrit);
+				}
+			}else{
+				if(object != null){
+					attacker.notifyArround("%s impacta %s con su %s inflingiendo %s%s", 
+						Constants.capitalize(attacker.nameElLa()),
+						creature.nameAlALa(),
+						object.nameWNoStacks(),
+						wound.nameUnUna(),
+						isCrit);
+				}else{
+					attacker.notifyArround("%s le provoca %s %s%s", 
+						Constants.capitalize(attacker.nameElLa()),
+						wound.nameUnUna(),
+						creature.nameAlALa(),
+						isCrit);
+				}
+			}
 		}
 		
-		creature.modifyHp(-amount, "Matado por " + attacker.nameUnUna());
+		creature.inflictWound(wound);
+		
 		return true;
 	}
 	
@@ -321,7 +323,7 @@ public class CreatureAi {
 	}
 	
 	public boolean distanceFrom(Creature target, int amount){
-		if(target == null || target.hp() < 1 || amount == 0)
+		if(target == null || !target.isAlive() || amount == 0)
 			return false;
 		
 		if(creature.position().distance(target.position()) <= amount){

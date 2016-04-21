@@ -1,8 +1,8 @@
 package sayden.ai;
 
-import sayden.Constants;
 import sayden.Creature;
 import sayden.Effect;
+import sayden.Item;
 import sayden.Speed;
 import sayden.Wound;
 
@@ -22,12 +22,6 @@ public class LunaticAi extends CreatureAi {
 				creature.addEffect(new Effect("", 3){
 					public void update(Creature creature){
 						super.update(creature);
-						creature.modifyHp(2, "Enloquecido");
-					}
-				});
-				other.inflictWound(new Wound("desfigurado", 20, 100, Constants.HEAD_POS){
-					public void start(Creature creature){
-						creature.modifyVisionRadius(-3);
 					}
 				});
 			}
@@ -44,7 +38,7 @@ public class LunaticAi extends CreatureAi {
 		return super.onAttack(other);
 	}
 	
-	public boolean onGetAttacked(int amount, String position, Creature attacker){
+	public boolean onGetAttacked(String position, Wound wound, Creature attacker, Item object){
 		if(attacker.isPlayer()){
 			double rand = Math.random();
 			
@@ -53,7 +47,6 @@ public class LunaticAi extends CreatureAi {
 				creature.addEffect(new Effect("", 3){
 					public void update(Creature creature){
 						super.update(creature);
-						creature.modifyHp(2, "Enloquecido");
 					}
 				});
 			}else if(!creature.getBooleanData("IsFeared")){
@@ -71,7 +64,7 @@ public class LunaticAi extends CreatureAi {
 			}
 		}
 		
-		return super.onGetAttacked(amount, position, attacker);
+		return super.onGetAttacked(position, wound, attacker, object);
 	}
 	
 	public void onUpdate(){

@@ -17,7 +17,7 @@ public class FireWeaponScreen extends TargetBasedScreen {
 	}
 
 	public void displayOutput(AsciiPanel terminal) {
-		if(lastCreature != null && lastCreature.hp() > 0){
+		if(lastCreature != null && lastCreature.isAlive()){
 			String quickFire = "(F) - Disparar " + player.weapon().nameElLaWNoStacks() + " hacia " + lastCreature.nameElLa();
 			terminal.write(quickFire, terminal.getWidthInCharacters() - quickFire.length() - 1, 0);
 		}
@@ -41,7 +41,7 @@ public class FireWeaponScreen extends TargetBasedScreen {
 	}
 	
 	public Screen respondToUserInput(KeyEvent key) {
-		if(key.getKeyCode() == KeyEvent.VK_F && lastCreature != null && lastCreature.hp() > 0 && player.canSee(lastCreature.x, lastCreature.y)){
+		if(key.getKeyCode() == KeyEvent.VK_F && lastCreature != null && lastCreature.isAlive() && player.canSee(lastCreature.x, lastCreature.y)){
 			player.rangedWeaponAttack(lastCreature);
 			return null;
 		}else{

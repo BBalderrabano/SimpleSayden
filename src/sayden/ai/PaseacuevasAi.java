@@ -33,7 +33,7 @@ public class PaseacuevasAi extends CreatureAi {
 //			return;
 		}else{
 			for(int i = 0; i < males.size(); i++){
-				if(males.get(i).hp() < 1){
+				if(!males.get(i).isAlive()){
 					males.remove(males.get(i));
 				}
 			}
