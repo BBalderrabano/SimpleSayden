@@ -14,7 +14,7 @@ public class Creature extends Thing{
 	public World world() { return world; }
 	public void setWorld(World newWorld) { this.world = newWorld; }
 	
-	public int x;
+	public int x;//
 	public int y;
 	public Point position() { return new Point(x,y); }
 	
