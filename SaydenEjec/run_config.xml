@@ -2,8 +2,8 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>C:\Users\Bruno\Desktop\Sayden\Sayden exe\files\Sayden.jar</jar>
-  <outfile>C:\Users\Bruno\Desktop\Sayden\Sayden exe\Sayden.exe</outfile>
+  <jar>files\Sayden.jar</jar>
+  <outfile>Sayden.exe</outfile>
   <errTitle>No tenes Java y queres jugar al Sayden?</errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
