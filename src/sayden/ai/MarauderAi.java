@@ -7,6 +7,7 @@ import sayden.Creature;
 import sayden.DamageType;
 import sayden.Effect;
 import sayden.Item;
+import sayden.Point;
 import sayden.Wound;
 
 public class MarauderAi extends CreatureAi {
@@ -27,6 +28,28 @@ public class MarauderAi extends CreatureAi {
 		
 		creature.setData(Constants.DEALS_WOUNDS, true);
 		creature.setData(Constants.RACE, "merodeador");
+		
+		possibleFatality().add(new Wound(4, "decapitacion", null, 'F', 1, 50){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return dtype.id == DamageType.SLICE.id && 
+						position == Constants.HEAD_POS && 
+						attacker.weapon() != null && target.vigor() >= 4;
+			}
+			public boolean startFlavorText(Creature creature, Creature target){
+				String text = "";
+				if(creature.isPlayer()){
+					text = "de tu " + creature.weapon().nameWNoStacks() + " separas"; 
+				}else{
+					text = "de su " + creature.weapon().nameWNoStacks() + " " + creature.nameElLa() + " separa"; 
+				}
+				target.notifyArround("Con un habil movimiento %s en seco la cabeza del merodeador", text);
+				Item head = new Item('*', 'F', target.originalColor(), "cabeza de merodeador", null, 0);
+				head.setData("IsMarauderHead", true);
+				target.drop(head);
+				target.makeBleed(100f);
+				return false;
+			}
+		});
 	}
 	
 	public boolean onGetAttacked(String position, Wound wound, Creature attacker, Item object){
@@ -58,12 +81,6 @@ public class MarauderAi extends CreatureAi {
 			public void start(Creature creature){
 				creature.notify("El cadaver del merodeador esta empapado de |veneno04|!");
 			}
-//TODO:			public void update(Creature creature){
-//				super.update(creature);
-//				if(creature.getStringData(Constants.RACE) != "merodeador"){
-//					creature.receiveDamage(2, DamageType.POISON, "El veneno del merodeador consume tus viceras", true);
-//				}
-//			}
 		});
 	}
 	
@@ -78,6 +95,8 @@ public class MarauderAi extends CreatureAi {
 			useBetterEquipment();
 			return;
 		}
+		
+		reacToHead();
 		
 		if(canSee(player.x, player.y)){
 			if(!playerHidden()){
@@ -106,7 +125,7 @@ public class MarauderAi extends CreatureAi {
 				
 				if(c.getData(Constants.RACE) == "paseacuevas"
 						&& pack.size() < 4 && !pack.contains(player)){
-					distanceFrom(c, 4);
+					distanceFrom(c, 3);
 					return;
 				}else if(c.getData(Constants.RACE) == "paseacuevas" && (pack.size() >= 4 || pack.contains(player))){
 					hunt(c);
@@ -135,5 +154,20 @@ public class MarauderAi extends CreatureAi {
 		}
 		
 		wander();
+	}
+	
+	private void reacToHead(){
+		for(Point p : creature.position().neighbors(creature.visionRadius())){
+			Item temp = creature.item(p.x, p.y);
+			
+			if(temp != null && temp.getBooleanData("IsMarauderHead") && p.distance(creature.position()) <= 4){
+				if(canSee(player.x, player.y)){
+					creature.doAction("huye despavorido al ver la cabeza de uno de sus compañeros");
+					distanceFrom(p, 5);
+				}else if(pack.size() <= 2){
+					creature.doAction("parece contemplar la cabeza de su compañero en silencio..");
+				}
+			}
+		}
 	}
 }

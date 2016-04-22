@@ -14,7 +14,7 @@ public class Creature extends Thing{
 	public World world() { return world; }
 	public void setWorld(World newWorld) { this.world = newWorld; }
 	
-	public int x;//
+	public int x;
 	public int y;
 	public Point position() { return new Point(x,y); }
 	
@@ -78,6 +78,16 @@ public class Creature extends Thing{
 
 		cloned.start(this);
 		inflictedWounds.add(cloned);
+		
+		if(!isPlayer && vigor() > maxVigor()){
+			die(cloned.causeOfDeath());
+		}else if(isPlayer && vigor() > maxVigor()){
+			if(Math.random() > .5f){
+				die(cloned.causeOfDeath());
+			}else{
+				notify("Sientes la sombra de la muerte abalanzandose sobre ti");
+			}
+		}
 	}
 	
 	private int maxVigor;
@@ -437,7 +447,7 @@ public class Creature extends Thing{
 		
 		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()), false);
 		
-		if(weapon() != null && weapon().canBreake()){
+		if(weapon() != null && weapon().canBreak()){
 			weapon().modifyDurability(-1);
 			if(weapon().durability() < 1){
 				doAction("rompe " + weapon().nameElLaWNoStacks() + " al tensarlo demasiado");
@@ -459,8 +469,6 @@ public class Creature extends Thing{
 		
 		int highestDamage = -100;
 		DamageType highestDamageType = null;
-		
-		int min_attack = 1;
 		
 		if(x < other.x && y >= other.y){
 			shieldBlock = true;
@@ -494,7 +502,6 @@ public class Creature extends Thing{
 			
 			if(isShielding){
 				attack -= other.shield().defenseValue(DamageType.BLUNT);
-				min_attack = 0;
 			}
 		}else{
 			for(DamageType d : DamageType.ALL_TYPES()){
@@ -505,7 +512,6 @@ public class Creature extends Thing{
 				
 				if(isShielding){
 					attackValue -= other.shield().defenseValue(d);
-					min_attack = 0;
 				}
 				
 				if(weakSpotHit){
@@ -528,7 +534,7 @@ public class Creature extends Thing{
 		
 		int amount = attack;
 		
-		amount = Math.max(min_attack, amount);
+		amount = Math.max(0, amount);
 		
 		if(amount < 1){
 			
@@ -537,7 +543,7 @@ public class Creature extends Thing{
 			if(isPlayer()){
 				other.doAction("resiste tu ataque");
 			}else{
-				other.doAction("resiste el ataque " + other.nameDelDeLa());
+				other.doAction("resiste el ataque " + nameDelDeLa());
 			}
 			return false;
 			
@@ -611,7 +617,7 @@ public class Creature extends Thing{
 	}
 	
 	private void impactWeapon(){
-		if(weapon() != null && weapon().canBreake()){
+		if(weapon() != null && weapon().canBreak()){
 			weapon().modifyDurability(-1);
 			
 			if(weapon().durability() < 1){
@@ -627,36 +633,27 @@ public class Creature extends Thing{
 		world.propagate(x, y, amount, Constants.BLOOD_FLUID);
 	}
 	
-//	public void modifyHp(int amount, String causeOfDeath) { 
-//		hp += amount;
-//		this.causeOfDeath = causeOfDeath;
-//		
-//		if(amount > 0){
-//			blood += amount * (Constants.BLOOD_AMOUNT_MULTIPLIER * 0.5f);
-//		}
-//		if (hp > maxHp) {
-//			hp = maxHp;
-//		} else if (hp < 1) {
-//			doAction("muere");
-//			if(!isPlayer()){
-//				ai.onDecease(leaveCorpse());
-//				world.remove(this);
-//			}else{
-//				glyph = '%';
-//			}
-//		}
-//	}
+	public void die(String causeOfDeath){
+		if(causeOfDeath != null && !causeOfDeath.isEmpty()){
+			this.causeOfDeath = causeOfDeath;
+		}
+		doAction("muere");
+		
+		isAlive = false;
+		
+		if(!isPlayer()){
+			ai.onDecease(leaveCorpse());
+			world.remove(this);
+		}else{
+			glyph = '%';
+		}
+	}
 	
 	private Item leaveCorpse(){
 		Item corpse = new Item('%', 'M', originalColor, "cadaver de " + nameWStacks() + "", null, 0);
 		
 		corpse.setData(Constants.CHECK_CONSUMABLE, true);
 		corpse.setData(Constants.CHECK_CORPSE, true);
-//TODO:	corpse.setQuaffEffect(new Effect("alimentado", 1, false){
-//			public void start(Creature creature){
-//				creature.modifyHp((int) 5, "Severa indigestion");
-//			}
-//		});
 		
 		world.addAtEmptySpace(corpse, x, y);
 		

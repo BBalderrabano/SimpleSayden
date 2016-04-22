@@ -15,7 +15,10 @@ public class LoseScreen implements Screen {
 	@Override
 	public void displayOutput(AsciiPanel terminal) {
 		terminal.writeCenter("R.I.P.", 3);
-		terminal.writeCenter(player.causeOfDeath(), 5);
+		
+		if(player.causeOfDeath() != null)
+			terminal.writeCenter(player.causeOfDeath(), 5);
+		
 		terminal.writeCenter("-- press [enter] to restart --", 22);
 	}
 

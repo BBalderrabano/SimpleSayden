@@ -8,21 +8,22 @@ import sayden.Item;
 import sayden.Point;
 import sayden.StuffFactory;
 import sayden.Tile;
+import sayden.Wound;
 
 public class RockBugAi extends CreatureAi {
 	Creature player;
 	StuffFactory factory;
 	
-	boolean digesting = false;
+	private String digestingFlag = "DIGESTING";
 	
 	int rocksEaten = 0;
 	
-	int attackBonus = 6;
-	int attackBonusDuration = 8;
-	int healthBonus = 10;
-	float healthOnEatChance = 0.4f;
+	float eatWallChance = 0.4f;
 	float destroyWallChance = 0.2f;
 	private boolean isFull() { return rocksEaten > 8; }
+
+	boolean corpseShattered = false;
+	boolean corpseSplit = false;
 	
 	public RockBugAi(Creature creature, Creature player, StuffFactory factory) {
 		super(creature);
@@ -32,6 +33,62 @@ public class RockBugAi extends CreatureAi {
 		
 		this.setWeakSpot(Constants.LEG_POS);
 		creature.setData(Constants.RACE, "comepiedras");
+		
+		possibleWounds().add(new Wound(2, "abrasion acida", "Tus acidas quemaduras te mataron de dolor", 'F', 50, 200){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+				if(attacker.getBooleanData(digestingFlag)){
+					return true;
+				}
+				return false;
+			}
+			public boolean startFlavorText(Creature creature, Creature target){
+				creature.notifyArround("Una espesa baba acida chorrea aun de la boca del comepiedras");
+				target.notify("El comepiedras te muerde");
+				return true;
+			}
+		});
+		
+		possibleWounds().add(new Wound(1, "mordisco acido", "La mordida del comepiedras llena tu sangre de acido",'M', 40, 80){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+				return dtype.id == DamageType.SLICE.id;
+			}
+			public boolean startFlavorText(Creature creature, Creature target){
+				if(target.isPlayer()){
+					creature.doAction("te hinca los dientes, aun cubiertos en bilis acida");
+				}else{
+					creature.doAction("muerde " + target.nameAlALa() + " con sus dientes cubiertos en acido");
+				}
+				return true;
+			}
+		});
+		
+		possibleFatality().add(new Wound(4, "destrozo", null, 'M', 1, 50){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+				return dtype.id == DamageType.BLUNT.id && position == Constants.HEAD_POS;
+			}
+			public void start(Creature creature){
+				creature.notifyArround("El golpe destroza el caparazon del comepiedras, salpicando sangre y viceras enderredor");
+				corpseShattered = true;
+			}
+		});
+		
+		possibleFatality().add(new Wound(4, "cercenamiento", null, 'M', 1, 50){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+				return dtype.id == DamageType.SLICE.id && position == Constants.LEG_POS;
+			}
+			public boolean startFlavorText(Creature creature, Creature target){
+				String text = "";
+				if(creature.weapon() != null){
+					text = Constants.capitalize((creature.isPlayer() ? 
+							"Tu " + creature.weapon().nameWNoStacks() : creature.weapon().nameElLaWNoStacks() + " " + creature.nameDelDeLa()));
+				}else{
+					text = Constants.capitalize((creature.isPlayer() ? "Tu golpe" : "El golpe " + creature.nameDelDeLa()));
+				}
+				creature.notifyArround("%s separa en dos al comepiedras, que se retuerce cercenado, hasta morir en agonia", text);
+				corpseSplit = true;
+				return false;
+			}
+		});
 	}
 
 	public void onDecease(Item corpse){
@@ -44,6 +101,11 @@ public class RockBugAi extends CreatureAi {
 				super.update(creature);
 			}
 		});
+		if(corpseShattered){
+			corpse.name = "cadaver destrozado de comepiedras";
+		}else if(corpseSplit){
+			corpse.name = "cadaver cercenado de comepiedras";
+		}
 	}
 	
 	public void onUpdate(){
@@ -54,19 +116,23 @@ public class RockBugAi extends CreatureAi {
 		}else{
 			Item rockCheck = creature.item(creature.x, creature.y);
 			
-			if(rockCheck != null && rockCheck.nameWStacks().equals("roca")){
+			if(rockCheck != null && rockCheck.nameWStacks().equals("roca") && !creature.getBooleanData(digestingFlag)){
 				creature.pickup();
+				
+				creature.doAction("regurgita una bilis acida sobre " + rockCheck.nameElLa());
 				creature.doAction("consume la roca ganando fuerzas");
+				
 				creature.modifyActionPoints(-creature.getActionPoints(), false);
-				addBonusDamage();
+				digestRock();
+				
 				return;
 			}
 			for(Point p : creature.position().neighbors4()){
 				if(creature.world().tile(p.x, p.y) == Tile.WALL){
-					if(Math.random() < healthOnEatChance){
-						if(creature.vigor() > 1){
-							creature.doAction("devora la pared ganando fuerzas");
-						}
+					if(Math.random() < eatWallChance && !creature.getBooleanData(digestingFlag)){
+						
+						creature.doAction("regurgita una bilis acida sobre la pared");
+						creature.doAction("devora la pared ganando fuerzas");
 						
 						if(Math.random() < destroyWallChance && isFull()){
 							creature.dig(p.x, p.y);
@@ -74,9 +140,11 @@ public class RockBugAi extends CreatureAi {
 						}
 						
 						creature.modifyActionPoints(-creature.getActionPoints(), false);
-						addBonusDamage();
+						digestRock();
+						
 						return;
 					}else{
+						creature.modifyActionPoints(-creature.getActionPoints(), false);
 						return;
 					}
 				}
@@ -92,18 +160,13 @@ public class RockBugAi extends CreatureAi {
 		return;
 	}
 	
-	void addBonusDamage(){
-		if(!digesting)
-			return;
-		
-		creature.addEffect(new Effect("fortalecido", attackBonusDuration){
+	void digestRock(){
+		creature.addEffect(new Effect("digiriendo", 12){
 			public void start(Creature creature){
-				creature.modifyAttackValue(DamageType.BLUNT, 6);
-				digesting = true;
+				creature.setData(digestingFlag, true);
 			}
 			public void end(Creature creature){
-				creature.modifyAttackValue(DamageType.BLUNT, -6);
-				digesting = false;
+				creature.unsetData(digestingFlag);
 			}
 		});
 	}

@@ -260,9 +260,7 @@ public class PlayScreen implements Screen {
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
 		
-		String stats = String.format(" [ %s", player.statusEffects());
-		
-		terminal.write(stats, 0, 23);
+		terminal.write(" [", 0, 23);
 		terminal.setCursorX(1);
 		terminal.write('[', AsciiPanel.brightBlack);
 		
@@ -279,8 +277,10 @@ public class PlayScreen implements Screen {
             terminal.write('|', new Color(red, green, blue));
 		}
 		
-		terminal.setCursorX(terminal.getCursorX() + (player.maxVigor() - player.vigor()));
+		terminal.setCursorX(terminal.getCursorX() + Math.max(0, player.maxVigor() - player.vigor()));
 		terminal.write(']', AsciiPanel.brightBlack);
+		
+		terminal.write(" " + player.statusEffects());
 
 		if(pauseTooltip){
 			String tooltip = "-- esc o p ayuda --";

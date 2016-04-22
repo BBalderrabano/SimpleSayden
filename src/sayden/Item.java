@@ -96,14 +96,14 @@ public class Item extends Thing{
 	public Speed movementSpeed() { return movementSpeed; }
 	public void modifyMovementSpeed(Speed speed) { this.movementSpeed = speed; } 
 	
-	private boolean canBreake = false;
-	public boolean canBreake() { return canBreake; }
+	private boolean canBreak = false;
+	public boolean canBreak() { return canBreak; }
 	
 	private int durability = 1;
 	public int durability() { return durability; }
 	public void modifyDurability(int amount) { 
 		if(amount > 1) { 
-			this.canBreake = true;
+			this.canBreak = true;
 		}
 		
 		this.durability += amount; 
@@ -208,11 +208,11 @@ public class Item extends Thing{
 		details = details.substring(0, 1).toUpperCase()
 				+ details.substring(1);
 		
-		if(canBreake() && durability() <= 20){
+		if(canBreak() && durability() <= 20){
 			details += " Esta a punto de romperse.";
-		}else if(canBreake() && durability() <= 50){
+		}else if(canBreak() && durability() <= 50){
 			details += " No se ve muy resistente.";
-		}else if(canBreake() && durability() > 50){
+		}else if(canBreak() && durability() > 50){
 			details += " Puede romperse.";
 		}
 		
@@ -245,6 +245,6 @@ public class Item extends Thing{
 			details += " Posee alcance de hasta " + reach + " casillas.";
 		}
 		
-		return details.replace('ñ', (char)164).replace('Ñ', (char)165);
+		return details;
 	}
 }

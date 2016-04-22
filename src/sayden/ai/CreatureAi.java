@@ -130,7 +130,7 @@ public class CreatureAi {
 			isCrit = "";
 		}
 		
-		if(wound.startFlavorText(creature, attacker)){
+		if(wound.startFlavorText(attacker, creature)){
 			if(attacker.isPlayer()){
 				if(object != null){
 					attacker.notifyArround("Tu %s inflige %s %s%s", 
@@ -307,6 +307,10 @@ public class CreatureAi {
 	}
 	
 	public void flee(Creature target){
+		flee(target.position());
+	}
+	
+	public void flee(Point target){
 		List<Point> points = new Path(creature, target.x, target.y).points();
 		
 		if(points == null || points.isEmpty())
@@ -323,11 +327,18 @@ public class CreatureAi {
 	}
 	
 	public boolean distanceFrom(Creature target, int amount){
-		if(target == null || !target.isAlive() || amount == 0)
+		if(!target.isAlive())
 			return false;
 		
-		if(creature.position().distance(target.position()) <= amount){
-			flee(target);
+		return distanceFrom(target.position(), amount);
+	}
+	
+	public boolean distanceFrom(Point p, int amount){
+		if(p == null || amount <= 0)
+			return false;
+		
+		if(creature.position().distance(p) <= amount){
+			flee(p);
 			return true;
 		}
 		

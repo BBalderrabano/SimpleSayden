@@ -14,14 +14,14 @@ public class Wound extends Thing implements Cloneable {
 	public static ArrayList<Wound> DEFAULT_WOUNDS(){
 		ArrayList<Wound> defWounds = new ArrayList<Wound>();
 		
-		defWounds.add(new Wound(1, "moreton", 'M', 20, 100){
+		defWounds.add(new Wound(1, "moreton", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', 20, 100){
 			@Override
 			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
 				return dtype.id == DamageType.BLUNT.id;
 			}
 		});
 		
-		defWounds.add(new Wound(1, "corte superficial", 'M', 20, 100){
+		defWounds.add(new Wound(1, "corte superficial", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', 20, 100){
 			@Override
 			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
 				return dtype.id == DamageType.SLICE.id ||
@@ -30,7 +30,7 @@ public class Wound extends Thing implements Cloneable {
 			}
 		});
 		
-		defWounds.add(new Wound(1, "herida arcana", 'F', 20, 100){
+		defWounds.add(new Wound(1, "herida arcana", "La magia finalmente te es demasia, mueres de un derrame cerebral", 'F', 20, 100){
 			@Override
 			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
 				return dtype.id == DamageType.MAGIC.id;
@@ -48,8 +48,12 @@ public class Wound extends Thing implements Cloneable {
 	
 	public boolean isDone() { return this.duration < 1; }
 	
-	public Wound(int vigor, String name, char gender, int duration, double weight){
+	private String causeOfDeath;
+	public String causeOfDeath() { return causeOfDeath; }
+	
+	public Wound(int vigor, String name, String causeOfDeath, char gender, int duration, double weight){
 		this.duration = duration;
+		this.causeOfDeath = causeOfDeath;
 		this.name = name;
 		this.gender = gender;
 		this.weight = weight;

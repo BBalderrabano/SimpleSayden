@@ -70,9 +70,12 @@ public class StuffFactory {
 				
 		player.setStartingMovementSpeed(Speed.VERY_FAST);
 		player.setStartingAttackSpeed(Speed.VERY_FAST);
+
+		player.modifyAttackValue(DamageType.BLUNT, 1);
 		
 		Point[] startPos = {new Point(45, 2),
 							new Point(36, 12)};
+		
 		int selectedStart = (int) (Math.random() * startPos.length);
 		
 		world.addAtEmptySpace(player, startPos[selectedStart].x, startPos[selectedStart].y);
@@ -83,6 +86,7 @@ public class StuffFactory {
 		
 		if(!Constants.PRODUCTION){
 			player.inventory().add(newMace(false));
+			player.inventory().add(newSword(false));
 		}
 		
 		new PlayerAi(player, messages, fov);
@@ -94,6 +98,8 @@ public class StuffFactory {
 		
 		dreamer.setStartingMovementSpeed(Speed.VERY_FAST);
 		dreamer.setStartingAttackSpeed(Speed.VERY_FAST);
+		
+		dreamer.modifyAttackValue(DamageType.BLUNT, 1);
 		
 		dreamer.equip(randomWeapon(null, false, false, true, true, true));
 		dreamer.equip(randomArmor(null, false, true, true, true, false));
@@ -253,7 +259,7 @@ public class StuffFactory {
 	}
 	
 	public Creature newMarauder(Creature player){
-		Creature marauder = new Creature(world, 'm', 'M', AsciiPanel.brightYellow, "merodeador", 12);
+		Creature marauder = new Creature(world, 'm', 'M', AsciiPanel.brightYellow, "merodeador", 6);
 		marauder.setStartingAttackSpeed(Speed.NORMAL);
 		marauder.setStartingMovementSpeed(Speed.NORMAL);
 		marauder.setVisionRadius(6);
@@ -297,14 +303,16 @@ public class StuffFactory {
 	}
 	
 	public Creature newRockBug(Creature player){
-		Creature rockBug = new Creature(world, 'c', 'M', AsciiPanel.yellow, "comepiedras", 6);
+		Creature rockBug = new Creature(world, 'c', 'M', AsciiPanel.yellow, "comepiedras", 2);
 		
 		rockBug.setStartingAttackSpeed(Speed.NORMAL);
 		rockBug.setStartingMovementSpeed(Speed.FAST);
 		rockBug.setVisionRadius(2);
 		
+		rockBug.modifyAttackValue(DamageType.SLICE, 2);
+		
 		rockBug.modifyDefenseValue(DamageType.SLICE, 3);
-		rockBug.modifyDefenseValue(DamageType.BLUNT, 2);
+		rockBug.modifyDefenseValue(DamageType.BLUNT, 3);
 		
 		if(Math.random() > 0.2f){
 			rockBug.pickup(newRockBugHelm(false));

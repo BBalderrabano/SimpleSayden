@@ -1,9 +1,9 @@
 
 
 Version:	3.8
-CmdLine:	C:\Users\Bruno\Desktop\Sayden\Sayden exe\Sayden.exe --l4j-debug
+CmdLine:	Sayden.exe --l4j-debug
 WOW64:		yes
-Working dir:	C:\Users\Bruno\Desktop\Sayden\Sayden exe\.
+Working dir:	\.
 64-bit search:	SOFTWARE\JavaSoft\Java Runtime Environment...
 Check:		SOFTWARE\JavaSoft\Java Runtime Environment\1.7
 Check launcher:	C:\Program Files\Java\jre7\bin\javaw.exe (OK)

@@ -19,7 +19,7 @@ public class DamageType {
 	public static final DamageType RANGED = new DamageType(4, "rango", "daño efectuado por armas de rango", 0);
 	public static final DamageType MAGIC = new DamageType(5, "magico", "daño efectuador por fuentes magicas", 0);
 	
-	protected int id;
+	public int id;
 	public String name;
 	public String description;
 	public int amount;
