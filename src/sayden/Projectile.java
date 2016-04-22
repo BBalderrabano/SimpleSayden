@@ -1,5 +1,4 @@
 package sayden;
-
 import java.util.List;
 
 public class Projectile {
@@ -111,34 +110,18 @@ public class Projectile {
 	private void pickTarget(Creature target){
 		int totalDamage = 0;
 		
-		for(DamageType d : DamageType.ALL_TYPES()){
+		for(int d : DamageType.ALL_TYPES()){
 			totalDamage += Math.max(0, (projectile.attackValue(d) - target.defenseValue(d)));
 		}
 		
 		totalDamage = Math.max(1, totalDamage);	//Always deals at least 1 damage (ignores shields?)
 		
 		if(target.isPlayer()){
-			target.notifyArround("%s |(%s %s %s)01|%s te impacta |[%s %s %s]02| por |%s01|!", Constants.capitalize(projectile.nameUnUna()),
-					projectile.attackValue(DamageType.SLICE),
-					projectile.attackValue(DamageType.BLUNT),
-					projectile.attackValue(DamageType.PIERCING),
-					projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
-					target.defenseValue(DamageType.SLICE),
-					target.defenseValue(DamageType.BLUNT),
-					target.defenseValue(DamageType.PIERCING),
-					totalDamage);
+			target.notifyArround("%s te impacta!", Constants.capitalize(projectile.nameUnUna()));
 		}else{
-			target.notifyArround("%s |(%s %s %s)01|%s impacta %s |[%s %s %s]02| por |%s01|!", 
+			target.notifyArround("%s impacta %s!", 
 					Constants.capitalize(projectile.nameUnUna()),
-					projectile.attackValue(DamageType.SLICE),
-					projectile.attackValue(DamageType.BLUNT),
-					projectile.attackValue(DamageType.PIERCING),
-					projectile.attackValue(DamageType.RANGED) > 0 ? " |"+ projectile.attackValue(DamageType.RANGED)+"03|" : "",
-					target.nameAlALa(),
-					target.defenseValue(DamageType.SLICE),
-					target.defenseValue(DamageType.BLUNT),
-					target.defenseValue(DamageType.PIERCING),
-					totalDamage);
+					target.nameAlALa());
 		}
 
 		if(projectile.quaffEffect() != null && projectile.quaffEffect().quaffable){
@@ -151,9 +134,6 @@ public class Projectile {
 		}
 		
 		target.setData(Constants.CHECKPOINT, path.getPoints().get(0));
-		
-		float drained_blood = (totalDamage * Constants.BLOOD_AMOUNT_MULTIPLIER) * projectile.bloodModifyer();
-		target.makeBleed(drained_blood);
 		
 		if(target.isAlive() && target.queSpell() != null){
 			target.stopCasting();

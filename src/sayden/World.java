@@ -10,7 +10,6 @@ public class World {
 	
 	private Item[][] items;
 	private float[][] blood;
-	private float[][] fire;
 	
 	private boolean[][] visited;
 	
@@ -23,13 +22,6 @@ public class World {
 	private List<Creature> creatures;
 	private List<Projectile> projectiles;
 	
-	public float fire(int x, int y) { 
-		if (x < 0 || x >= width || y < 0 || y >= height)
-			return 0;
-		
-		return fire[x][y];
-	}
-	
 	public World(Tile[][] tiles){
 		this.tiles = tiles;
 
@@ -41,7 +33,6 @@ public class World {
 		
 		this.items = new Item[tiles.length][tiles[0].length];
 		this.blood = new float[tiles.length][tiles[0].length];
-		this.fire = new float[tiles.length][tiles[0].length];
 		this.visited = new boolean[tiles.length][tiles[0].length];
 		this.regions = new int[tiles.length][tiles[0].length];
 	}
@@ -176,26 +167,6 @@ public class World {
 					}
 				}
 			}
-		}else if(fluidType == Constants.FIRE_TERRAIN){
-			amount -= tiles[x][y].fireResistance();
-			amount = Math.max(amount, 0);			
-			
-			fire[x][y] += amount;
-			
-			if(fire[x][y] > 100f){
-				tiles[x][y] = Tile.BURNT_FLOOR;
-				for(Point t : tile.neighbors4()){
-					if(isOutBounds(t.x, t.y)){
-						continue;
-					}
-					if(fire[t.x][t.y] > 0)
-						continue;
-					
-					fire[t.x][t.y] += (fire[x][y] - 100);
-					//fire[x][y][z] -= (fire[x][y][z] - 100);
-					return;
-				}
-			}
 		}
 	}
 	
@@ -208,9 +179,6 @@ public class World {
 		
 		if (creature != null && !creature.getBooleanData(Constants.FLAG_INVISIBLE))
 			return creature.glyph();
-		
-		if(fire[x][y] > 0)
-			return (char)30;
 		
 		if (item(x,y) != null)
 			return item(x,y).glyph();
@@ -227,9 +195,6 @@ public class World {
 		
 		if (creature != null && !creature.getBooleanData(Constants.FLAG_INVISIBLE))
 			return creature.color();
-		
-		if(fire[x][y] > 0)
-			return Tile.getFire().color();
 		
 		if (item(x,y) != null)
 			return item(x,y).color();
@@ -310,18 +275,6 @@ public class World {
 					blood[x][y] -= 1f;
 			}	
 		}
-		for (int x = 0; x < width; x++){
-			for (int y = 0; y < height; y++){
-				if(fire[x][y] > 0)
-					fire[x][y] -= Constants.FIRE_DEGRADATION;
-				if(fire[x][y] > 80){
-					propagate(x, y, 30, Constants.FIRE_TERRAIN);
-					fire[x][y] -= Constants.FIRE_DEGRADATION;
-				}
-				if(fire[x][y] > 100 && tiles[x][y].fireResistance() < 100)
-					tiles[x][y] = Tile.BURNT_FLOOR;
-			}	
-		}	
 	}
 
 	public void remove(Creature other) {

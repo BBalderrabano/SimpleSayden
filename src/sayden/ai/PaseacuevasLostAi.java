@@ -20,7 +20,6 @@ public class PaseacuevasLostAi extends CreatureAi {
 		boolean success = false;
 		
 		if(creature.y < y && creature.x == x){
-			creature.modifyAttackValue(DamageType.SLICE, 3);
 			success = super.onAttack(other);
 			
 			if(success){
@@ -34,7 +33,6 @@ public class PaseacuevasLostAi extends CreatureAi {
 //				});
 			}
 			
-			creature.modifyAttackValue(DamageType.SLICE, -3);
 		}else{
 			success = super.onAttack(other);
 		}

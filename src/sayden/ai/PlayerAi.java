@@ -91,7 +91,7 @@ public class PlayerAi extends CreatureAi {
 				if(weaponLevel > 0){
 					creature.notify("Te sientes mas comodo con tu " + creature.weapon().name);
 					if(weaponLevel == 1){
-						creature.weapon().modifyAttackValue(creature.weapon().highestDamage(), 2);
+						creature.weapon().modifyAttackValue(creature.weapon().highestDamage().id, 2);
 					}
 					if(weaponLevel == 3){
 						if(creature.weapon().attackSpeed() != null){
@@ -111,7 +111,7 @@ public class PlayerAi extends CreatureAi {
 		if(weaponLevel > 0){
 			creature.notify("Te sientes mas comodo con tu " + weapon.name);
 			if(weaponLevel == 1){
-				weapon.modifyAttackValue(weapon.highestDamage(), 2);
+				weapon.modifyAttackValue(weapon.highestDamage().id, 2);
 			}
 			if(weaponLevel == 3){
 				if(weapon.attackSpeed() != null){

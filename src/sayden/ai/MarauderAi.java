@@ -26,12 +26,11 @@ public class MarauderAi extends CreatureAi {
 		this.setWeakSpot(Constants.HEAD_POS);
 		this.pack = new ArrayList<Creature>();
 		
-		creature.setData(Constants.DEALS_WOUNDS, true);
 		creature.setData(Constants.RACE, "merodeador");
 		
 		possibleFatality().add(new Wound(4, "decapitacion", null, 'F', 1, 50){
-			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
-				return dtype.id == DamageType.SLICE.id && 
+			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
+				return dtype == DamageType.SLICE && 
 						position == Constants.HEAD_POS && 
 						attacker.weapon() != null && target.vigor() >= 4;
 			}

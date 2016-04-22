@@ -70,8 +70,8 @@ public class StuffFactory {
 				
 		player.setStartingMovementSpeed(Speed.VERY_FAST);
 		player.setStartingAttackSpeed(Speed.VERY_FAST);
-
-		player.modifyAttackValue(DamageType.BLUNT, 1);
+		
+		player.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 1);
 		
 		Point[] startPos = {new Point(45, 2),
 							new Point(36, 12)};
@@ -99,7 +99,7 @@ public class StuffFactory {
 		dreamer.setStartingMovementSpeed(Speed.VERY_FAST);
 		dreamer.setStartingAttackSpeed(Speed.VERY_FAST);
 		
-		dreamer.modifyAttackValue(DamageType.BLUNT, 1);
+		dreamer.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 1);
 		
 		dreamer.equip(randomWeapon(null, false, false, true, true, true));
 		dreamer.equip(randomArmor(null, false, true, true, true, false));
@@ -176,7 +176,7 @@ public class StuffFactory {
 		Creature lunatic = new Creature(world, 'l', 'M', Color.gray, "lunatico", 14);
 		lunatic.setStartingAttackSpeed(Speed.FAST);
 		lunatic.setStartingMovementSpeed(Speed.NORMAL);
-		lunatic.modifyAttackValue(DamageType.BLUNT, 1);
+		lunatic.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 1);
 		
 		world.addAtEmptyLocation(lunatic);
 		new LunaticAi(lunatic, player);
@@ -187,7 +187,7 @@ public class StuffFactory {
 		Creature dog = new Creature(world, 'd', 'M', new Color(165,42,42), "perro", 8);
 		dog.setStartingAttackSpeed(Speed.FAST);
 		dog.setStartingMovementSpeed(Speed.FAST);
-		dog.modifyAttackValue(DamageType.SLICE, 4);
+		dog.setUnarmeDamage(DamageType.getInstance(DamageType.SLICE), 4);
 		
 		world.addAtEmptyLocation(dog);
 		new DogAi(dog, player, owner);
@@ -214,9 +214,8 @@ public class StuffFactory {
 		caveBrute.setStartingMovementSpeed(Speed.SLOW);
 		caveBrute.setVisionRadius(4);
 		
-		caveBrute.modifyAttackValue(DamageType.BLUNT, 4);
-		caveBrute.modifyDefenseValue(DamageType.BLUNT, 2);
-		caveBrute.modifyDefenseValue(DamageType.SLICE, 1);
+		caveBrute.modifyBonusDefense(DamageType.BLUNT, 2);
+		caveBrute.modifyBonusDefense(DamageType.SLICE, 1);
 		
 		caveBrute.equip(newBigMace(false));
 		
@@ -236,7 +235,7 @@ public class StuffFactory {
 		caveLost.setStartingAttackSpeed(Speed.NORMAL);
 		caveLost.setStartingMovementSpeed(Speed.FAST);
 		
-		caveLost.modifyAttackValue(DamageType.SLICE, 2);
+		caveLost.setUnarmeDamage(DamageType.getInstance(DamageType.SLICE), 2);
 		
 		caveLost.setVisionRadius(8);
 		
@@ -251,7 +250,7 @@ public class StuffFactory {
 		caveSmall.setStartingMovementSpeed(Speed.FAST);
 		caveSmall.setVisionRadius(8);
 		
-		caveSmall.modifyAttackValue(DamageType.BLUNT, 2);
+		caveSmall.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 2);
 		
 		world.addAtEmptySpace(caveSmall, female.x, female.y);
 		new PaseacuevasMaleAi(caveSmall, player, female);
@@ -289,7 +288,6 @@ public class StuffFactory {
 		bigMarauder.setVisionRadius(6);
 		bigMarauder.setStartingAttackSpeed(Speed.VERY_SLOW);
 		bigMarauder.setStartingMovementSpeed(Speed.NORMAL);
-		bigMarauder.modifyAttackValue(DamageType.BLUNT, 8);
 
 		bigMarauder.equip(newMarauderVest(false));
 		bigMarauder.equip(newMarauderHood(false));
@@ -309,10 +307,10 @@ public class StuffFactory {
 		rockBug.setStartingMovementSpeed(Speed.FAST);
 		rockBug.setVisionRadius(2);
 		
-		rockBug.modifyAttackValue(DamageType.SLICE, 2);
+		rockBug.setUnarmeDamage(DamageType.getInstance(DamageType.SLICE), 2);
 		
-		rockBug.modifyDefenseValue(DamageType.SLICE, 3);
-		rockBug.modifyDefenseValue(DamageType.BLUNT, 3);
+		rockBug.modifyBonusDefense(DamageType.SLICE, 3);
+		rockBug.modifyBonusDefense(DamageType.BLUNT, 3);
 		
 		if(Math.random() > 0.2f){
 			rockBug.pickup(newRockBugHelm(false));
@@ -326,10 +324,11 @@ public class StuffFactory {
 	public Creature newHidden(Creature player){
 		Creature hidden = new Creature(world, 'a', 'M', AsciiPanel.yellow, "acechador", 6);
 		
-		hidden.modifyDefenseValue(DamageType.BLUNT, 4);
-		hidden.modifyDefenseValue(DamageType.PIERCING, 2);
+		hidden.modifyBonusDefense(DamageType.BLUNT, 4);
+		hidden.modifyBonusDefense(DamageType.PIERCING, 2);
 		
-		hidden.modifyAttackValue(DamageType.PIERCING, 6);
+		hidden.setUnarmeDamage(DamageType.getInstance(DamageType.PIERCING), 6);
+		
 		hidden.modifyAttackSpeed(Speed.VERY_FAST);
 		hidden.modifyMovementSpeed(Speed.SLOW);
 		hidden.setVisionRadius(6);
@@ -1226,19 +1225,6 @@ public class StuffFactory {
 		return item;
 	}
 		
-	public Item newPotionOfFire(boolean spawn){
-		String appearance = potionAppearances.get(1);
-		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion ignea", appearance, 70);
-		item.setQuaffEffect(new Effect("incinerado", 1){
-			public void start(int x, int y){
-				world.propagate(x, y, 400, Constants.FIRE_TERRAIN);
-			}
-		});
-		item.makeStackable(5);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
 	public Item newPotionOfSlowHealth(boolean spawn){
 		String appearance = potionAppearances.get(2);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de lenta curacion", appearance, 60);
@@ -1284,13 +1270,13 @@ public class StuffFactory {
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion del guerrero", appearance, 50);
 		item.setQuaffEffect(new Effect("fortalecido", 20){
 			public void start(Creature creature){
-				creature.modifyAttackValue(DamageType.BLUNT, 5);
-				creature.modifyDefenseValue(DamageType.BLUNT, 5);
+				creature.modifyBonusDamage(DamageType.BLUNT, 5);
+				creature.modifyBonusDefense(DamageType.BLUNT, 5);
 				creature.doAction(item, "siente mas fuerte");
 			}
 			public void end(Creature creature){
-				creature.modifyAttackValue(DamageType.BLUNT, -5);
-				creature.modifyDefenseValue(DamageType.BLUNT, -5);
+				creature.modifyBonusDamage(DamageType.BLUNT, -5);
+				creature.modifyBonusDefense(DamageType.BLUNT, -5);
 				creature.doAction("siente amainar su fuerza");
 			}
 		});
@@ -1425,8 +1411,8 @@ public class StuffFactory {
 //					creature.modifyHp(1, "Killed by inner strength spell?");
 //			}
 //			public void end(Creature creature){
-//				creature.modifyAttackValue(DamageType.BLUNT, -2);
-//				creature.modifyDefenseValue(DamageType.BLUNT, -2);
+//				creature.modifyAttackValue(DamageType.BLUNT(), -2);
+//				creature.modifyDefenseValue(DamageType.BLUNT(), -2);
 //				creature.modifyVisionRadius(-1);
 //				creature.modifyRegenHpPer1000(-10);
 //			}

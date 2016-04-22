@@ -3,21 +3,40 @@ package sayden;
 import java.util.ArrayList;
 
 public class DamageType {
-	public static ArrayList<DamageType> ALL_TYPES(){
+	public static ArrayList<DamageType> ALL_TYPES_INSTANCE(){
 		ArrayList<DamageType> toReturn = new ArrayList<DamageType>();
-		toReturn.add(new DamageType(SLICE));
-		toReturn.add(new DamageType(PIERCING));
-		toReturn.add(new DamageType(BLUNT));
-		toReturn.add(new DamageType(RANGED));
-		toReturn.add(new DamageType(MAGIC));
+		toReturn.add(new DamageType(1, "cortante", "daño efectuado por corte", 0));
+		toReturn.add(new DamageType(2, "contundente", "daño efectuado por golpes fuertes", 0));
+		toReturn.add(new DamageType(3, "penetrante", "daño efectuado por penetrar la piel", 0));
+		toReturn.add(new DamageType(4, "rango", "daño efectuado por armas de rango", 0));
+		toReturn.add(new DamageType(5, "magico", "daño efectuador por fuentes magicas", 0));
 		return toReturn;
 	}
 	
-	public static final DamageType SLICE = new DamageType(1, "cortante", "daño efectuado por corte", 0);
-	public static final DamageType BLUNT = new DamageType(2, "contundente", "daño efectuado por golpes fuertes", 0);
-	public static final DamageType PIERCING = new DamageType(3, "penetrante", "daño efectuado por penetrar la piel", 0);
-	public static final DamageType RANGED = new DamageType(4, "rango", "daño efectuado por armas de rango", 0);
-	public static final DamageType MAGIC = new DamageType(5, "magico", "daño efectuador por fuentes magicas", 0);
+	public static DamageType getInstance(int type){
+		for(DamageType d : ALL_TYPES_INSTANCE()){
+			if(d.id == type){
+				return d;
+			}
+		}
+		return null;
+	}
+	
+	public static ArrayList<Integer> ALL_TYPES(){
+		ArrayList<Integer> toReturn = new ArrayList<Integer>();
+		toReturn.add(1);
+		toReturn.add(2);
+		toReturn.add(3);
+		toReturn.add(4);
+		toReturn.add(5);
+		return toReturn;
+	}
+	
+	public static final int SLICE = 1;
+	public static final int BLUNT = 2;
+	public static final int PIERCING = 3;
+	public static final int RANGED = 4;
+	public static final int MAGIC = 5;
 	
 	public int id;
 	public String name;

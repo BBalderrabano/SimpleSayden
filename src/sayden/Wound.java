@@ -16,24 +16,24 @@ public class Wound extends Thing implements Cloneable {
 		
 		defWounds.add(new Wound(1, "moreton", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', 20, 100){
 			@Override
-			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
-				return dtype.id == DamageType.BLUNT.id;
+			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
+				return dtype == DamageType.BLUNT;
 			}
 		});
 		
 		defWounds.add(new Wound(1, "corte superficial", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', 20, 100){
 			@Override
-			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
-				return dtype.id == DamageType.SLICE.id ||
-						dtype.id == DamageType.PIERCING.id ||
-						dtype.id == DamageType.RANGED.id;
+			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
+				return dtype == DamageType.SLICE ||
+						dtype == DamageType.PIERCING ||
+						dtype == DamageType.RANGED;
 			}
 		});
 		
 		defWounds.add(new Wound(1, "herida arcana", "La magia finalmente te es demasia, mueres de un derrame cerebral", 'F', 20, 100){
 			@Override
-			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
-				return dtype.id == DamageType.MAGIC.id;
+			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
+				return dtype == DamageType.MAGIC;
 			}
 		});
 		
@@ -60,7 +60,11 @@ public class Wound extends Thing implements Cloneable {
 		this.vigor = vigor;
 	}
 	
-	public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+	public boolean canBePickedFRanged(Creature target, int dtype, int amount){
+		return true;
+	}
+	
+	public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
 		return true;
 	}
 	

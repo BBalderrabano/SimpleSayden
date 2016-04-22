@@ -24,9 +24,9 @@ public class Item extends Thing{
 	
 	private ArrayList<DamageType> attackValues;
 	public ArrayList<DamageType> attackValues() { return attackValues; }
-	public void modifyAttackValue(DamageType type, int value) { 
+	public void modifyAttackValue(int type, int value) { 
 		for(DamageType d : attackValues){
-			if(d.id == type.id)
+			if(d.id == type)
 				d.modifyAmount(value);
 		}
 	}
@@ -37,9 +37,9 @@ public class Item extends Thing{
 		}
 		return amount;
 	}
-	public int attackValue(DamageType type) { 
+	public int attackValue(int type) { 
 		for(DamageType d : attackValues){
-			if(d.id == type.id)
+			if(d.id == type)
 				return d.amount;
 		}
 		return 0;
@@ -60,9 +60,9 @@ public class Item extends Thing{
 
 	private ArrayList<DamageType> defenseValues;
 	public ArrayList<DamageType> defenseValues() { return defenseValues; };
-	public void modifyDefenseValue(DamageType type, int value) { 
+	public void modifyDefenseValue(int type, int value) { 
 		for(DamageType d : defenseValues){
-			if(d.id == type.id)
+			if(d.id == type)
 				d.modifyAmount(value);
 		}
 	}
@@ -73,9 +73,9 @@ public class Item extends Thing{
 		}
 		return amount;
 	}
-	public int defenseValue(DamageType type) { 
+	public int defenseValue(int type) { 
 		for(DamageType d : defenseValues){
-			if(d.id == type.id)
+			if(d.id == type)
 				return d.amount;
 		}
 		return 0;
@@ -165,10 +165,13 @@ public class Item extends Thing{
 		this.appearance = appearance;
 		this.writtenSpells = new ArrayList<Spell>();
 		this.possibleWounds = new ArrayList<Wound>();
+		
 		this.attackValues = new ArrayList<DamageType>();
-		this.attackValues.addAll(DamageType.ALL_TYPES());
+		this.attackValues.addAll(DamageType.ALL_TYPES_INSTANCE());
+		
 		this.defenseValues = new ArrayList<DamageType>();
-		this.defenseValues.addAll(DamageType.ALL_TYPES());
+		this.defenseValues.addAll(DamageType.ALL_TYPES_INSTANCE());
+		
 		this.spawnWeight = spawnWeight;
 		this.bloodModifyer = 0.5f;
 		

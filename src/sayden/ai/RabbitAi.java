@@ -16,7 +16,6 @@ public class RabbitAi extends CreatureAi {
 		
 		this.player = player;
 		creature.setData(Constants.RACE, "conejo");
-		creature.setData(Constants.DEALS_WOUNDS, true);
 	}
 
 	public void onUpdate(){

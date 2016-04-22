@@ -5,47 +5,65 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import asciiPanel.AsciiPanel;
 import sayden.ai.CreatureAi;
 import sayden.screens.Screen;
 
 public class Creature extends Thing{
-	private World world;
-	public World world() { return world; }
-	public void setWorld(World newWorld) { this.world = newWorld; }
-	
-	public int x;
-	public int y;
-	public Point position() { return new Point(x,y); }
-	
-	private Spell queSpell;
-	private Creature queSpellCreature;
-	
-	public boolean isAlly(Creature target) { return getData(Constants.RACE) == target.getData(Constants.RACE) || target.getBooleanData(Constants.UNIVERSAL_ALLY); }
-	
-	public Spell queSpell() { return queSpell; }
-	public Creature queSpellCreature() { return queSpellCreature; }
-	public void stopCasting() { if(queSpell == null && queSpellCreature == null){ return ; } doAction("|deja06| de conjurar " + queSpell.nameElLa()); this.setQueSpell(null, null); }
-	
-	public void setQueSpell(Creature c, Spell s) { this.queSpellCreature = c; this.queSpell = s; }
-	
-	private Point queAttack;
-	public Point queAttack(){ return queAttack; }
-	public void setQueAttack(Point p) { this.queAttack = p; }
-	
-	private char glyph;
+
+	private char glyph;	//El char o grafico de la criatura
 	public char glyph() { return glyph; }
 	
 	private Color color;
-	public Color color() { return queSpell != null ? AsciiPanel.brightMagenta : queAttack != null ? AsciiPanel.brightBlue : color; }
+	public Color color() { return queSpell != null ? Constants.SPELL_QUE_COLOR : queAttack != null ? Constants.ATTACK_QUE_COLOR : color; }
 	public void changeColor(Color color) { this.color = color; }
 	
-	private Color originalColor;
+	//El color de la criatura al instanciarse
+	private Color originalColor;							
 	public Color originalColor() { return originalColor; }
 
 	private CreatureAi ai;
 	public CreatureAi ai() { return ai; }
 	public void setCreatureAi(CreatureAi ai) { this.ai = ai; }
+	//Si la criatura tiene la misma raza que el target, o si es aliado universal
+	public boolean isAlly(Creature target) { return getData(Constants.RACE) == target.getData(Constants.RACE) || target.getBooleanData(Constants.UNIVERSAL_ALLY); }
+
+	
+	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		private World world;
+		public World world() { return world; }	
+		public void setWorld(World newWorld) { this.world = newWorld; }
+		
+		public int x;
+		public int y;
+		public Point position() { return new Point(x,y); }
+	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		private Spell queSpell;				//El spell que quiere lanzar
+		private Creature queSpellCreature;	//La criatura a la que quiere lanzar el spell
+		
+		public Spell queSpell() { return queSpell; }
+		public Creature queSpellCreature() { return queSpellCreature; }
+		public void stopCasting() { if(queSpell == null && queSpellCreature == null){ return ; } doAction("|deja06| de conjurar " + queSpell.nameElLa()); this.setQueSpell(null, null); }
+		
+		public void setQueSpell(Creature c, Spell s) { this.queSpellCreature = c; this.queSpell = s; }
+		
+		//La posicion a donde quiere atacar la criatura
+		private Point queAttack;
+		public Point queAttack(){ return queAttack; }	
+		public void setQueAttack(Point p) { this.queAttack = p; }
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	
+	private boolean isAlive;
+	public boolean isAlive() { return isAlive; }
+	
+	private String causeOfDeath;
+	public String causeOfDeath() { return causeOfDeath; }
+		
+	//El vigor funciona como el "HP", devuelve la suma del vigor de todas las heridas
+	private int maxVigor;
+	public int maxVigor() { return maxVigor; }
+	public void modifyMaxVigor(int amount) { this.maxVigor += amount; }
 	
 	public int vigor() { 
 		int vigor = 0;
@@ -57,6 +75,7 @@ public class Creature extends Thing{
 		return vigor; 
 	}
 	
+	//Las heridas que tiene inflingidas la criatura
 	private ArrayList<Wound> inflictedWounds;
 	public ArrayList<Wound> inflictedWounds() { return inflictedWounds; }
 	public void inflictWound(Wound wound){
@@ -79,6 +98,7 @@ public class Creature extends Thing{
 		cloned.start(this);
 		inflictedWounds.add(cloned);
 		
+		//Aqui se chequea si la criatura muere, al player se le dan 50% chances de sobrevivir
 		if(!isPlayer && vigor() > maxVigor()){
 			die(cloned.causeOfDeath());
 		}else if(isPlayer && vigor() > maxVigor()){
@@ -90,181 +110,204 @@ public class Creature extends Thing{
 		}
 	}
 	
-	private int maxVigor;
-	public int maxVigor() { return maxVigor; }
-	public void setMaxVigor(int amount) { this.maxVigor += amount; }
-	
-	private boolean isAlive;
-	public boolean isAlive() { return isAlive; }
-	public void modifyAlive(boolean isAlive) { this.isAlive = isAlive; }
-	
-	private float blood;
-	public float blood() { return blood; }
-	public void modifyBlood(float value) { blood += value; }
-	
-	private ArrayList<DamageType> attackValues;
-	public void modifyAttackValue(DamageType type, int value) { 
-		for(DamageType d : attackValues){
-			if(d.id == type.id)
-				d.modifyAmount(value);
-		}
-	}
-	public int attackValue(DamageType type) { 
-		for(DamageType d : attackValues){
-			if(d.id == type.id)
-				return d.amount 
-					+ (weapon != null ? weapon.attackValue(type) : 0)
-					+ (shield != null ? shield.attackValue(type) : 0)
-					+ (helment != null ? helment.attackValue(type) : 0)
-					+ (armor != null ? armor.attackValue(type) : 0);		
-		}
-		return 0;
-	}
-
-	private ArrayList<DamageType> defenseValues;
-	public void modifyDefenseValue(DamageType type, int value) { 
-		for(DamageType d : defenseValues){
-			if(d.id == type.id)
-				d.modifyAmount(value);
-		}
-	}
-	public int defenseValue(DamageType type) { 
-		for(DamageType d : defenseValues){
-			if(d.id == type.id)
-				return d.amount
-					+ (weapon != null ? weapon.defenseValue(type) : 0)
-					+ (helment != null ? helment.defenseValue(type) : 0)
-					+ (armor != null ? armor.defenseValue(type) : 0);
-		}
-		return 0;
-	}
-
-	private int actionPoints;
-	public int getActionPoints() { return actionPoints;	}
-	public void modifyActionPoints(int amount, boolean affectPlayer) {
-		if(isPlayer()){
-			world.modifyActionPoints(amount);
-			
-			if(affectPlayer){
-				this.actionPoints += amount;
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		//Los bonus de daño de la criatura, al inicializar se le pasan TODOS los daños en 0
+		private ArrayList<DamageType> bonusDamages;
+		public void modifyBonusDamage(int type, int value) { 
+			for(DamageType d : bonusDamages){
+				if(d.id == type)
+					d.modifyAmount(value);
 			}
-			return;
 		}
-		this.actionPoints += amount; 
 		
-		if(amount < 0){
-			updateEffects();
-			updateWounds();
+		//El daño desarmado de la criatura
+		private DamageType unarmeDamage = null;
+		public DamageType unarmeDamage() { return unarmeDamage; }
+		public void setUnarmeDamage(DamageType damage, int amount) { 
+			if(unarmeDamage != null)
+				return;
+			
+			this.unarmeDamage = damage; 
+			this.unarmeDamage.amount = amount; 
 		}
-	}
+		
+		//El daño de la criatura (bonus + equipo)
+		public int attackValue(int type) { 
+			for(DamageType d : bonusDamages){
+				if(d.id == type){
+					return d.amount 
+						+ (weapon != null ? weapon.attackValue(type) : 0)
+						+ (shield != null ? shield.attackValue(type) : 0)
+						+ (helment != null ? helment.attackValue(type) : 0)
+						+ (armor != null ? armor.attackValue(type) : 0);	
+				}
+			}
+			return 0;
+		}
 
-	private Speed getSlowestAttackSpeed(){
-		Speed slowest = attackSpeed;
-		if(helment != null && helment.attackSpeed() != null &&
-				helment.attackSpeed().velocity() > slowest.velocity())
-			slowest =  helment.attackSpeed();
-		if(armor != null && armor.attackSpeed() != null &&
-				armor.attackSpeed().velocity() > slowest.velocity())
-			slowest =  armor.attackSpeed();
-		if(shield != null && shield.attackSpeed() != null &&
-				shield.attackSpeed().velocity() > slowest.velocity())
-			slowest =  shield.attackSpeed();
-		if(weapon != null && weapon.attackSpeed() != null && 
-				weapon.attackSpeed().velocity() > slowest.velocity())
-			slowest =  weapon.attackSpeed();
+		//Los bonus de defensa de la criatura, al inicializar se le pasan TODAS las defensas en 0 (se usa para guardar las defensas "pasivas" de las criaturas sin equipo
+		private ArrayList<DamageType> bonusDefenses;
+		public void modifyBonusDefense(int type, int value) { 
+			for(DamageType d : bonusDefenses){
+				if(d.id == type)
+					d.modifyAmount(value);
+			}
+		}
 		
-		return slowest;
-	}
-	private Speed startingAttackSpeed;
-	public Speed startingAttackSpeed(){ return startingAttackSpeed; }
-	public void setStartingAttackSpeed(Speed attackSpeed) {
-		this.startingAttackSpeed = attackSpeed;
-		this.attackSpeed = attackSpeed;
-	}
-	private Speed attackSpeed;
-	public Speed getAttackSpeed() {
-		return getSlowestAttackSpeed();
-	}
-	public void modifyAttackSpeed(Speed attackSpeed) {
-		this.attackSpeed = attackSpeed;
-	}
-	
-	private Speed getSlowestMovementSpeed(){
-		Speed slowest = movementSpeed;
-		if(helment != null && helment.movementSpeed() != null &&
-				helment.movementSpeed().velocity() > slowest.velocity())
-			slowest =  helment.movementSpeed();
-		if(armor != null && armor.movementSpeed() != null &&
-				armor.movementSpeed().velocity() > slowest.velocity())
-			slowest =  armor.movementSpeed();
-		if(shield != null && shield.movementSpeed() != null &&
-				shield.movementSpeed().velocity() > slowest.velocity())
-			slowest =  shield.movementSpeed();
-		if(weapon != null && weapon.movementSpeed() != null && 
-				weapon.movementSpeed().velocity() > slowest.velocity())
-			slowest =  weapon.movementSpeed();
+		//La defensa de la criatura (bonus + equipo)
+		public int defenseValue(int id) { 
+			for(DamageType d : bonusDefenses){
+				if(d.id == id)
+					return d.amount
+						+ (weapon != null ? weapon.defenseValue(id) : 0)
+						+ (helment != null ? helment.defenseValue(id) : 0)
+						+ (armor != null ? armor.defenseValue(id) : 0);
+			}
+			return 0;
+		}
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+		private int actionPoints;
+		public int getActionPoints() { return actionPoints;	}
+		//Modifica los puntos de accion de las criaturas
+		public void modifyActionPoints(int amount, boolean affectPlayer) {
+			if(isPlayer()){
+				world.modifyActionPoints(amount);	//El player modifica los AP de todas las criaturas
+				
+				if(affectPlayer){					//Este flag se usa para substraer puntos al jugador, en caso de que se quiera dejar al jugador con AP negativo
+					this.actionPoints += amount;
+				}
+				return;
+			}
+			
+			this.actionPoints += amount; 
+			
+			//Si estoy substrayendo puntos (tomando una accion) actualizo las heridas/efectos
+			if(amount < 0){		
+				updateEffects();
+				updateWounds();
+			}
+		}
 		
-		return slowest;
-	}
-	private Speed startingMovementSpeed;
-	public Speed startingMovementSpeed(){ return startingMovementSpeed; }
-	public void setStartingMovementSpeed(Speed movementSpeed) {
-		this.startingMovementSpeed = movementSpeed;
-		this.movementSpeed = movementSpeed;
-	}
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	//Con las velocidades, SIEMPRE toma la velocidad mas "lenta"
+		
+	//ATAQUE
+		private Speed getSlowestAttackSpeed(){
+			Speed slowest = attackSpeed;
+			if(helment != null && helment.attackSpeed() != null &&
+					helment.attackSpeed().velocity() > slowest.velocity())
+				slowest =  helment.attackSpeed();
+			if(armor != null && armor.attackSpeed() != null &&
+					armor.attackSpeed().velocity() > slowest.velocity())
+				slowest =  armor.attackSpeed();
+			if(shield != null && shield.attackSpeed() != null &&
+					shield.attackSpeed().velocity() > slowest.velocity())
+				slowest =  shield.attackSpeed();
+			if(weapon != null && weapon.attackSpeed() != null && 
+					weapon.attackSpeed().velocity() > slowest.velocity())
+				slowest =  weapon.attackSpeed();
+			
+			return slowest;
+		}
+		private Speed startingAttackSpeed;
+		public Speed startingAttackSpeed(){ return startingAttackSpeed; }
+		public void setStartingAttackSpeed(Speed attackSpeed) {
+			this.startingAttackSpeed = attackSpeed;
+			this.attackSpeed = attackSpeed;
+		}
+		private Speed attackSpeed;
+		public Speed getAttackSpeed() {
+			return getSlowestAttackSpeed();
+		}
+		public void modifyAttackSpeed(Speed attackSpeed) {
+			this.attackSpeed = attackSpeed;
+		}
 	
-	private Speed movementSpeed;
-	public Speed getMovementSpeed() {
-		return getSlowestMovementSpeed();
-	}
-	public void modifyMovementSpeed(Speed movementSpeed) {
-		this.movementSpeed = movementSpeed;
-	}
-	
+	//DEFENSA
+
+		private Speed getSlowestMovementSpeed(){
+			Speed slowest = movementSpeed;
+			if(helment != null && helment.movementSpeed() != null &&
+					helment.movementSpeed().velocity() > slowest.velocity())
+				slowest =  helment.movementSpeed();
+			if(armor != null && armor.movementSpeed() != null &&
+					armor.movementSpeed().velocity() > slowest.velocity())
+				slowest =  armor.movementSpeed();
+			if(shield != null && shield.movementSpeed() != null &&
+					shield.movementSpeed().velocity() > slowest.velocity())
+				slowest =  shield.movementSpeed();
+			if(weapon != null && weapon.movementSpeed() != null && 
+					weapon.movementSpeed().velocity() > slowest.velocity())
+				slowest =  weapon.movementSpeed();
+			
+			return slowest;
+		}
+		private Speed startingMovementSpeed;
+		public Speed startingMovementSpeed(){ return startingMovementSpeed; }
+		public void setStartingMovementSpeed(Speed movementSpeed) {
+			this.startingMovementSpeed = movementSpeed;
+			this.movementSpeed = movementSpeed;
+		}
+		
+		private Speed movementSpeed;
+		public Speed getMovementSpeed() {
+			return getSlowestMovementSpeed();
+		}
+		public void modifyMovementSpeed(Speed movementSpeed) {
+			this.movementSpeed = movementSpeed;
+		}
+		
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 	private int visionRadius;
 	public void modifyVisionRadius(int value) { visionRadius += value; }
 	public void setVisionRadius(int value) { visionRadius = value; }
 	public int visionRadius() { return visionRadius; }
 
-	private Inventory inventory;
-	public Inventory inventory() { return inventory; }
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
-	public boolean hasEquipped(Item check){
-		return check == weapon || check == shield
-				|| check == armor || check == helment
-				|| check == offWeapon;
-	}
+		private Inventory inventory;
+		public Inventory inventory() { return inventory; }
+		
+		public boolean hasEquipped(Item check){
+			return check == weapon || check == shield
+					|| check == armor || check == helment
+					|| check == offWeapon;
+		}
+		
+		private Item weapon;
+		public Item weapon() { return weapon; }
+		
+		private Item offWeapon;
+		public Item offWeapon() { return offWeapon; }
+		
+		private Item shield;
+		public Item shield() { return shield; }
+		
+		private Item armor;
+		public Item armor() { return armor; }
+		
+		private Item helment;
+		public Item helment() { return helment; }
 	
-	private Item weapon;
-	public Item weapon() { return weapon; }
-	
-	private Item offWeapon;
-	public Item offWeapon() { return offWeapon; }
-	
-	private Item shield;
-	public Item shield() { return shield; }
-	
-	private Item armor;
-	public Item armor() { return armor; }
-	
-	private Item helment;
-	public Item helment() { return helment; }
-	
+	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 	private List<Effect> effects;
 	public List<Effect> effects(){ return effects; }
 	
 	private List<Spell> spells;
 	public List<Spell> learnedSpells(){ return spells; }
 	
-	private String causeOfDeath;
-	public String causeOfDeath() { return causeOfDeath; }
-	
 	private float stealthLevel = 0;
+	//Se arranca a contar "stealth" al efectuar 1 paso completo
 	public int stealthLevel() { return (int) Math.max(0, stealthLevel - Constants.STEALTH_MIN_STEPS); }
+	//No se puede subir el nivel de stealth a mas de STEALTH_LEVEL_MAX
 	public void modifyStealth(float amount) { this.stealthLevel += amount; this.stealthLevel = Math.max(Math.min(Constants.STEALTH_LEVEL_MAX, this.stealthLevel), 0); }
+	//Setea el stealth a 0
 	public void removeStealth() { this.stealthLevel = 0; }
 	
-	public Screen subscreen;
+	public Screen subscreen;	//Variable SOLO USADA EN EL PLAYER para poder apagar/prender screens mientras se juega
 	
 	public Creature(World world, char glyph, char gender, Color color, String name, int vigor){
 		super();
@@ -277,27 +320,33 @@ public class Creature extends Thing{
 		this.color = color;
 		this.originalColor = color;
 		this.maxVigor = vigor;
-		this.blood = vigor * 10;
 		this.visionRadius = 6;
 		this.name = name;
-		this.inventory = new Inventory(20);
+		this.inventory = new Inventory(Constants.STARTING_INV_SPACE);
+		
 		this.inflictedWounds = new ArrayList<Wound>();
-		this.attackValues = new ArrayList<DamageType>();
-		this.attackValues.addAll(DamageType.ALL_TYPES());
-		this.defenseValues = new ArrayList<DamageType>();
-		this.defenseValues.addAll(DamageType.ALL_TYPES());
+		
+		this.bonusDamages = new ArrayList<DamageType>();
+		this.bonusDamages.addAll(DamageType.ALL_TYPES_INSTANCE());
+		
+		this.bonusDefenses = new ArrayList<DamageType>();
+		this.bonusDefenses.addAll(DamageType.ALL_TYPES_INSTANCE());
+		
 		this.effects = new ArrayList<Effect>();
 		this.spells = new ArrayList<Spell>();
+		
 		this.isAlive = true;
 	}
 		
 	public void moveBy(int mx, int my){
+		//Si el player tiene AP negativo, no puede moverse
 		if(getActionPoints() < 0 && isPlayer()){
 			mx = 0;
 			my = 0;
 			modifyActionPoints(-actionPoints, true);
 			notify("Te encuentras aturdido");
 		}
+		
 		ai.onMoveBy(mx, my);
 		
 		if (mx==0 && my==0){
@@ -310,15 +359,8 @@ public class Creature extends Thing{
 		
 		Tile tile = world.tile(x+mx, y+my);
 		
-		if(world.fire(x+mx, y+my) > 0){
-			//TODO: modifyHp(-(int)world.fire(x+mx, y+my) / 10, "Incinerado");
-			if(isPlayer)
-				notify("Estas siendo consumido por las llamas!");
-			else
-				notifyArround(Constants.capitalize(nameElLa()) + " es consumido por las llamas!");
-		}
-		
 		Creature other = world.creature(x+mx, y+my);
+		
 		boolean reachWarning = false;
 		
 		if(weapon() != null && weapon().cantReach() > 0){
@@ -383,6 +425,7 @@ public class Creature extends Thing{
 		}
 	}
 
+	//El dual strike primero pegas con el arma en la mano primaria, luego la secundaria
 	private boolean dualStrike = false;
 	public boolean dualStrike() { return dualStrike; }
 
@@ -435,7 +478,8 @@ public class Creature extends Thing{
 			glyph = '/';
 		
 		Item thrown = new Item(glyph, 'F', weapon().color(), "flecha", null, 100);
-		for(DamageType t : DamageType.ALL_TYPES()){
+		
+		for(int t : DamageType.ALL_TYPES()){
 			thrown.modifyAttackValue(t, weapon().attackValue(t));
 		}
 		
@@ -461,14 +505,20 @@ public class Creature extends Thing{
 		world.add(new Projectile(world, new Line(this.x, this.y, other.x, other.y), Speed.SUPER_FAST, thrown, this));
 	}
 	
+	/**
+	 * Efectua un ataque MEELE sobre una criatura
+	 * @param other	La criatura a la que vas a atacar
+	 * @param object El objeto con el que efectuas el ataque (un objeto especifico o tu arma)
+	 * @param onlyObject Si cuenta o no los bonus de daño de la criatura
+	 * @return Si el ataque se efectuo o no
+	 */
 	private boolean commonAttack(Creature other, Item object, boolean onlyObject) {
-		int attack = 0;	//Start adding the inherit damage of the creature
 		boolean weakSpotHit = false;
 		boolean shieldBlock = false;
 		String position = null;
 		
 		int highestDamage = -100;
-		DamageType highestDamageType = null;
+		int highestDamageType = -1;
 		
 		if(x < other.x && y >= other.y){
 			shieldBlock = true;
@@ -496,35 +546,48 @@ public class Creature extends Thing{
 		
 		boolean isShielding = other.shield() != null && shieldBlock;
 		
-		if(onlyObject && object != null && object.getBooleanData(Constants.CHECK_RANGED) || 
-				!onlyObject && weapon() != null && weapon().getBooleanData(Constants.CHECK_RANGED)){
-			attack += 1 - other.defenseValue(DamageType.BLUNT);
+		//Aqui se entra si esta tratando de golpear con un arma de rango, el daño es 1 blunt FIJO
+		if(object != null && object.getBooleanData(Constants.CHECK_RANGED)){
+			int attackValue = 1 - other.defenseValue(DamageType.BLUNT);
 			
 			if(isShielding){
-				attack -= other.shield().defenseValue(DamageType.BLUNT);
+				attackValue -= other.shield().defenseValue(DamageType.BLUNT);
+			}
+			
+			if(Math.max(0, attackValue) > highestDamage){
+				//Guardamos el daño maximo para luego buscar heridas
+				highestDamage = Math.max(0, attackValue);
+				highestDamageType = DamageType.BLUNT;
 			}
 		}else{
-			for(DamageType d : DamageType.ALL_TYPES()){
-				if(d.id == DamageType.RANGED.id)
+			//Recorremos todos los daños que existen
+			for(int d : DamageType.ALL_TYPES()){
+				//Ignoramos los daños de rango
+				if(d == DamageType.RANGED)
 					continue;
 				
-				int attackValue = onlyObject ? object.attackValue(d) : attackValue(d);
+				//Si esta prendido "onlyobject" vamos a buscar el daño del objeto en si, sino sumamos bonus
+				int attackValue = onlyObject && object != null ? object.attackValue(d) : attackValue(d);
+
+				if(object == null && unarmeDamage() != null && unarmeDamage().id == d){
+					attackValue = unarmeDamage().amount;
+				}
 				
+				//Solo si esta atacando de los costados se le resta la defensa de los escudos
 				if(isShielding){
 					attackValue -= other.shield().defenseValue(d);
 				}
 				
 				if(weakSpotHit){
-					attack += Math.max(0, attackValue);
-					
+					//Si estamos pegando al punto debil, no se resta las defensas (excepto el escudo, si esta defendiendo)
 					if(Math.max(0, attackValue) > highestDamage){
+						//Guardamos el daño maximo para luego buscar heridas
 						highestDamage = Math.max(0, attackValue);
 						highestDamageType = d;
 					}
 				}else{
-					attack += Math.max(0, attackValue - other.defenseValue(d));
-					
 					if(Math.max(0, attackValue - other.defenseValue(d)) > highestDamage){
+						//Guardamos el daño maximo para luego buscar heridas
 						highestDamage = Math.max(0, attackValue);
 						highestDamageType = d;
 					}
@@ -532,11 +595,7 @@ public class Creature extends Thing{
 			}
 		}
 		
-		int amount = attack;
-		
-		amount = Math.max(0, amount);
-		
-		if(amount < 1){
+		if(highestDamage < 1){
 			
 			impactWeapon();
 			
@@ -550,9 +609,6 @@ public class Creature extends Thing{
 		}
 		
 		ArrayList<Wound> checkWounds = new ArrayList<Wound>();
-		
-		if(highestDamageType == null)
-			highestDamageType = DamageType.BLUNT;
 		
 		for(Wound w : ai.possibleWounds()){
 			if(w.canBePicked(this, other, position, highestDamageType)){
@@ -582,13 +638,9 @@ public class Creature extends Thing{
 
 		other.ai().onGetAttacked(position, pickWeightedWound(checkWounds), this, object);
 	
-		float drained_blood = (amount * Constants.BLOOD_AMOUNT_MULTIPLIER) * (object == null ? 0.1f : object.bloodModifyer());
-		
-		other.makeBleed(drained_blood);
-		
 		impactWeapon();
 		
-		if(other.shield() != null && isShielding && amount >= 1){
+		if(other.shield() != null && isShielding && highestDamage >= 2){
 			other.shield().modifyDurability(-1);
 			other.notifyArround(Constants.capitalize(other.shield().nameElLaWNoStacks()) + " cruje con el impacto!");
 		}
@@ -629,7 +681,6 @@ public class Creature extends Thing{
 	}
 	
 	public void makeBleed(float amount){
-		modifyBlood(-amount);
 		world.propagate(x, y, amount, Constants.BLOOD_FLUID);
 	}
 	
