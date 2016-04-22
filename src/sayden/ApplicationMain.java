@@ -15,6 +15,7 @@ import sayden.screens.StartScreen;
 public class ApplicationMain extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1060623638149583738L;
 	
+	//Instanciamos el app updater y le pasamos la url del repositorio donde esta el archivo .jar
 	ApplicationUpdater updater = new ApplicationUpdater(
 			"https://raw.githubusercontent.com/BBalderrabano/SimpleSayden/master/deploy/",
 			Constants.SAVE_FILE_NAME);
