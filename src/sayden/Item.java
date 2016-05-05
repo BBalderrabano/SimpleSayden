@@ -11,10 +11,6 @@ public class Item extends Thing{
 	private char glyph;
 	public char glyph() { return glyph; }
 	
-	private float bloodModifyer;
-	public float bloodModifyer() { return bloodModifyer; }
-	public void modifyBloodModifyer(float amount) { this.bloodModifyer += amount; }
-	
 	private Color color;
 	public Color color() { return appearance != null && appearance != name  && name.indexOf("pocion") == -1 ? Constants.UNIDENTIFIED_COLOR : color; }
 	
@@ -173,7 +169,6 @@ public class Item extends Thing{
 		this.defenseValues.addAll(DamageType.ALL_TYPES_INSTANCE());
 		
 		this.spawnWeight = spawnWeight;
-		this.bloodModifyer = 0.5f;
 		
 		if(this.appearance != null && this.appearance != this.name)
 			this.identify(false);
@@ -190,7 +185,6 @@ public class Item extends Thing{
 		this.writtenSpells = clone.writtenSpells();
 		this.attackValues = clone.attackValues();
 		this.defenseValues = clone.defenseValues();
-		this.bloodModifyer = clone.bloodModifyer();
 		this.movementSpeed = clone.movementSpeed();
 		this.attackSpeed = clone.attackSpeed();
 		this.possibleWounds = clone.possibleWounds();

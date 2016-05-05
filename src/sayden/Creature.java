@@ -483,7 +483,6 @@ public class Creature extends Thing{
 			thrown.modifyAttackValue(t, weapon().attackValue(t));
 		}
 		
-		thrown.modifyBloodModifyer(weapon().bloodModifyer());
 		thrown.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
 		thrown.setData(Constants.CHECK_PROJECTILE_DISSAPEAR, true);
 		
@@ -1000,6 +999,9 @@ public class Creature extends Thing{
 	}
 	
 	public void equip(Item item){
+		if(item == null)
+			return;
+		
 		if (!inventory.contains(item)) {
 			if (inventory.isFull()) {
 				notify("No puedes equiparte %s, libera tu inventario.", item.nameElLaWNoStacks());

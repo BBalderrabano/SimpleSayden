@@ -28,11 +28,11 @@ public class MarauderAi extends CreatureAi {
 		
 		creature.setData(Constants.RACE, "merodeador");
 		
-		possibleFatality().add(new Wound(4, "decapitacion", null, 'F', 1, 50){
+		possibleFatality().add(new Wound(4, "decapitacion", null, 'F', 1, Wound.LOWEST_CHANCE){
 			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
 				return dtype == DamageType.SLICE && 
 						position == Constants.HEAD_POS && 
-						attacker.weapon() != null && target.vigor() >= 4;
+						attacker.weapon() != null;
 			}
 			public boolean startFlavorText(Creature creature, Creature target){
 				String text = "";

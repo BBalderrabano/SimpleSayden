@@ -34,7 +34,7 @@ public class RockBugAi extends CreatureAi {
 		this.setWeakSpot(Constants.LEG_POS);
 		creature.setData(Constants.RACE, "comepiedras");
 		
-		possibleWounds().add(new Wound(2, "abrasion acida", "Tus acidas quemaduras te mataron de dolor", 'F', 50, 200){
+		possibleWounds().add(new Wound(2, "abrasion acida", "Tus acidas quemaduras te mataron de dolor", 'F', 50, Wound.HIGHER_CHANCE){
 			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
 				if(attacker.getBooleanData(digestingFlag)){
 					return true;
@@ -48,7 +48,7 @@ public class RockBugAi extends CreatureAi {
 			}
 		});
 		
-		possibleWounds().add(new Wound(1, "mordisco acido", "La mordida del comepiedras llena tu sangre de acido",'M', 40, 80){
+		possibleWounds().add(new Wound(1, "mordisco acido", "La mordida del comepiedras llena tu sangre de acido",'M', 40, Wound.LOW_CHANCE){
 			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
 				return dtype == DamageType.SLICE;
 			}
@@ -62,17 +62,21 @@ public class RockBugAi extends CreatureAi {
 			}
 		});
 		
-		possibleFatality().add(new Wound(4, "destrozo", null, 'M', 1, 50){
+		possibleFatality().add(new Wound(4, "destrozo", null, 'M', 1, Wound.LOWEST_CHANCE){
 			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
 				return dtype == DamageType.BLUNT && position == Constants.HEAD_POS;
 			}
-			public void start(Creature creature){
+			public boolean startFlavorText(Creature creature, Creature target){ 
 				creature.notifyArround("El golpe destroza el caparazon del comepiedras, salpicando sangre y viceras enderredor");
+				return false; 
+			}
+			public void start(Creature creature){
+				creature.makeBleed(50f);
 				corpseShattered = true;
 			}
 		});
 		
-		possibleFatality().add(new Wound(4, "cercenamiento", null, 'M', 1, 50){
+		possibleFatality().add(new Wound(4, "cercenamiento", null, 'M', 1, Wound.LOWEST_CHANCE){
 			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
 				return dtype == DamageType.SLICE && position == Constants.LEG_POS;
 			}
@@ -87,6 +91,9 @@ public class RockBugAi extends CreatureAi {
 				creature.notifyArround("%s separa en dos al comepiedras, que se retuerce cercenado, hasta morir en agonia", text);
 				corpseSplit = true;
 				return false;
+			}
+			public void start(Creature creature){
+				creature.makeBleed(80f);
 			}
 		});
 	}

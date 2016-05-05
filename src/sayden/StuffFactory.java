@@ -85,8 +85,9 @@ public class StuffFactory {
 		}
 		
 		if(!Constants.PRODUCTION){
+			player.inventory().add(newDagger(false));
 			player.inventory().add(newMace(false));
-			player.inventory().add(newSword(false));
+			player.inventory().add(newShortSword(false));
 		}
 		
 		new PlayerAi(player, messages, fov);
@@ -217,7 +218,7 @@ public class StuffFactory {
 		caveBrute.modifyBonusDefense(DamageType.BLUNT, 2);
 		caveBrute.modifyBonusDefense(DamageType.SLICE, 1);
 		
-		caveBrute.equip(newBigMace(false));
+		//caveBrute.equip(newBigMace(false));
 		
 		world.addAtEmptyLocation(caveBrute );
 		PaseacuevasAi ai = new PaseacuevasAi(caveBrute, player);
@@ -270,12 +271,12 @@ public class StuffFactory {
 		if(Math.random() < .3f)
 			marauder.equip(newMarauderHood(false));
 		if(Math.random() < .3f)
-			marauder.inventory().add(randomThrowableWeapon(false, false));
+			marauder.inventory().add(newMace(false));
 		
 		if(Math.random() < .1f)
 			newDog(player, marauder);
 		
-		marauder.inventory().add(randomWeapon(null, false, true, false, false, false));
+		//marauder.inventory().add(randomWeapon(null, false, true, false, false, false));
 		
 		world.addAtEmptyLocation(marauder );
 		new MarauderAi(marauder, player);
@@ -355,7 +356,7 @@ public class StuffFactory {
 		ArrayList<Item> rockItems = new ArrayList<Item>();
 		rockItems.add(newSmallRock(false));
 		rockItems.add(newGiantRock(false));
-		rockItems.add(newRockMace(false));
+		//rockItems.add(newRockMace(false));
 		return randomWeapon(rockItems, spawn, false, false, false, false);
 	}
 	
@@ -391,460 +392,494 @@ public class StuffFactory {
 		return alcohol;
 	}
 	
-	public Item newKnife(boolean spawn){
-		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo", DROP_1_CHANCE);
-		knife.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
-		knife.modifyAttackValue(DamageType.PIERCING, 1);
-		knife.modifyAttackValue(DamageType.RANGED, 1);
-		knife.setData(Constants.CHECK_WEAPON, true);
-		knife.modifyAttackSpeed(Speed.FAST);
-		knife.modifyBloodModifyer(0.7f);
-		knife.makeStackable(3);
-		world.addAtEmptyLocation(knife, spawn);
-		return knife;
-	}
+//	public Item newKnife(boolean spawn){
+//		Item knife = new Item((char)255, 'M', AsciiPanel.brightWhite, "cuchillo", "cuchillo", DROP_1_CHANCE);
+//		knife.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
+//		knife.modifyAttackValue(DamageType.PIERCING, 1);
+//		knife.modifyAttackValue(DamageType.RANGED, 1);
+//		knife.setData(Constants.CHECK_WEAPON, true);
+//		knife.modifyAttackSpeed(Speed.FAST);
+//		knife.modifyBloodModifyer(0.7f);
+//		knife.makeStackable(3);
+//		world.addAtEmptyLocation(knife, spawn);
+//		return knife;
+//	}
 	
 	public Item newDagger(boolean spawn){
 		Item item = new Item((char)255, 'F', AsciiPanel.white, "daga", "daga", DROP_1_CHANCE);
-		item.modifyAttackValue(DamageType.PIERCING, 2);
+		item.modifyAttackValue(DamageType.PIERCING, 1);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.FAST);
-		item.modifyBloodModifyer(0.7f);
 		item.makeStackable(3);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newCurveDagger(boolean spawn){
-		Item item = new Item((char)255, 'F', AsciiPanel.yellow, "daga curva", "daga curva", DROP_2_CHANCE);
-		item.modifyAttackValue(DamageType.PIERCING, 4);
-		item.modifyAttackSpeed(Speed.FAST);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyBloodModifyer(0.75f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newLance(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.white, "lanza", "lanza", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 2);
-		item.modifyAttackValue(DamageType.PIERCING, 4);
 		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.modifyReach(2);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		
-		item.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newLongLance(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.brightWhite, "lanza larga", "lanza larga", DROP_4_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 2);
-		item.modifyAttackValue(DamageType.PIERCING, 8);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyReach(3);
-		item.modifyCantReach(1);
-		
-		item.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newKnightLance(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.brightBlue, "lanza de caballeria", "lanza de caballeria", DROP_4_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 2);
-		item.modifyAttackValue(DamageType.BLUNT, 2);
-		item.modifyAttackValue(DamageType.PIERCING, 6);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyReach(2);
-
-		item.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newJavelin(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.white, "javalina", "javalina", DROP_2_CHANCE);
-		item.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
-		item.modifyAttackValue(DamageType.PIERCING, 4);
-		item.modifyAttackValue(DamageType.RANGED, 2);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.FAST);
-		
-		item.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newSchyte(boolean spawn){
-		Item item = new Item((char)244, 'F', AsciiPanel.white, "guadaña", "guadaña", DROP_2_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 2);
-		item.modifyAttackValue(DamageType.PIERCING, 6);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.modifyReach(2);
-		item.modifyCantReach(1);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		
-		item.modifyBloodModifyer(0.85f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newCimitarra(boolean spawn){
-		Item item = new Item((char)253, 'F', new Color(167, 166, 166), "cimitarra", "cimitarra", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 6);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.FAST);
-		item.modifyBloodModifyer(0.6f);
+		item.possibleWounds().add(new Wound(3, "puñalada", "Mueres de hemorragia interna", 'F', Wound.LOWEST_DURATION, Wound.HIGH_CHANCE){
+			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
+				return position == Constants.BACK_POS;
+			}
+			public boolean startFlavorText(Creature creature, Creature target){
+				if(target.isPlayer()){
+					creature.doAction("te apuñala por la espalda, hundiendo el filo de su daga en tu cuerpo");
+				}else{
+					creature.doAction("apuñala " + target.nameAlALa() + " por la espalda, hundiendo "+ (creature.isPlayer() ? "tu daga" : "la daga") +" en su cuerpo");
+				}
+				target.makeBleed(30f);
+				return false;
+			}
+		});
 		
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newSword(boolean spawn){
-		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada", "espada", DROP_2_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 6);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newCurveDagger(boolean spawn){
+//		Item item = new Item((char)255, 'F', AsciiPanel.yellow, "daga curva", "daga curva", DROP_2_CHANCE);
+//		item.modifyAttackValue(DamageType.PIERCING, 4);
+//		item.modifyAttackSpeed(Speed.FAST);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyBloodModifyer(0.75f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newLongSword(boolean spawn){
-		Item item = new Item((char)253, 'F', Color.DARK_GRAY, "espada larga", "espada larga", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 7);
-		item.modifyAttackValue(DamageType.BLUNT, 1);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newLance(boolean spawn){
+//		Item item = new Item((char)244, 'F', AsciiPanel.white, "lanza", "lanza", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 2);
+//		item.modifyAttackValue(DamageType.PIERCING, 4);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.modifyReach(2);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		
+//		item.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newMandoble(boolean spawn){
-		Item item = new Item((char)253, 'F', Color.green, "mandoble", "mandoble", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 8);
-		item.modifyAttackValue(DamageType.BLUNT, 2);
-		
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.6f);
-		
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newLongLance(boolean spawn){
+//		Item item = new Item((char)244, 'F', AsciiPanel.brightWhite, "lanza larga", "lanza larga", DROP_4_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 2);
+//		item.modifyAttackValue(DamageType.PIERCING, 8);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyReach(3);
+//		item.modifyCantReach(1);
+//		
+//		item.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newKnightLance(boolean spawn){
+//		Item item = new Item((char)244, 'F', AsciiPanel.brightBlue, "lanza de caballeria", "lanza de caballeria", DROP_4_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 2);
+//		item.modifyAttackValue(DamageType.BLUNT, 2);
+//		item.modifyAttackValue(DamageType.PIERCING, 6);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyReach(2);
+//
+//		item.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newJavelin(boolean spawn){
+//		Item item = new Item((char)244, 'F', AsciiPanel.white, "javalina", "javalina", DROP_2_CHANCE);
+//		item.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
+//		item.modifyAttackValue(DamageType.PIERCING, 4);
+//		item.modifyAttackValue(DamageType.RANGED, 2);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.FAST);
+//		
+//		item.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newSchyte(boolean spawn){
+//		Item item = new Item((char)244, 'F', AsciiPanel.white, "guadaña", "guadaña", DROP_2_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 2);
+//		item.modifyAttackValue(DamageType.PIERCING, 6);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.modifyReach(2);
+//		item.modifyCantReach(1);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		
+//		item.modifyBloodModifyer(0.85f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newCimitarra(boolean spawn){
+//		Item item = new Item((char)253, 'F', new Color(167, 166, 166), "cimitarra", "cimitarra", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 6);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.FAST);
+//		item.modifyBloodModifyer(0.6f);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newSword(boolean spawn){
+//		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada", "espada", DROP_2_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 6);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newLongSword(boolean spawn){
+//		Item item = new Item((char)253, 'F', Color.DARK_GRAY, "espada larga", "espada larga", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 7);
+//		item.modifyAttackValue(DamageType.BLUNT, 1);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newMandoble(boolean spawn){
+//		Item item = new Item((char)253, 'F', Color.green, "mandoble", "mandoble", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 8);
+//		item.modifyAttackValue(DamageType.BLUNT, 2);
+//		
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyBloodModifyer(0.6f);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
 	public Item newShortSword(boolean spawn){
 		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada corta", "espada corta", DROP_1_CHANCE);
 		item.modifyAttackValue(DamageType.SLICE, 4);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.6f);
+		
+		item.possibleWounds().add(new Wound(3, "corte severo", "Mueres desangrado", 'M', Wound.LOWEST_DURATION, Wound.HIGH_CHANCE){
+			public boolean startFlavorText(Creature creature, Creature target){
+				target.makeBleed(30f);
+				return true;
+			}
+			public void update(Creature creature){
+				creature.makeBleed(15f);
+			}
+		});
+		
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newBastardSword(boolean spawn){
-		Item item = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada bastarda", "espada bastarda", DROP_2_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 8);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newBastardSword(boolean spawn){
+//		Item item = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada bastarda", "espada bastarda", DROP_2_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 8);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newBigSword(boolean spawn){
-		Item bigSword = new Item((char)253, 'M', Color.gray, "espadon", "espadon", DROP_3_CHANCE);
-		bigSword.modifyAttackValue(DamageType.SLICE, 10);
-		bigSword.modifyAttackSpeed(Speed.NORMAL);
-		bigSword.setData(Constants.CHECK_WEAPON, true);
-		bigSword.setData(Constants.CHECK_TWO_HANDED, true);
-		bigSword.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(bigSword, spawn);
-		return bigSword;
-	}
+//	public Item newBigSword(boolean spawn){
+//		Item bigSword = new Item((char)253, 'M', Color.gray, "espadon", "espadon", DROP_3_CHANCE);
+//		bigSword.modifyAttackValue(DamageType.SLICE, 10);
+//		bigSword.modifyAttackSpeed(Speed.NORMAL);
+//		bigSword.setData(Constants.CHECK_WEAPON, true);
+//		bigSword.setData(Constants.CHECK_TWO_HANDED, true);
+//		bigSword.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(bigSword, spawn);
+//		return bigSword;
+//	}
 	
-	public Item newHugeSword(boolean spawn){
-		Item hugeSword = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada gigante", "espada gigante", DROP_3_CHANCE);
-		hugeSword.modifyAttackValue(DamageType.SLICE, 10);
-		hugeSword.modifyAttackValue(DamageType.BLUNT, 2);
-		hugeSword.modifyAttackSpeed(Speed.SLOW);
-		hugeSword.modifyMovementSpeed(Speed.FAST);
-		hugeSword.setData(Constants.CHECK_WEAPON, true);
-		hugeSword.setData(Constants.CHECK_TWO_HANDED, true);
-		hugeSword.modifyBloodModifyer(0.8f);
-		world.addAtEmptyLocation(hugeSword, spawn);
-		return hugeSword;
-	}
+//	public Item newHugeSword(boolean spawn){
+//		Item hugeSword = new Item((char)253, 'F', AsciiPanel.brightBlack, "espada gigante", "espada gigante", DROP_3_CHANCE);
+//		hugeSword.modifyAttackValue(DamageType.SLICE, 10);
+//		hugeSword.modifyAttackValue(DamageType.BLUNT, 2);
+//		hugeSword.modifyAttackSpeed(Speed.SLOW);
+//		hugeSword.modifyMovementSpeed(Speed.FAST);
+//		hugeSword.setData(Constants.CHECK_WEAPON, true);
+//		hugeSword.setData(Constants.CHECK_TWO_HANDED, true);
+//		hugeSword.modifyBloodModifyer(0.8f);
+//		world.addAtEmptyLocation(hugeSword, spawn);
+//		return hugeSword;
+//	}
 	
-	public Item newAxe(boolean spawn){
-		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha", "hacha", DROP_1_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 2);
-		item.modifyAttackValue(DamageType.BLUNT, 2);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.7f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newAxe(boolean spawn){
+//		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha", "hacha", DROP_1_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 2);
+//		item.modifyAttackValue(DamageType.BLUNT, 2);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyBloodModifyer(0.7f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newBigAxe(boolean spawn){
-		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha grande", "hacha grande", DROP_2_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 4);
-		item.modifyAttackValue(DamageType.BLUNT, 4);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyBloodModifyer(0.7f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newBigAxe(boolean spawn){
+//		Item item = new Item((char)243, 'M', Color.LIGHT_GRAY, "hacha grande", "hacha grande", DROP_2_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 4);
+//		item.modifyAttackValue(DamageType.BLUNT, 4);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyBloodModifyer(0.7f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newWarAxe(boolean spawn){
-		Item item = new Item((char)243, 'M', AsciiPanel.brightBlack, "hacha de guerra", "hacha de guerra", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 4);
-		item.modifyAttackValue(DamageType.BLUNT, 4);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.7f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newWarAxe(boolean spawn){
+//		Item item = new Item((char)243, 'M', AsciiPanel.brightBlack, "hacha de guerra", "hacha de guerra", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 4);
+//		item.modifyAttackValue(DamageType.BLUNT, 4);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyBloodModifyer(0.7f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newThrowAxe(boolean spawn){
-		Item item = new Item((char)243, 'M', AsciiPanel.yellow, "hacha alada", "hacha alada", DROP_1_CHANCE);
-		item.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
-		item.modifyAttackValue(DamageType.SLICE, 2);
-		item.modifyAttackValue(DamageType.BLUNT, 2);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.6f);
-		item.makeStackable(3);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newThrowAxe(boolean spawn){
+//		Item item = new Item((char)243, 'M', AsciiPanel.yellow, "hacha alada", "hacha alada", DROP_1_CHANCE);
+//		item.setData(Constants.CHECK_PROJECTILE_AUTOTARGET, true);
+//		item.modifyAttackValue(DamageType.SLICE, 2);
+//		item.modifyAttackValue(DamageType.BLUNT, 2);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyBloodModifyer(0.6f);
+//		item.makeStackable(3);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
 	public Item newMace(boolean spawn){
 		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "maza", "maza", DROP_1_CHANCE);
 		item.modifyAttackValue(DamageType.BLUNT, 4);
 		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.FAST);
-		item.modifyBloodModifyer(0.4f);
+		item.modifyAttackSpeed(Speed.NORMAL);
+		
+		item.possibleWounds().add(new Wound(1, "contusion", "Mueres por trauma cerebral", 'F', Wound.LOWEST_DURATION, Wound.NORMAL_CHANCE){
+			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
+				return position == Constants.HEAD_POS;
+			}
+			public void start(Creature creature){
+				creature.notifyArround("La contusion "+ (creature.isPlayer() ? "te |aturde03|" : "|aturde03| " + creature.nameAlALa()));
+				creature.modifyActionPoints(-Speed.NORMAL.velocity(), true);
+			}
+		});
 
 		world.addAtEmptyLocation(item, spawn);
 		return item;
 	}
 	
-	public Item newHammer(boolean spawn){
-		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo", "martillo", DROP_2_CHANCE);
-		item.modifyAttackValue(DamageType.BLUNT, 8);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyBloodModifyer(0.4f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newWarHammer(boolean spawn){
-		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo de guerra", "martillo de guerra", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.BLUNT, 10);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyBloodModifyer(0.4f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newGiantHammer(boolean spawn){
-		Item item = new Item((char)254, 'M', AsciiPanel.brightBlack, "martillo gigante", "martillo gigante", DROP_4_CHANCE);
-		item.modifyAttackValue(DamageType.BLUNT, 14);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyBloodModifyer(0.4f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newBallAndChain(boolean spawn){
-		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "bola y cadena", "bola y cadena", DROP_2_CHANCE);
-		item.modifyAttackValue(DamageType.BLUNT, 6);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyCantReach(1);
-		item.modifyReach(2);
-		item.modifyBloodModifyer(0.4f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
-	
-	public Item newRockMace(boolean spawn){
-		Item rockMace = new Item((char)254, 'F', AsciiPanel.yellow, "estalactita", null, 10);
-		rockMace.modifyAttackValue(DamageType.BLUNT, 6);
-		rockMace.setData(Constants.CHECK_WEAPON, true);
-		rockMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
-		rockMace.modifyAttackSpeed(Speed.FAST);
-		
-		rockMace.modifyBloodModifyer(0.4f);
-		rockMace.modifyDurability((int) (Math.random() * (15 - 5)) + 5);
-		world.addAtEmptyLocation(rockMace, spawn);
-		return rockMace;
-	}
-	
-	public Item newMorningStar(boolean spawn){
-		Item morningStar = new Item((char)254, 'F', AsciiPanel.brightBlack, "estrella", "estrella", DROP_2_CHANCE);
-		morningStar.modifyAttackValue(DamageType.SLICE, 1);
-		morningStar.modifyAttackValue(DamageType.BLUNT, 4);
-		morningStar.modifyAttackValue(DamageType.PIERCING, 1);
-		morningStar.setData(Constants.CHECK_WEAPON, true);
-		morningStar.modifyAttackSpeed(Speed.NORMAL);
-		morningStar.modifyBloodModifyer(0.6f);
-		world.addAtEmptyLocation(morningStar, spawn);
-		return morningStar;
-	}
-	
-	public Item newBigMace(boolean spawn){
-		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra", DROP_2_CHANCE);
-		bigMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
-		bigMace.modifyAttackValue(DamageType.BLUNT, 8);
-		bigMace.setData(Constants.CHECK_WEAPON, true);
-		bigMace.modifyMovementSpeed(Speed.FAST);
-		bigMace.modifyAttackSpeed(Speed.SLOW);
-		bigMace.modifyBloodModifyer(0.8f);
-		world.addAtEmptyLocation(bigMace, spawn);
-		return bigMace;
-	}
-	
-	public Item newHalberd(boolean spawn){
-		Item item = new Item((char)244, 'M', Color.LIGHT_GRAY, "alabarda", "alabarda", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 4);
-		item.modifyAttackValue(DamageType.BLUNT, 2);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyReach(2);
+//	public Item newHammer(boolean spawn){
+//		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo", "martillo", DROP_2_CHANCE);
+//		item.modifyAttackValue(DamageType.BLUNT, 8);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyBloodModifyer(0.4f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 
-		item.modifyBloodModifyer(0.7f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newWarHammer(boolean spawn){
+//		Item item = new Item((char)254, 'M', AsciiPanel.white, "martillo de guerra", "martillo de guerra", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.BLUNT, 10);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyBloodModifyer(0.4f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newShortBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto", DROP_1_CHANCE + DROP_RANGED_HANDICAP);
-		item.modifyAttackValue(DamageType.RANGED, 1);
-		item.modifyAttackValue(DamageType.PIERCING, 3);
-		item.modifyAttackSpeed(Speed.FAST);
-		item.modifyBloodModifyer(0.5f);
-		item.modifyDurability((int) (Math.random() * (50 - 10)) + 10);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_RANGED, true);
-		
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newGiantHammer(boolean spawn){
+//		Item item = new Item((char)254, 'M', AsciiPanel.brightBlack, "martillo gigante", "martillo gigante", DROP_4_CHANCE);
+//		item.modifyAttackValue(DamageType.BLUNT, 14);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyBloodModifyer(0.4f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newCompositeBow(boolean spawn){
-		Item item = new Item(')', 'M', Color.gray, "arco compuesto", "arco compuesto", DROP_1_CHANCE + DROP_RANGED_HANDICAP);
-		item.modifyAttackValue(DamageType.RANGED, 2);
-		item.modifyAttackValue(DamageType.PIERCING, 4);
-		item.modifyAttackSpeed(Speed.NORMAL);
-		item.modifyBloodModifyer(0.5f);
-		item.modifyDurability((int) (Math.random() * (50 - 30)) + 30);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_RANGED, true);
-		
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newBallAndChain(boolean spawn){
+//		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "bola y cadena", "bola y cadena", DROP_2_CHANCE);
+//		item.modifyAttackValue(DamageType.BLUNT, 6);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyCantReach(1);
+//		item.modifyReach(2);
+//		item.modifyBloodModifyer(0.4f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newLongBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.white, "arco largo", "arco largo", DROP_2_CHANCE + DROP_RANGED_HANDICAP);
-		item.modifyAttackValue(DamageType.RANGED, 2);
-		item.modifyAttackValue(DamageType.PIERCING, 6);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyBloodModifyer(0.5f);
-		
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_RANGED, true);
-		
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newRockMace(boolean spawn){
+//		Item rockMace = new Item((char)254, 'F', AsciiPanel.yellow, "estalactita", null, 10);
+//		rockMace.modifyAttackValue(DamageType.BLUNT, 6);
+//		rockMace.setData(Constants.CHECK_WEAPON, true);
+//		rockMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
+//		rockMace.modifyAttackSpeed(Speed.FAST);
+//		
+//		rockMace.modifyBloodModifyer(0.4f);
+//		rockMace.modifyDurability((int) (Math.random() * (15 - 5)) + 5);
+//		world.addAtEmptyLocation(rockMace, spawn);
+//		return rockMace;
+//	}
 	
-	public Item newCrossbow(boolean spawn){
-		Item item = new Item(')', 'F', Color.gray, "ballesta", "ballesta", DROP_3_CHANCE + DROP_RANGED_HANDICAP);
-		item.modifyAttackValue(DamageType.RANGED, 4);
-		item.modifyAttackValue(DamageType.BLUNT, 2);
-		item.modifyAttackSpeed(Speed.FAST);
-		item.modifyBloodModifyer(0.5f);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_RANGED, true);
-		
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newMorningStar(boolean spawn){
+//		Item morningStar = new Item((char)254, 'F', AsciiPanel.brightBlack, "estrella", "estrella", DROP_2_CHANCE);
+//		morningStar.modifyAttackValue(DamageType.SLICE, 1);
+//		morningStar.modifyAttackValue(DamageType.BLUNT, 4);
+//		morningStar.modifyAttackValue(DamageType.PIERCING, 1);
+//		morningStar.setData(Constants.CHECK_WEAPON, true);
+//		morningStar.modifyAttackSpeed(Speed.NORMAL);
+//		morningStar.modifyBloodModifyer(0.6f);
+//		world.addAtEmptyLocation(morningStar, spawn);
+//		return morningStar;
+//	}
 	
-	public Item newHeavyCrossbow(boolean spawn){
-		Item item = new Item(')', 'F', Color.darkGray, "ballesta pesada", "ballesta pesada", DROP_4_CHANCE + DROP_RANGED_HANDICAP);
-		item.modifyAttackValue(DamageType.RANGED, 6);
-		item.modifyAttackValue(DamageType.BLUNT, 2);
-		item.modifyAttackSpeed(Speed.FAST);
-		item.modifyBloodModifyer(0.5f);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_RANGED, true);
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newBigMace(boolean spawn){
+//		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra", DROP_2_CHANCE);
+//		bigMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
+//		bigMace.modifyAttackValue(DamageType.BLUNT, 8);
+//		bigMace.setData(Constants.CHECK_WEAPON, true);
+//		bigMace.modifyMovementSpeed(Speed.FAST);
+//		bigMace.modifyAttackSpeed(Speed.SLOW);
+//		bigMace.modifyBloodModifyer(0.8f);
+//		world.addAtEmptyLocation(bigMace, spawn);
+//		return bigMace;
+//	}
 	
-	public Item newHunterBow(boolean spawn){
-		Item item = new Item(')', 'M', AsciiPanel.green, "arco cazador", "arco cazador", DROP_3_CHANCE + DROP_RANGED_HANDICAP);
-		item.modifyAttackValue(DamageType.RANGED, 2);
-		item.modifyAttackValue(DamageType.PIERCING, 8);
-		item.modifyAttackSpeed(Speed.SLOW);
-		item.modifyBloodModifyer(0.5f);
-		
-		item.setData(Constants.CHECK_TWO_HANDED, true);
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_RANGED, true);
-		
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newHalberd(boolean spawn){
+//		Item item = new Item((char)244, 'M', Color.LIGHT_GRAY, "alabarda", "alabarda", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.SLICE, 4);
+//		item.modifyAttackValue(DamageType.BLUNT, 2);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyReach(2);
+//
+//		item.modifyBloodModifyer(0.7f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
-	public Item newKatar(boolean spawn){
-		Item item = new Item((char)255, 'M', AsciiPanel.white, "katar", "katar", DROP_3_CHANCE);
-		item.modifyAttackValue(DamageType.PIERCING, 3);
-		item.modifyAttackValue(DamageType.SLICE, 3);
-		
-		item.setData(Constants.CHECK_WEAPON, true);
-		item.setData(Constants.CHECK_DUAL_WIELD, true);
-		item.modifyAttackSpeed(Speed.FAST);
-		
-		item.modifyBloodModifyer(.75f);
-		world.addAtEmptyLocation(item, spawn);
-		return item;
-	}
+//	public Item newShortBow(boolean spawn){
+//		Item item = new Item(')', 'M', AsciiPanel.yellow, "arco corto", "arco corto", DROP_1_CHANCE + DROP_RANGED_HANDICAP);
+//		item.modifyAttackValue(DamageType.RANGED, 1);
+//		item.modifyAttackValue(DamageType.PIERCING, 3);
+//		item.modifyAttackSpeed(Speed.FAST);
+//		item.modifyBloodModifyer(0.5f);
+//		item.modifyDurability((int) (Math.random() * (50 - 10)) + 10);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_RANGED, true);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newCompositeBow(boolean spawn){
+//		Item item = new Item(')', 'M', Color.gray, "arco compuesto", "arco compuesto", DROP_1_CHANCE + DROP_RANGED_HANDICAP);
+//		item.modifyAttackValue(DamageType.RANGED, 2);
+//		item.modifyAttackValue(DamageType.PIERCING, 4);
+//		item.modifyAttackSpeed(Speed.NORMAL);
+//		item.modifyBloodModifyer(0.5f);
+//		item.modifyDurability((int) (Math.random() * (50 - 30)) + 30);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_RANGED, true);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newLongBow(boolean spawn){
+//		Item item = new Item(')', 'M', AsciiPanel.white, "arco largo", "arco largo", DROP_2_CHANCE + DROP_RANGED_HANDICAP);
+//		item.modifyAttackValue(DamageType.RANGED, 2);
+//		item.modifyAttackValue(DamageType.PIERCING, 6);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyBloodModifyer(0.5f);
+//		
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_RANGED, true);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newCrossbow(boolean spawn){
+//		Item item = new Item(')', 'F', Color.gray, "ballesta", "ballesta", DROP_3_CHANCE + DROP_RANGED_HANDICAP);
+//		item.modifyAttackValue(DamageType.RANGED, 4);
+//		item.modifyAttackValue(DamageType.BLUNT, 2);
+//		item.modifyAttackSpeed(Speed.FAST);
+//		item.modifyBloodModifyer(0.5f);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_RANGED, true);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newHeavyCrossbow(boolean spawn){
+//		Item item = new Item(')', 'F', Color.darkGray, "ballesta pesada", "ballesta pesada", DROP_4_CHANCE + DROP_RANGED_HANDICAP);
+//		item.modifyAttackValue(DamageType.RANGED, 6);
+//		item.modifyAttackValue(DamageType.BLUNT, 2);
+//		item.modifyAttackSpeed(Speed.FAST);
+//		item.modifyBloodModifyer(0.5f);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_RANGED, true);
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newHunterBow(boolean spawn){
+//		Item item = new Item(')', 'M', AsciiPanel.green, "arco cazador", "arco cazador", DROP_3_CHANCE + DROP_RANGED_HANDICAP);
+//		item.modifyAttackValue(DamageType.RANGED, 2);
+//		item.modifyAttackValue(DamageType.PIERCING, 8);
+//		item.modifyAttackSpeed(Speed.SLOW);
+//		item.modifyBloodModifyer(0.5f);
+//		
+//		item.setData(Constants.CHECK_TWO_HANDED, true);
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_RANGED, true);
+//		
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
+	
+//	public Item newKatar(boolean spawn){
+//		Item item = new Item((char)255, 'M', AsciiPanel.white, "katar", "katar", DROP_3_CHANCE);
+//		item.modifyAttackValue(DamageType.PIERCING, 3);
+//		item.modifyAttackValue(DamageType.SLICE, 3);
+//		
+//		item.setData(Constants.CHECK_WEAPON, true);
+//		item.setData(Constants.CHECK_DUAL_WIELD, true);
+//		item.modifyAttackSpeed(Speed.FAST);
+//		
+//		item.modifyBloodModifyer(.75f);
+//		world.addAtEmptyLocation(item, spawn);
+//		return item;
+//	}
 	
 	public Item newWoodenShield(boolean spawn){
 		Item woodenShield = new Item('#', 'M', AsciiPanel.yellow, "escudo de madera", "escudo de madera", 70);
@@ -905,7 +940,6 @@ public class StuffFactory {
 	public Item newEdibleWeapon(boolean spawn){
 		Item item = new Item(')', 'F', AsciiPanel.yellow, "baguette", null, 40);
 		item.modifyAttackValue(DamageType.BLUNT, 1);
-		item.modifyBloodModifyer(0.1f);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.setData(Constants.CHECK_CONSUMABLE, true);
 		item.description = "Es dura como una roca.";
@@ -1062,9 +1096,9 @@ public class StuffFactory {
 	public Item randomThrowableWeapon(boolean spawn, boolean fullyStacked){
 		ArrayList<Item> items = new ArrayList<Item>();
 		
-		items.add(newKnife(false));
-		items.add(newThrowAxe(false));
-		items.add(newJavelin(false));
+//		items.add(newKnife(false));
+//		items.add(newThrowAxe(false));
+//		items.add(newJavelin(false));
 		
 		Item to_return = randomWeapon(items, spawn, false, false, false, false);
 		
@@ -1081,40 +1115,40 @@ public class StuffFactory {
 			items.add(newShortSword(false));
 			items.add(newMace(false));
 			items.add(newDagger(false));
-			items.add(newMorningStar(false));
-			items.add(newSword(false));
-			items.add(newBastardSword(false));
-			items.add(newAxe(false));
-			items.add(newHammer(false));
-			items.add(newLance(false));
+//			items.add(newMorningStar(false));
+//			items.add(newSword(false));
+//			items.add(newBastardSword(false));
+//			items.add(newAxe(false));
+//			items.add(newHammer(false));
+//			items.add(newLance(false));
 		}
 		if(includeUncommon){
-			items.add(newBallAndChain(false));
-			items.add(newCimitarra(false));
-			items.add(newCurveDagger(false));
-			items.add(newWarAxe(false));
-			items.add(newWarHammer(false));
-			items.add(newSchyte(false));
-			items.add(newJavelin(false));
-			items.add(newKnightLance(false));
-			items.add(newLongLance(false));
+//			items.add(newBallAndChain(false));
+//			items.add(newCimitarra(false));
+//			items.add(newCurveDagger(false));
+//			items.add(newWarAxe(false));
+//			items.add(newWarHammer(false));
+//			items.add(newSchyte(false));
+//			items.add(newJavelin(false));
+//			items.add(newKnightLance(false));
+//			items.add(newLongLance(false));
 		}
 		if(includeHeavy){
-			items.add(newLongSword(false));
-			items.add(newMandoble(false));
-			items.add(newBigSword(false));
-			items.add(newHugeSword(false));
-			items.add(newBigAxe(false));
-			items.add(newGiantHammer(false));
-			items.add(newHalberd(false));
+//			items.add(newLongSword(false));
+//			items.add(newMandoble(false));
+//			items.add(newBigSword(false));
+//			items.add(newHugeSword(false));
+//			items.add(newBigAxe(false));
+//			items.add(newGiantHammer(false));
+//			items.add(newHalberd(false));
 		}
 		if(includeRanged){
-			items.add(newShortBow(false));
-			items.add(newCompositeBow(false));
-			items.add(newHunterBow(false));
-			items.add(newLongBow(false));
-			items.add(newCrossbow(false));
-			items.add(newHeavyCrossbow(false));
+//			items.add(newShortBow(false));
+//			items.add(newCompositeBow(false));
+//			items.add(newHunterBow(false));
+//			items.add(newLongBow(false));
+//			items.add(newCrossbow(false));
+//			items.add(newHeavyCrossbow(false));
 		}
 		
 		if(pool != null)
@@ -1138,6 +1172,10 @@ public class StuffFactory {
 		        randomIndex = i;
 		        break;
 		    }
+		}
+		
+		if(randomIndex < 1){
+			return null;
 		}
 		
 		Item myRandomItem = items.get(randomIndex);
