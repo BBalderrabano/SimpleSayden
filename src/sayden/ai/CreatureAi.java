@@ -52,7 +52,7 @@ public class CreatureAi {
 		if(!creature.isPlayer() && spell.castSpeed().velocity() >= creature.getActionPoints() && creature.queSpell() == null){
 			if(other != null && other.isPlayer() && 
 					Math.abs(spell.castSpeed().velocity() - other.getMovementSpeed().velocity()) > 1){
-				creature.modifyActionPoints(-creature.getActionPoints(), false);
+				creature.modifyActionPoints(-creature.getActionPoints());
 				creature.setQueSpell(other,  spell);
 				creature.doAction("comienza a pronunciar " + spell.nameUnUna());
 				return;
@@ -82,7 +82,7 @@ public class CreatureAi {
 		if(creature.getActionPoints() < creature.getMovementSpeed().velocity() && !creature.isPlayer()){
 			return;	//There are not enough action points to perform a movement action, return
 		}else if(!creature.isPlayer()){
-			creature.modifyActionPoints(-creature.getMovementSpeed().velocity(), false);	//We can move, and we are not a player, substract movement speed
+			creature.modifyActionPoints(-creature.getMovementSpeed().velocity());	//We can move, and we are not a player, substract movement speed
 		}
 		if (tile.isGround()){
 			creature.x = x;
@@ -101,14 +101,14 @@ public class CreatureAi {
 			if(other.isPlayer()){
 				if(Math.abs(creature.getAttackSpeed().velocity() - other.getMovementSpeed().velocity()) > 2
 						&& creature.queAttack() == null){
-					creature.modifyActionPoints(-creature.getActionPoints(), false);
+					creature.modifyActionPoints(-creature.getActionPoints());
 					creature.setQueAttack(other.position());
 				}
 			}
 			return false;	//There are not enough action points to perform an attack, queue attack
 		}else if(!creature.isPlayer()){
 			creature.modifyActionPoints(-(creature.dualStrike() ?	creature.offWeapon().attackSpeed().velocity() : 
-																	creature.getAttackSpeed().velocity()), false);
+																	creature.getAttackSpeed().velocity()));
 		}
 		
 		boolean success = creature.meleeAttack(other);
@@ -182,6 +182,12 @@ public class CreatureAi {
 	}
 	
 	public void onUpdate(){
+		if(creature.stunTime() > 0 && !creature.isPlayer()){
+			creature.modifyStunTime(-1);
+			creature.modifyActionPoints(-creature.getActionPoints());
+			creature.doAction(creature.stunText());
+			return;
+		}
 		if(!creature.isPlayer() && creature.queSpell() != null &&
 				creature.getActionPoints() >= creature.queSpell().castSpeed().velocity()){
 			
@@ -195,7 +201,7 @@ public class CreatureAi {
 		
 		if(creature.queAttack() != null && 
 				creature.getActionPoints() >= creature.getAttackSpeed().velocity()){
-			creature.modifyActionPoints(-creature.getAttackSpeed().velocity(), false);
+			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
 			
 			Creature c = creature.world().creature(creature.queAttack().x, creature.queAttack().y);
 			

@@ -73,10 +73,7 @@ public class Constants {
 	public static final String SPELL_WOUND_HEADACHE = "HasHeadache";	//La herida que te provoca lanzar un hechizo
 	
 	
-	
-	
-	
-	
+	public static final String STUN_TEXT = "esta |aturdido03|";			//Que dice al estar aturdida una criatura
 	
 	public static String capitalize(String text){						//Funcion que devuelve el string capitalizado
 		return Character.toUpperCase(text.charAt(0))+""+text.substring(1);

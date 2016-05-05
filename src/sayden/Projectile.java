@@ -137,7 +137,7 @@ public class Projectile {
 		
 		if(target.isAlive() && target.queSpell() != null){
 			target.stopCasting();
-			target.modifyActionPoints(-target.getActionPoints(), false);
+			target.modifyActionPoints(-target.getActionPoints());
 		}
 	}
 }

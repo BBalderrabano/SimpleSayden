@@ -31,7 +31,7 @@ public class LunaticAi extends CreatureAi {
 						creature.weapon() == null ? "fuerza" : "su "+creature.weapon().name(), 
 						other.isPlayer() ? "tu entrepierna" : "la entrepierna " + other.nameDelDeLa());
 				creature.doAction(Math.random() > 0.5 ? "rechina sus dientes, " : "contorsiona su rostro en una mueca salvaje");
-				other.modifyActionPoints(-Speed.NORMAL.velocity(), true);
+				other.modifyStunTime(1);
 				other.notify("Pierdes el aliento");
 			}
 		}

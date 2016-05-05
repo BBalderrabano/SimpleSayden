@@ -30,8 +30,10 @@ public class DogAi extends CreatureAi {
 		visitCheckPoint();
 		
 		if(canSee(player.x, player.y) && creature.position().distance(player.position()) <= 4 && creature.position().distance(player.position()) > 2){
+			
 			creature.doAction("gruñe, clavandote su mirada");
-			creature.modifyActionPoints(-creature.getActionPoints(), false);
+			creature.modifyActionPoints(-creature.getActionPoints());
+			
 		}else if(canSee(player.x, player.y) && creature.position().distance(player.position()) <= 2){
 			hunt(player);
 		}else if(creature.vigor() >= creature.maxVigor() * 0.5){
@@ -43,11 +45,11 @@ public class DogAi extends CreatureAi {
 			}else if(owner != null && canSee(owner.x, owner.y) && creature.getData(Constants.CHECKPOINT) != null){
 				creature.doAction("llama al " + owner.name() + " con un gemido");
 				owner.setData(Constants.CHECKPOINT, creature.getData(Constants.CHECKPOINT));
-				creature.modifyActionPoints(-creature.getActionPoints(), false);
+				creature.modifyActionPoints(-creature.getActionPoints());
 			}else{
 				creature.doAction("aulla, asustado");
 				player.notify("El aullido de un perro resuena por la cueva");
-				creature.modifyActionPoints(-creature.getActionPoints(), false);
+				creature.modifyActionPoints(-creature.getActionPoints());
 			}
 		}
 		

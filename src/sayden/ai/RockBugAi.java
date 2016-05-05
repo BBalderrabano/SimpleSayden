@@ -129,7 +129,7 @@ public class RockBugAi extends CreatureAi {
 				creature.doAction("regurgita una bilis acida sobre " + rockCheck.nameElLa());
 				creature.doAction("consume la roca ganando fuerzas");
 				
-				creature.modifyActionPoints(-creature.getActionPoints(), false);
+				creature.modifyActionPoints(-creature.getActionPoints());
 				digestRock();
 				
 				return;
@@ -146,12 +146,12 @@ public class RockBugAi extends CreatureAi {
 							rocksEaten++;
 						}
 						
-						creature.modifyActionPoints(-creature.getActionPoints(), false);
+						creature.modifyActionPoints(-creature.getActionPoints());
 						digestRock();
 						
 						return;
 					}else{
-						creature.modifyActionPoints(-creature.getActionPoints(), false);
+						creature.modifyActionPoints(-creature.getActionPoints());
 						return;
 					}
 				}

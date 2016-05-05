@@ -166,17 +166,33 @@ public class Creature extends Thing{
 			return 0;
 		}
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+		
+		private String stunText = null;
+		public String stunText() { return (stunText == null ? Constants.STUN_TEXT : stunText); }
+		
+		private int stunTime = 0;
+		public int stunTime() { return stunTime; }
+		public void modifyStunTime(int amount) { 
+			this.stunTime += amount; 
+			
+			if(stunTime < 1)
+				stunText = null;
+		}
+		
+		public void modifyStunTime(int amount, String stunText) { 
+			this.stunTime += amount; 
+			
+			if(stunText == null)
+				this.stunText = stunText;
+		}
+		
 		private int actionPoints;
 		public int getActionPoints() { return actionPoints;	}
+		
 		//Modifica los puntos de accion de las criaturas
-		public void modifyActionPoints(int amount, boolean affectPlayer) {
+		public void modifyActionPoints(int amount) {
 			if(isPlayer()){
-				world.modifyActionPoints(amount);	//El player modifica los AP de todas las criaturas
-				
-				if(affectPlayer){					//Este flag se usa para substraer puntos al jugador, en caso de que se quiera dejar al jugador con AP negativo
-					this.actionPoints += amount;
-				}
+				world.modifyActionPoints(Math.abs(amount));	//El player modifica los AP de todas las criaturas
 				return;
 			}
 			
@@ -339,18 +355,17 @@ public class Creature extends Thing{
 	}
 		
 	public void moveBy(int mx, int my){
-		//Si el player tiene AP negativo, no puede moverse
-		if(getActionPoints() < 0 && isPlayer()){
-			mx = 0;
-			my = 0;
-			modifyActionPoints(-actionPoints, true);
-			notify("Te encuentras aturdido");
+		if(stunTime() > 0 && isPlayer()){
+			modifyStunTime(-1);
+			modifyActionPoints(-getMovementSpeed().velocity());
+			doAction(stunText());
+			return;
 		}
 		
 		ai.onMoveBy(mx, my);
 		
 		if (mx==0 && my==0){
-			modifyActionPoints(-Math.max(1, movementSpeed.velocity()), false);
+			modifyActionPoints(-Math.max(1, movementSpeed.velocity()));
 			return;
 		}
 		
@@ -457,7 +472,7 @@ public class Creature extends Thing{
 			doAction("arroja %s", thrown.nameUnUnaWNoStacks());
 		}
 		
-		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()), false);
+		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()));
 		
 		ai.onThrowItem(thrown);
 		
@@ -488,7 +503,7 @@ public class Creature extends Thing{
 		
 		doAction("dispara %s hacia %s", weapon.nameElLaWNoStacks(), other.nameElLa());
 		
-		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()), false);
+		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()));
 		
 		if(weapon() != null && weapon().canBreak()){
 			weapon().modifyDurability(-1);

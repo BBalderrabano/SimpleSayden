@@ -115,7 +115,7 @@ public class BigMarauderAi extends CreatureAi {
 //TODO:			int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante", true);
 				c.doAction("recibe un golpe por "+ 1 + " de daño");
 			}
-			creature.modifyActionPoints(-creature.getAttackSpeed().velocity(), false);
+			creature.modifyStunTime(1);
 			creature.setQueAttack(null);
 			return;
 		}else{

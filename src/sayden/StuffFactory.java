@@ -675,7 +675,7 @@ public class StuffFactory {
 			}
 			public void start(Creature creature){
 				creature.notifyArround("La contusion "+ (creature.isPlayer() ? "te |aturde03|" : "|aturde03| " + creature.nameAlALa()));
-				creature.modifyActionPoints(-Speed.NORMAL.velocity(), true);
+				creature.modifyStunTime(1);
 			}
 		});
 

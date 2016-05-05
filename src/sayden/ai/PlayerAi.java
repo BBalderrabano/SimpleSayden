@@ -63,7 +63,7 @@ public class PlayerAi extends CreatureAi {
 		}
 		
 //		creature.addTime(creature.getMovementSpeed().velocity());
-		creature.modifyActionPoints(creature.getMovementSpeed().velocity(), false);
+		creature.modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
 	public void onUpdate(){	}
@@ -75,14 +75,14 @@ public class PlayerAi extends CreatureAi {
 		}
 		
 		creature.modifyActionPoints(creature.dualStrike() ? creature.offWeapon().attackSpeed().velocity() : 
-															creature.getAttackSpeed().velocity(), false);
+															creature.getAttackSpeed().velocity());
 		
 		boolean success = creature.meleeAttack(other);
 		
 		if(success){
 			if(other.isAlive() && other.queSpell() != null){
 				other.stopCasting();
-				other.modifyActionPoints(-other.getActionPoints(), false);
+				other.modifyActionPoints(-other.getActionPoints());
 			}
 			if(creature.weapon() != null && !creature.weapon().getBooleanData(Constants.CHECK_RANGED) && 
 					!creature.weapon().getBooleanData(Constants.CHECK_UNAUGMENTABLE)){
