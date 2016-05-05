@@ -10,6 +10,7 @@ public class DamageType {
 		toReturn.add(new DamageType(3, "penetrante", "daño efectuado por penetrar la piel", 0));
 		toReturn.add(new DamageType(4, "rango", "daño efectuado por armas de rango", 0));
 		toReturn.add(new DamageType(5, "magico", "daño efectuador por fuentes magicas", 0));
+		toReturn.add(new DamageType(6, "veneno", "daño efectuador por venenos", 0));
 		return toReturn;
 	}
 	
@@ -29,6 +30,7 @@ public class DamageType {
 		toReturn.add(3);
 		toReturn.add(4);
 		toReturn.add(5);
+		toReturn.add(6);
 		return toReturn;
 	}
 	
@@ -37,6 +39,7 @@ public class DamageType {
 	public static final int PIERCING = 3;
 	public static final int RANGED = 4;
 	public static final int MAGIC = 5;
+	public static final int POISON = 6;
 	
 	public int id;
 	public String name;

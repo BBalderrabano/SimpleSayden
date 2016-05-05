@@ -183,9 +183,9 @@ public class CreatureAi {
 	
 	public void onUpdate(){
 		if(creature.stunTime() > 0 && !creature.isPlayer()){
-			creature.modifyStunTime(-1);
 			creature.modifyActionPoints(-creature.getActionPoints());
 			creature.doAction(creature.stunText());
+			creature.modifyStunTime(-1);
 			return;
 		}
 		if(!creature.isPlayer() && creature.queSpell() != null &&

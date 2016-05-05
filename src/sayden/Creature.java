@@ -182,7 +182,7 @@ public class Creature extends Thing{
 		public void modifyStunTime(int amount, String stunText) { 
 			this.stunTime += amount; 
 			
-			if(stunText == null)
+			if(this.stunText == null)
 				this.stunText = stunText;
 		}
 		
@@ -356,9 +356,9 @@ public class Creature extends Thing{
 		
 	public void moveBy(int mx, int my){
 		if(stunTime() > 0 && isPlayer()){
-			modifyStunTime(-1);
 			modifyActionPoints(-getMovementSpeed().velocity());
 			doAction(stunText());
+			modifyStunTime(-1);
 			return;
 		}
 		

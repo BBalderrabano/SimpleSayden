@@ -262,6 +262,7 @@ public class StuffFactory {
 		Creature marauder = new Creature(world, 'm', 'M', AsciiPanel.brightYellow, "merodeador", 6);
 		marauder.setStartingAttackSpeed(Speed.NORMAL);
 		marauder.setStartingMovementSpeed(Speed.NORMAL);
+		marauder.modifyBonusDefense(DamageType.POISON, 1);
 		marauder.setVisionRadius(6);
 		
 		marauder.inventory().add(newPotionOfPoison(false));
@@ -1283,20 +1284,45 @@ public class StuffFactory {
 	public Item newPotionOfPoison(boolean spawn){
 		String appearance = potionAppearances.get(3);
 		final Item item = new Item((char)245, 'F', potionColors.get(appearance), "pocion de veneno", appearance, 70);
-		item.setQuaffEffect(new Effect("envenenado", 8){
+		
+		item.setQuaffEffect(new Effect("envenenado", 1){
 			public void start( Creature creature){
-//TODO:				if(creature.defenseValue(DamageType.POISON) >= 2){
-//					creature.doAction(item, "resiste el veneno");
-//					this.duration = 0;
-//				}else{
-//					creature.doAction(item, "siente |enfermo04|");
-//				}
-			}
-			
-			public void update(Creature creature){
-				super.update(creature);
+				if(creature.defenseValue(DamageType.POISON) > 0){
+					creature.doAction(item, "empapa en un liquido viscoso");
+					creature.doAction("resiste el veneno");
+					this.duration = 0;
+				}else{
+					creature.doAction(item, "siente |enfermo04|");
+					
+					creature.inflictWound(new Wound(2, "envenenado", "El veneno en tu cuerpo hierve tu sangre", 'M', Wound.LOW_DURATION, Wound.HIGHEST_CHANCE){
+						public boolean startFlavorText(Creature creature, Creature target){ 
+							if(target.isPlayer()){
+								target.notify("Sientes tu piel arder, empapado en un viscoso veneno");
+							}else{
+								target.notifyArround(target.nameElLa() + " se empapa en un viscoso veneno");
+							}
+							return false; 
+						}
+						public void update(Creature creature){
+							super.update(creature);
+							
+							if(Math.random() < 0.15f){
+								if(!creature.isPlayer()){
+									creature.modifyActionPoints(-creature.getActionPoints());
+								}
+								
+								creature.doAction("vomita bilis con sangre");
+								creature.modifyStunTime(1, "esta |mareado03|");
+								creature.makeBleed((float) (Math.random() * 100f));
+							}
+						}
+					});
+					
+					this.duration = 0;
+				}
 			}
 		});
+		
 		item.makeStackable(5);
 		world.addAtEmptyLocation(item, spawn);
 		return item;
