@@ -71,7 +71,7 @@ public class RockBugAi extends CreatureAi {
 				return false; 
 			}
 			public void start(Creature creature){
-				creature.makeBleed(50f);
+				creature.makeBleed(80f);
 				corpseShattered = true;
 			}
 		});
@@ -93,7 +93,7 @@ public class RockBugAi extends CreatureAi {
 				return false;
 			}
 			public void start(Creature creature){
-				creature.makeBleed(80f);
+				creature.makeBleed(150f);
 			}
 		});
 	}

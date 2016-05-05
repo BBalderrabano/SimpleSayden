@@ -45,7 +45,7 @@ public class MarauderAi extends CreatureAi {
 				Item head = new Item('*', 'F', target.originalColor(), "cabeza de merodeador", null, 0);
 				head.setData("IsMarauderHead", true);
 				target.drop(head);
-				target.makeBleed(100f);
+				target.makeBleed(180f);
 				return false;
 			}
 		});
