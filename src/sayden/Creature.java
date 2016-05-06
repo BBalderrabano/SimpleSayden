@@ -99,9 +99,9 @@ public class Creature extends Thing{
 		inflictedWounds.add(cloned);
 		
 		//Aqui se chequea si la criatura muere, al player se le dan 50% chances de sobrevivir
-		if(!isPlayer && vigor() > maxVigor()){
+		if(!isPlayer && vigor() >= maxVigor()){
 			die(cloned.causeOfDeath());
-		}else if(isPlayer && vigor() > maxVigor()){
+		}else if(isPlayer && vigor() >= maxVigor()){
 			if(Math.random() > .5f){
 				die(cloned.causeOfDeath());
 			}else{
@@ -532,7 +532,7 @@ public class Creature extends Thing{
 		String position = null;
 		
 		int highestDamage = -100;
-		int highestDamageType = -1;
+		DamageType highestDamageType = null;
 		
 		if(x < other.x && y >= other.y){
 			shieldBlock = true;
@@ -571,25 +571,25 @@ public class Creature extends Thing{
 			if(Math.max(0, attackValue) > highestDamage){
 				//Guardamos el daño maximo para luego buscar heridas
 				highestDamage = Math.max(0, attackValue);
-				highestDamageType = DamageType.BLUNT;
+				highestDamageType = DamageType.BLUNT();
 			}
 		}else{
 			//Recorremos todos los daños que existen
-			for(int d : DamageType.ALL_TYPES()){
+			for(DamageType d : DamageType.ALL_TYPES_INSTANCE()){
 				//Ignoramos los daños de rango
-				if(d == DamageType.RANGED)
+				if(d.equals(DamageType.RANGED))
 					continue;
 				
 				//Si esta prendido "onlyobject" vamos a buscar el daño del objeto en si, sino sumamos bonus
-				int attackValue = onlyObject && object != null ? object.attackValue(d) : attackValue(d);
+				int attackValue = onlyObject && object != null ? object.attackValue(d.id) : attackValue(d.id);
 
-				if(object == null && unarmeDamage() != null && unarmeDamage().id == d){
+				if(object == null && unarmeDamage() != null && unarmeDamage().equals(d)){
 					attackValue = unarmeDamage().amount;
 				}
 				
 				//Solo si esta atacando de los costados se le resta la defensa de los escudos
 				if(isShielding){
-					attackValue -= other.shield().defenseValue(d);
+					attackValue -= other.shield().defenseValue(d.id);
 				}
 				
 				if(weakSpotHit){
@@ -600,7 +600,7 @@ public class Creature extends Thing{
 						highestDamageType = d;
 					}
 				}else{
-					if(Math.max(0, attackValue - other.defenseValue(d)) > highestDamage){
+					if(Math.max(0, attackValue - other.defenseValue(d.id)) > highestDamage){
 						//Guardamos el daño maximo para luego buscar heridas
 						highestDamage = Math.max(0, attackValue);
 						highestDamageType = d;
@@ -699,6 +699,8 @@ public class Creature extends Thing{
 	}
 	
 	public void die(String causeOfDeath){
+		if(!isAlive)
+			return;
 		if(causeOfDeath != null && !causeOfDeath.isEmpty()){
 			this.causeOfDeath = causeOfDeath;
 		}
@@ -919,8 +921,14 @@ public class Creature extends Thing{
 	}
 	
 	public void drop(Item item){
+		drop(item, true);
+	}
+	
+	public void drop(Item item, boolean sayAction){
 		if (world.addAtEmptySpace(item, x, y)){
-			doAction("suelta " + item.nameUnUna());
+			if(sayAction){
+				doAction("suelta " + item.nameUnUna());
+			}
 			inventory.remove(item);
 			unequip(item, true);
 		} else {

@@ -20,9 +20,9 @@ public class Item extends Thing{
 	
 	private ArrayList<DamageType> attackValues;
 	public ArrayList<DamageType> attackValues() { return attackValues; }
-	public void modifyAttackValue(int type, int value) { 
+	public void modifyAttackValue(int typeId, int value) { 
 		for(DamageType d : attackValues){
-			if(d.id == type)
+			if(d.equals(typeId))
 				d.modifyAmount(value);
 		}
 	}
@@ -33,9 +33,9 @@ public class Item extends Thing{
 		}
 		return amount;
 	}
-	public int attackValue(int type) { 
+	public int attackValue(int typeId) { 
 		for(DamageType d : attackValues){
-			if(d.id == type)
+			if(d.equals(typeId))
 				return d.amount;
 		}
 		return 0;
@@ -56,9 +56,9 @@ public class Item extends Thing{
 
 	private ArrayList<DamageType> defenseValues;
 	public ArrayList<DamageType> defenseValues() { return defenseValues; };
-	public void modifyDefenseValue(int type, int value) { 
+	public void modifyDefenseValue(int typeId, int value) { 
 		for(DamageType d : defenseValues){
-			if(d.id == type)
+			if(d.equals(typeId))
 				d.modifyAmount(value);
 		}
 	}
@@ -69,9 +69,9 @@ public class Item extends Thing{
 		}
 		return amount;
 	}
-	public int defenseValue(int type) { 
+	public int defenseValue(int typeId) { 
 		for(DamageType d : defenseValues){
-			if(d.id == type)
+			if(d.equals(typeId))
 				return d.amount;
 		}
 		return 0;

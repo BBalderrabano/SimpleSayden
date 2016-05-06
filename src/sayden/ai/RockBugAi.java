@@ -35,7 +35,7 @@ public class RockBugAi extends CreatureAi {
 		creature.setData(Constants.RACE, "comepiedras");
 		
 		possibleWounds().add(new Wound(2, "abrasion acida", "Tus acidas quemaduras te mataron de dolor", 'F', 50, Wound.HIGHER_CHANCE){
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
 				if(attacker.getBooleanData(digestingFlag)){
 					return true;
 				}
@@ -49,8 +49,8 @@ public class RockBugAi extends CreatureAi {
 		});
 		
 		possibleWounds().add(new Wound(1, "mordisco acido", "La mordida del comepiedras llena tu sangre de acido",'M', 40, Wound.LOW_CHANCE){
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
-				return dtype == DamageType.SLICE;
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+				return dtype.equals(DamageType.SLICE);
 			}
 			public boolean startFlavorText(Creature creature, Creature target){
 				if(target.isPlayer()){
@@ -63,8 +63,8 @@ public class RockBugAi extends CreatureAi {
 		});
 		
 		possibleFatality().add(new Wound(4, "destrozo", null, 'M', 1, Wound.LOWEST_CHANCE){
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
-				return dtype == DamageType.BLUNT && position == Constants.HEAD_POS;
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+				return dtype.equals(DamageType.BLUNT) && position == Constants.HEAD_POS;
 			}
 			public boolean startFlavorText(Creature creature, Creature target){ 
 				creature.notifyArround("El golpe destroza el caparazon del comepiedras, salpicando sangre y viceras enderredor");
@@ -77,8 +77,8 @@ public class RockBugAi extends CreatureAi {
 		});
 		
 		possibleFatality().add(new Wound(4, "cercenamiento", null, 'M', 1, Wound.LOWEST_CHANCE){
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
-				return dtype == DamageType.SLICE && position == Constants.LEG_POS;
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
+				return dtype.equals(DamageType.SLICE) && position == Constants.LEG_POS;
 			}
 			public boolean startFlavorText(Creature creature, Creature target){
 				String text = "";

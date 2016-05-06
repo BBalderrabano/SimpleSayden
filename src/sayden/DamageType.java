@@ -5,22 +5,13 @@ import java.util.ArrayList;
 public class DamageType {
 	public static ArrayList<DamageType> ALL_TYPES_INSTANCE(){
 		ArrayList<DamageType> toReturn = new ArrayList<DamageType>();
-		toReturn.add(new DamageType(1, "cortante", "daño efectuado por corte", 0));
-		toReturn.add(new DamageType(2, "contundente", "daño efectuado por golpes fuertes", 0));
-		toReturn.add(new DamageType(3, "penetrante", "daño efectuado por penetrar la piel", 0));
-		toReturn.add(new DamageType(4, "rango", "daño efectuado por armas de rango", 0));
-		toReturn.add(new DamageType(5, "magico", "daño efectuador por fuentes magicas", 0));
-		toReturn.add(new DamageType(6, "veneno", "daño efectuador por venenos", 0));
+		toReturn.add(SLICE());
+		toReturn.add(BLUNT());
+		toReturn.add(PIERCING());
+		toReturn.add(RANGED());
+		toReturn.add(MAGIC());
+		toReturn.add(POISON());
 		return toReturn;
-	}
-	
-	public static DamageType getInstance(int type){
-		for(DamageType d : ALL_TYPES_INSTANCE()){
-			if(d.id == type){
-				return d;
-			}
-		}
-		return null;
 	}
 	
 	public static ArrayList<Integer> ALL_TYPES(){
@@ -33,6 +24,13 @@ public class DamageType {
 		toReturn.add(6);
 		return toReturn;
 	}
+	
+	public static final DamageType SLICE() { return new DamageType(1, "cortante", "daño efectuado por corte", 0); };
+	public static final DamageType BLUNT() { return new DamageType(2, "contundente", "daño efectuado por golpes fuertes", 0); };
+	public static final DamageType PIERCING() { return new DamageType(3, "penetrante", "daño efectuado al penetrar la piel", 0); };
+	public static final DamageType RANGED() { return new DamageType(4, "rango", "daño efectuado por objetos en vuelo", 0); };
+	public static final DamageType MAGIC() { return new DamageType(5, "magico", "daño efectuado por fuentes magicas", 0); };
+	public static final DamageType POISON() { return new DamageType(6, "veneno", "daño efectuado por venenos", 0); };
 	
 	public static final int SLICE = 1;
 	public static final int BLUNT = 2;
@@ -60,5 +58,25 @@ public class DamageType {
 		this.name = copy.name;
 		this.description = copy.description;
 		this.amount = copy.amount;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof DamageType))
+			return false;
+		DamageType other = (DamageType) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+	
+	public boolean equals(int id) {
+		if (this.id != id)
+			return false;
+		return true;
 	}
 }

@@ -31,7 +31,7 @@ public class Constants {
 	public static final String NO_POS = "NONE";
 	
 	public static final String BLOOD_FLUID = "BLOOD";	//El fluido de la sangre, en un tile puede haber un maximo de 100f de sangre
-	public static final float MIN_FLUID_AMOUNT = 15f;	//Cuado un tile ya tiene sangre, no puede bajar de 15f
+	public static final float MIN_FLUID_AMOUNT = 15f;	//Cuando un tile ya tiene sangre, no puede bajar de 15f
 	
 	//+++++++++++++++++++++++++++CHEQUEOS VARIOS+++++++++++++++++++++++++++++++++++++
 	public static final String RACE = "Race";							//El flag de la raza

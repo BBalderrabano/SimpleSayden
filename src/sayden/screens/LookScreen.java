@@ -53,6 +53,9 @@ public class LookScreen extends TargetBasedScreen {
 				return;
 			}
 			caption = Constants.capitalize(creature.nameUnUna()) + " " + creature.statusEffects();
+			for(int i = 0; i < creature.vigor(); i++){
+				caption += "|";
+			}
 			caption = PlayScreen.splitPhraseByLimit(caption, Constants.WORLD_WIDTH).get(0);
 			return;
 		}

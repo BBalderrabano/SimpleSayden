@@ -29,8 +29,8 @@ public class MarauderAi extends CreatureAi {
 		creature.setData(Constants.RACE, "merodeador");
 		
 		possibleFatality().add(new Wound(4, "decapitacion", null, 'F', 1, Wound.LOWEST_CHANCE){
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
-				return dtype == DamageType.SLICE && 
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return dtype.equals(DamageType.SLICE) && 
 						position == Constants.HEAD_POS && 
 						attacker.weapon() != null;
 			}
@@ -44,8 +44,9 @@ public class MarauderAi extends CreatureAi {
 				target.notifyArround("Con un habil movimiento %s en seco la cabeza del merodeador", text);
 				Item head = new Item('*', 'F', target.originalColor(), "cabeza de merodeador", null, 0);
 				head.setData("IsMarauderHead", true);
-				target.drop(head);
+				target.drop(head, false);
 				target.makeBleed(180f);
+				target.die(null);
 				return false;
 			}
 		});

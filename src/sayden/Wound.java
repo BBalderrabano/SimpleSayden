@@ -29,33 +29,54 @@ public class Wound extends Thing implements Cloneable {
 	public static ArrayList<Wound> DEFAULT_WOUNDS(){
 		ArrayList<Wound> defWounds = new ArrayList<Wound>();
 		
-		defWounds.add(new Wound(1, "moreton", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', LOWEST_DURATION, NORMAL_CHANCE){
+		defWounds.add(new Wound(1, "moreton", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', LOWEST_DURATION, LOW_CHANCE){
 			@Override
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
-				return dtype == DamageType.BLUNT;
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return dtype.equals(DamageType.BLUNT);
 			}
 		});
 		
-		defWounds.add(new Wound(1, "corte superficial", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', LOWEST_DURATION, NORMAL_CHANCE){
+		defWounds.add(new Wound(1, "corte superficial", "Tus heridas finalmente te colapsan, mueres en agonia", 'M', LOWEST_DURATION, LOW_CHANCE){
 			@Override
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
-				return dtype == DamageType.SLICE ||
-						dtype == DamageType.PIERCING ||
-						dtype == DamageType.RANGED;
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return dtype.equals(DamageType.SLICE) ||
+						dtype.equals(DamageType.PIERCING) ||
+						dtype.equals(DamageType.RANGED);
 			}
 			public void start(Creature creature){
 				creature.makeBleed(15f);
 			}
 		});
 		
-		defWounds.add(new Wound(1, "herida arcana", "La magia finalmente te es demasia, mueres de un derrame cerebral", 'F', LOWEST_DURATION, NORMAL_CHANCE){
+		defWounds.add(new Wound(1, "herida arcana", "La magia finalmente te es demasia, mueres de un derrame cerebral", 'F', LOWEST_DURATION, LOW_CHANCE){
 			@Override
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
-				return dtype == DamageType.MAGIC;
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return dtype.equals(DamageType.MAGIC);
 			}
 		});
 		
 		return defWounds;
+	}
+	
+	public static Wound CONCUSSION(final int stuntime){
+		return CONCUSSION(stuntime, Wound.LOWEST_DURATION, Wound.NORMAL_CHANCE);
+	}
+	
+	public static Wound CONCUSSION(final int stuntime, int duration, int chance){
+		return new Wound(1, "contusion", "Mueres por trauma cerebral", 'F', duration, chance){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return position == Constants.HEAD_POS;
+			}
+			public void start(Creature creature){
+				if(creature.helment() != null){
+					creature.doAction("resiste el |aturdimiento03| con " + (creature.isPlayer() ? "tu " + creature.helment().name() : "su " + creature.helment().name()));
+					return;
+				}
+				
+				creature.notifyArround("La contusion "+ (creature.isPlayer() ? "te |aturde03|" : "|aturde03| " + creature.nameAlALa()));
+				creature.modifyStunTime(stuntime);
+			}
+		};
 	}
 	
 	protected int duration;
@@ -78,11 +99,11 @@ public class Wound extends Thing implements Cloneable {
 		this.vigor = vigor;
 	}
 	
-	public boolean canBePickedFRanged(Creature target, int dtype, int amount){
+	public boolean canBePickedFRanged(Creature target, DamageType dtype, int amount){
 		return true;
 	}
 	
-	public boolean canBePicked(Creature attacker, Creature target, String position, int dtype){
+	public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype){
 		return true;
 	}
 	

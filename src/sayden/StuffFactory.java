@@ -71,7 +71,7 @@ public class StuffFactory {
 		player.setStartingMovementSpeed(Speed.VERY_FAST);
 		player.setStartingAttackSpeed(Speed.VERY_FAST);
 		
-		player.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 1);
+		player.setUnarmeDamage(DamageType.BLUNT(), 1);
 		
 		Point[] startPos = {new Point(45, 2),
 							new Point(36, 12)};
@@ -100,7 +100,7 @@ public class StuffFactory {
 		dreamer.setStartingMovementSpeed(Speed.VERY_FAST);
 		dreamer.setStartingAttackSpeed(Speed.VERY_FAST);
 		
-		dreamer.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 1);
+		dreamer.setUnarmeDamage(DamageType.BLUNT(), 1);
 		
 		dreamer.equip(randomWeapon(null, false, false, true, true, true));
 		dreamer.equip(randomArmor(null, false, true, true, true, false));
@@ -177,7 +177,7 @@ public class StuffFactory {
 		Creature lunatic = new Creature(world, 'l', 'M', Color.gray, "lunatico", 14);
 		lunatic.setStartingAttackSpeed(Speed.FAST);
 		lunatic.setStartingMovementSpeed(Speed.NORMAL);
-		lunatic.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 1);
+		lunatic.setUnarmeDamage(DamageType.BLUNT(), 1);
 		
 		world.addAtEmptyLocation(lunatic);
 		new LunaticAi(lunatic, player);
@@ -188,7 +188,7 @@ public class StuffFactory {
 		Creature dog = new Creature(world, 'd', 'M', new Color(165,42,42), "perro", 8);
 		dog.setStartingAttackSpeed(Speed.FAST);
 		dog.setStartingMovementSpeed(Speed.FAST);
-		dog.setUnarmeDamage(DamageType.getInstance(DamageType.SLICE), 4);
+		dog.setUnarmeDamage(DamageType.SLICE(), 3);
 		
 		world.addAtEmptyLocation(dog);
 		new DogAi(dog, player, owner);
@@ -210,19 +210,18 @@ public class StuffFactory {
 	}
 	
 	public Creature newCaveBrute(Creature player){
-		Creature caveBrute = new Creature(world, 'P', 'F', AsciiPanel.brightGreen, "matriarca", 30);
-		caveBrute.setStartingAttackSpeed(Speed.SLOW);
+		Creature caveBrute = new Creature(world, 'P', 'F', AsciiPanel.brightGreen, "matriarca", 12);
+		caveBrute.setStartingAttackSpeed(Speed.NORMAL);
 		caveBrute.setStartingMovementSpeed(Speed.SLOW);
 		caveBrute.setVisionRadius(4);
 		
-		caveBrute.modifyBonusDefense(DamageType.BLUNT, 2);
-		caveBrute.modifyBonusDefense(DamageType.SLICE, 1);
-		
-		//caveBrute.equip(newBigMace(false));
+		caveBrute.equip(newBigMace(false));
+		caveBrute.equip(newHeavyLeather(false));
 		
 		world.addAtEmptyLocation(caveBrute );
 		PaseacuevasAi ai = new PaseacuevasAi(caveBrute, player);
-		
+		caveBrute.ai().possibleWounds().add(new Wound(2, "lesion", "Tus lesiones te producen una severa hemorragia interna", 'F', Wound.HIGH_DURATION, Wound.HIGH_CHANCE));
+
 		for(int i = 0; i < Math.random() * 3; i++){
 			ai.addMale(newCaveSmall(player, caveBrute));
 		}
@@ -231,12 +230,12 @@ public class StuffFactory {
 	}
 	
 	public Creature newCaveLost(Creature player){
-		Creature caveLost = new Creature(world, 'p', 'M', AsciiPanel.green, "paseacuevas", 8);
+		Creature caveLost = new Creature(world, 'p', 'M', AsciiPanel.green, "paseacuevas", 4);
 		
 		caveLost.setStartingAttackSpeed(Speed.NORMAL);
 		caveLost.setStartingMovementSpeed(Speed.FAST);
 		
-		caveLost.setUnarmeDamage(DamageType.getInstance(DamageType.SLICE), 2);
+		caveLost.setUnarmeDamage(DamageType.SLICE(), 2);
 		
 		caveLost.setVisionRadius(8);
 		
@@ -246,12 +245,12 @@ public class StuffFactory {
 	}
 		
 	public Creature newCaveSmall(Creature player, Creature female){
-		Creature caveSmall = new Creature(world, 'p', 'M', AsciiPanel.brightGreen, "paseacuevas", 8);
+		Creature caveSmall = new Creature(world, 'p', 'M', AsciiPanel.brightGreen, "paseacuevas", 4);
 		caveSmall.setStartingAttackSpeed(Speed.NORMAL);
 		caveSmall.setStartingMovementSpeed(Speed.FAST);
 		caveSmall.setVisionRadius(8);
 		
-		caveSmall.setUnarmeDamage(DamageType.getInstance(DamageType.BLUNT), 2);
+		caveSmall.setUnarmeDamage(DamageType.BLUNT(), 2);
 		
 		world.addAtEmptySpace(caveSmall, female.x, female.y);
 		new PaseacuevasMaleAi(caveSmall, player, female);
@@ -263,6 +262,8 @@ public class StuffFactory {
 		marauder.setStartingAttackSpeed(Speed.NORMAL);
 		marauder.setStartingMovementSpeed(Speed.NORMAL);
 		marauder.modifyBonusDefense(DamageType.POISON, 1);
+		marauder.setUnarmeDamage(DamageType.BLUNT(), 1);
+		
 		marauder.setVisionRadius(6);
 		
 		marauder.inventory().add(newPotionOfPoison(false));
@@ -271,13 +272,11 @@ public class StuffFactory {
 			marauder.equip(newMarauderVest(false));
 		if(Math.random() < .3f)
 			marauder.equip(newMarauderHood(false));
-		if(Math.random() < .3f)
-			marauder.inventory().add(newMace(false));
 		
 		if(Math.random() < .1f)
 			newDog(player, marauder);
 		
-		//marauder.inventory().add(randomWeapon(null, false, true, false, false, false));
+		marauder.inventory().add(randomWeapon(null, false, true, false, false, false));
 		
 		world.addAtEmptyLocation(marauder );
 		new MarauderAi(marauder, player);
@@ -309,7 +308,7 @@ public class StuffFactory {
 		rockBug.setStartingMovementSpeed(Speed.FAST);
 		rockBug.setVisionRadius(2);
 		
-		rockBug.setUnarmeDamage(DamageType.getInstance(DamageType.SLICE), 2);
+		rockBug.setUnarmeDamage(DamageType.SLICE(), 2);
 		
 		rockBug.modifyBonusDefense(DamageType.SLICE, 3);
 		rockBug.modifyBonusDefense(DamageType.BLUNT, 3);
@@ -329,7 +328,7 @@ public class StuffFactory {
 		hidden.modifyBonusDefense(DamageType.BLUNT, 4);
 		hidden.modifyBonusDefense(DamageType.PIERCING, 2);
 		
-		hidden.setUnarmeDamage(DamageType.getInstance(DamageType.PIERCING), 6);
+		hidden.setUnarmeDamage(DamageType.PIERCING(), 3);
 		
 		hidden.modifyAttackSpeed(Speed.VERY_FAST);
 		hidden.modifyMovementSpeed(Speed.SLOW);
@@ -414,7 +413,7 @@ public class StuffFactory {
 		item.makeStackable(3);
 		
 		item.possibleWounds().add(new Wound(3, "puñalada", "Mueres de hemorragia interna", 'F', Wound.LOWEST_DURATION, Wound.HIGH_CHANCE){
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
 				return position == Constants.BACK_POS;
 			}
 			public boolean startFlavorText(Creature creature, Creature target){
@@ -423,7 +422,7 @@ public class StuffFactory {
 				}else{
 					creature.doAction("apuñala " + target.nameAlALa() + " por la espalda, hundiendo "+ (creature.isPlayer() ? "tu daga" : "la daga") +" en su cuerpo");
 				}
-				target.makeBleed(30f);
+				target.makeBleed(40f);
 				return false;
 			}
 		});
@@ -566,17 +565,18 @@ public class StuffFactory {
 	
 	public Item newShortSword(boolean spawn){
 		Item item = new Item((char)253, 'F', AsciiPanel.brightWhite, "espada corta", "espada corta", DROP_1_CHANCE);
-		item.modifyAttackValue(DamageType.SLICE, 4);
+		item.modifyAttackValue(DamageType.SLICE, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.NORMAL);
 		
-		item.possibleWounds().add(new Wound(3, "corte severo", "Mueres desangrado", 'M', Wound.LOWEST_DURATION, Wound.HIGH_CHANCE){
+		item.possibleWounds().add(new Wound(2, "corte severo", "Mueres desangrado", 'M', Wound.LOWEST_DURATION, Wound.HIGH_CHANCE){
 			public boolean startFlavorText(Creature creature, Creature target){
-				target.makeBleed(30f);
+				target.makeBleed(40f);
 				return true;
 			}
 			public void update(Creature creature){
-				creature.makeBleed(15f);
+				super.update(creature);
+				creature.makeBleed(20f);
 			}
 		});
 		
@@ -666,19 +666,11 @@ public class StuffFactory {
 	
 	public Item newMace(boolean spawn){
 		Item item = new Item((char)254, 'M', Color.LIGHT_GRAY, "maza", "maza", DROP_1_CHANCE);
-		item.modifyAttackValue(DamageType.BLUNT, 4);
+		item.modifyAttackValue(DamageType.BLUNT, 2);
 		item.setData(Constants.CHECK_WEAPON, true);
 		item.modifyAttackSpeed(Speed.NORMAL);
 		
-		item.possibleWounds().add(new Wound(1, "contusion", "Mueres por trauma cerebral", 'F', Wound.LOWEST_DURATION, Wound.NORMAL_CHANCE){
-			public boolean canBePicked(Creature attacker, Creature target, String position, int dtype) {
-				return position == Constants.HEAD_POS;
-			}
-			public void start(Creature creature){
-				creature.notifyArround("La contusion "+ (creature.isPlayer() ? "te |aturde03|" : "|aturde03| " + creature.nameAlALa()));
-				creature.modifyStunTime(1);
-			}
-		});
+		item.possibleWounds().add(Wound.CONCUSSION(1));
 
 		world.addAtEmptyLocation(item, spawn);
 		return item;
@@ -752,17 +744,46 @@ public class StuffFactory {
 //		return morningStar;
 //	}
 	
-//	public Item newBigMace(boolean spawn){
-//		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza de piedra", "maza de piedra", DROP_2_CHANCE);
-//		bigMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
-//		bigMace.modifyAttackValue(DamageType.BLUNT, 8);
-//		bigMace.setData(Constants.CHECK_WEAPON, true);
-//		bigMace.modifyMovementSpeed(Speed.FAST);
-//		bigMace.modifyAttackSpeed(Speed.SLOW);
-//		bigMace.modifyBloodModifyer(0.8f);
-//		world.addAtEmptyLocation(bigMace, spawn);
-//		return bigMace;
-//	}
+	public Item newBigMace(boolean spawn){
+		Item bigMace = new Item((char)254, 'F', Color.DARK_GRAY, "maza gigante", "maza gigante", DROP_2_CHANCE);
+		bigMace.setData(Constants.CHECK_UNAUGMENTABLE, true);
+		bigMace.modifyAttackValue(DamageType.BLUNT, 4);
+		bigMace.setData(Constants.CHECK_WEAPON, true);
+		bigMace.modifyMovementSpeed(Speed.FAST);
+		bigMace.modifyAttackSpeed(Speed.SLOW);
+		
+		bigMace.possibleWounds().add(new Wound(1, "aplastar", "Una maza gigante te alcanza, rompiendo varios de tus huesos y provocandote una horrible hemorragia interna", 'M', Wound.LOW_DURATION, Wound.HIGH_CHANCE){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return target.maxVigor() <= 3;
+			}
+			public boolean startFlavorText(Creature creature, Creature target){
+				target.makeBleed((float) (150f + (100f * Math.random())));
+				creature.doAction("aplasta con " + (creature.isPlayer() ? "tu" : "su") + " maza gigante " + target.nameAlALa());
+				target.die(null);
+				return false;
+			}
+		});
+		
+		bigMace.possibleWounds().add(Wound.CONCUSSION(2, Wound.LOW_DURATION, Wound.HIGH_CHANCE));
+		
+		bigMace.possibleWounds().add(new Wound(3, "costilla rota", "Tu costilla rota perfora el pulmon, llenandolo de sangre", 'F', Wound.HIGHER_DURATION, Wound.HIGH_CHANCE){
+			public boolean canBePicked(Creature attacker, Creature target, String position, DamageType dtype) {
+				return position == Constants.ARM_POS || position == Constants.BACK_POS;
+			}
+			public boolean startFlavorText(Creature creature, Creature target){
+				creature.doAction("golpea con terrible fuerza el costado " + (target.isPlayer() ? "de tu cuerpo" : target.nameDelDeLa()));
+				target.notify("Sientes un terrible crujido en tus costillas");
+				target.modifyStunTime(1, "esta sin |aliento03|");
+				return false;
+			}
+		});
+		
+		bigMace.possibleWounds().add(new Wound(2, "lesion", "Tus lesiones te producen una severa hemorragia interna", 'F', Wound.HIGH_DURATION, Wound.HIGH_CHANCE));
+
+		
+		world.addAtEmptyLocation(bigMace, spawn);
+		return bigMace;
+	}
 	
 //	public Item newHalberd(boolean spawn){
 //		Item item = new Item((char)244, 'M', Color.LIGHT_GRAY, "alabarda", "alabarda", DROP_3_CHANCE);
@@ -950,7 +971,6 @@ public class StuffFactory {
 	
 	public Item newMarauderHood(boolean spawn){
 		Item marauderHood = new Item((char)248, 'F', AsciiPanel.brightYellow, "capucha de merodeador", "capucha de merodeador", DROP_1_CHANCE);
-		marauderHood.modifyDefenseValue(DamageType.PIERCING, 1);
 		marauderHood.setData(Constants.CHECK_HELMENT, true);
 		marauderHood.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
 		marauderHood.setData(Constants.CHECK_UNAUGMENTABLE, true);
@@ -961,7 +981,7 @@ public class StuffFactory {
 	
 	public Item newMarauderVest(boolean spawn){
 		Item marauderVest = new Item((char)252, 'M', AsciiPanel.brightYellow, "abrigo de merodeador", "abrigo de merodeador", DROP_1_CHANCE);
-		marauderVest.modifyDefenseValue(DamageType.SLICE, 2);
+		marauderVest.modifyDefenseValue(DamageType.SLICE, 1);
 		marauderVest.modifyDefenseValue(DamageType.BLUNT, 1);
 		marauderVest.setData(Constants.CHECK_MARAUDER_DISGUISE, true);
 		marauderVest.setData(Constants.CHECK_UNAUGMENTABLE, true);
@@ -970,15 +990,14 @@ public class StuffFactory {
 		return marauderVest;
 	}
 	
-	public Item newLeatherArmor(boolean spawn){
-		Item leatherArmor = new Item((char)252, 'F', Color.orange, "armadura de cuero", "armadura de cuero", DROP_2_CHANCE);
-		leatherArmor.modifyDefenseValue(DamageType.SLICE, 3);
-		leatherArmor.modifyDefenseValue(DamageType.BLUNT, 1);
-		leatherArmor.modifyDefenseValue(DamageType.PIERCING, 1);
-		leatherArmor.setData(Constants.CHECK_ARMOR, true);
-		leatherArmor.modifyMovementSpeed(Speed.FAST);
-		world.addAtEmptyLocation(leatherArmor, spawn);
-		return leatherArmor;
+	public Item newHeavyLeather(boolean spawn){
+		Item heavyLeather = new Item((char)252, 'F', Color.orange, "cuero pesado", "cuero pesado", DROP_4_CHANCE);
+		heavyLeather.modifyDefenseValue(DamageType.SLICE, 1);
+		heavyLeather.modifyDefenseValue(DamageType.BLUNT, 2);
+		heavyLeather.setData(Constants.CHECK_ARMOR, true);
+		heavyLeather.modifyMovementSpeed(Speed.FAST);
+		world.addAtEmptyLocation(heavyLeather, spawn);
+		return heavyLeather;
 	}
 	
 	public Item newLeatherMediumArmor(boolean spawn){
@@ -1097,10 +1116,6 @@ public class StuffFactory {
 	public Item randomThrowableWeapon(boolean spawn, boolean fullyStacked){
 		ArrayList<Item> items = new ArrayList<Item>();
 		
-//		items.add(newKnife(false));
-//		items.add(newThrowAxe(false));
-//		items.add(newJavelin(false));
-		
 		Item to_return = randomWeapon(items, spawn, false, false, false, false);
 		
 		if(fullyStacked)
@@ -1116,51 +1131,26 @@ public class StuffFactory {
 			items.add(newShortSword(false));
 			items.add(newMace(false));
 			items.add(newDagger(false));
-//			items.add(newMorningStar(false));
-//			items.add(newSword(false));
-//			items.add(newBastardSword(false));
-//			items.add(newAxe(false));
-//			items.add(newHammer(false));
-//			items.add(newLance(false));
 		}
 		if(includeUncommon){
-//			items.add(newBallAndChain(false));
-//			items.add(newCimitarra(false));
-//			items.add(newCurveDagger(false));
-//			items.add(newWarAxe(false));
-//			items.add(newWarHammer(false));
-//			items.add(newSchyte(false));
-//			items.add(newJavelin(false));
-//			items.add(newKnightLance(false));
-//			items.add(newLongLance(false));
 		}
 		if(includeHeavy){
-//			items.add(newLongSword(false));
-//			items.add(newMandoble(false));
-//			items.add(newBigSword(false));
-//			items.add(newHugeSword(false));
-//			items.add(newBigAxe(false));
-//			items.add(newGiantHammer(false));
-//			items.add(newHalberd(false));
 		}
 		if(includeRanged){
-//			items.add(newShortBow(false));
-//			items.add(newCompositeBow(false));
-//			items.add(newHunterBow(false));
-//			items.add(newLongBow(false));
-//			items.add(newCrossbow(false));
-//			items.add(newHeavyCrossbow(false));
 		}
 		
-		if(pool != null)
+		if(pool != null){
 			items.addAll(pool);
+		}
 		
 		// Compute the total weight of all items together
 		double totalWeight = 0.0d;
+		
 		for (Item i : items)
 		{
 		    totalWeight += i.spawnWeight();
 		}
+		
 		// Now choose a random item
 		int randomIndex = -1;
 		double random = Math.random() * totalWeight;
@@ -1175,7 +1165,7 @@ public class StuffFactory {
 		    }
 		}
 		
-		if(randomIndex < 1){
+		if(randomIndex < 0){
 			return null;
 		}
 		
@@ -1192,7 +1182,7 @@ public class StuffFactory {
 		ArrayList<Item> items = new ArrayList<Item>();
 		
 		if(includeLight){
-			items.add(newLeatherArmor(false));
+			items.add(newHeavyLeather(false));
 			items.add(newLeatherMediumArmor(false));
 			items.add(newLightArmor(false));
 		}
@@ -1410,11 +1400,11 @@ public class StuffFactory {
 			public void start(Creature creature){
 				creature.notify("Pronuncias la palabra del dolor");
 				
-				if(10 > 0){
-					creature.doAction(item, "retuerce en agonia!");
-				}else{
-					creature.doAction(item, "resigna al dolor");
-				}
+//				if(10 > 0){
+//					creature.doAction(item, "retuerce en agonia!");
+//				}else{
+//					creature.doAction(item, "resigna al dolor");
+//				}
 			}
 		}, 4, 90, Constants.SPELL_PAIN,  new Effect("adolorido", 1){
 			public void start(Creature creature){
