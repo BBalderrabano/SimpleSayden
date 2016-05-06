@@ -1,5 +1,7 @@
 package sayden.screens;
 
+import java.awt.event.MouseEvent;
+
 import sayden.Creature;
 import sayden.Item;
 import sayden.Line;
@@ -27,5 +29,10 @@ public class ThrowAtScreen extends TargetBasedScreen {
 
 	public void selectWorldCoordinate(int x, int y, int screenX, int screenY){
 		player.throwItem(item, x, y);
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

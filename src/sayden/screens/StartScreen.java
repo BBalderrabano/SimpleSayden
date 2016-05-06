@@ -2,6 +2,7 @@ package sayden.screens;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 import asciiPanel.AsciiPanel;
 
@@ -47,5 +48,10 @@ public class StartScreen implements Screen {
 		}
 		
 		terminal.repaint();
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

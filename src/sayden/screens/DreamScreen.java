@@ -2,6 +2,7 @@ package sayden.screens;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -386,6 +387,11 @@ public class DreamScreen implements Screen {
 		if (!player.isAlive())
 			return new PlayScreen();
 		
+		return this;
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
 		return this;
 	}
 }

@@ -1,6 +1,7 @@
 package sayden.screens;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
@@ -209,5 +210,10 @@ public class TalkScreen extends InventoryBasedScreen {
 		}
 		
 		return messages.isEmpty() ? null : this;
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

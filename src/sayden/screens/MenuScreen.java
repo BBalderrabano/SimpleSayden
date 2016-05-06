@@ -2,6 +2,7 @@ package sayden.screens;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
@@ -609,5 +610,10 @@ public class MenuScreen extends InventoryBasedScreen {
 		} else {
 			return this;
 		}
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

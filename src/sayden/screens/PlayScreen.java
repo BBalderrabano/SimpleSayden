@@ -2,10 +2,12 @@ package sayden.screens;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
@@ -521,5 +523,10 @@ public class PlayScreen implements Screen {
 		
 		if(player.item(player.x, player.y) != null)
 			player.pickup();
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

@@ -1,6 +1,8 @@
 package sayden.screens;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+
 import asciiPanel.AsciiPanel;
 
 public class HelpScreen implements Screen {
@@ -35,5 +37,10 @@ public class HelpScreen implements Screen {
 	@Override
 	public Screen respondToUserInput(KeyEvent key) {
 		return null;
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

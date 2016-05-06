@@ -1,6 +1,7 @@
 package sayden.screens;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 import asciiPanel.AsciiPanel;
 import sayden.Constants;
@@ -77,5 +78,10 @@ public class LookScreen extends TargetBasedScreen {
 		}else{
 			return super.respondToUserInput(key);
 		}
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

@@ -2,6 +2,8 @@ package sayden;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,7 +14,7 @@ import sayden.autoupdater.ApplicationUpdater;
 import sayden.screens.Screen;
 import sayden.screens.StartScreen;
 
-public class ApplicationMain extends JFrame implements KeyListener {
+public class ApplicationMain extends JFrame implements KeyListener, MouseListener {
 	private static final long serialVersionUID = 1060623638149583738L;
 	
 	//Instanciamos el app updater y le pasamos la url del repositorio donde esta el archivo .jar
@@ -52,8 +54,9 @@ public class ApplicationMain extends JFrame implements KeyListener {
 		//La primer screen es la start screen
 		screen = new StartScreen();
 		
-		//Seteamos los keylistener y ponemos el tamaño de la pantalla
+		//Seteamos los keylistener y mouselistener y ponemos el tamaño de la pantalla
 		addKeyListener(this);
+		addMouseListener(this);
 		setFocusTraversalKeysEnabled(false);
 		setSize(terminal.getWidth() + 6, terminal.getHeight() + 28);
 		setResizable(false);
@@ -104,5 +107,26 @@ public class ApplicationMain extends JFrame implements KeyListener {
 		ApplicationMain app = new ApplicationMain(args.length < 1);
 		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		app.setVisible(true);
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		screen = screen.respondToMouseInput(e);
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {	
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {	
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {		
 	}
 }

@@ -1,6 +1,7 @@
 package sayden.screens;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
@@ -165,5 +166,10 @@ public class ReadSpellScreen implements Screen {
 		
 		player.castSpell(spell, player.x, player.y);
 		return null;
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

@@ -1,5 +1,7 @@
 package sayden.screens;
 
+import java.awt.event.MouseEvent;
+
 import sayden.Creature;
 import sayden.Item;
 
@@ -27,5 +29,10 @@ public class ReadScreen extends InventoryBasedScreen {
 	@Override
 	protected Screen use(Item item) {
 		return new ReadSpellScreen(player, sx, sy, item);
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }

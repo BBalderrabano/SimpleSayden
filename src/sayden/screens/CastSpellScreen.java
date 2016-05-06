@@ -1,5 +1,7 @@
 package sayden.screens;
 
+import java.awt.event.MouseEvent;
+
 import sayden.Creature;
 import sayden.Spell;
 
@@ -13,5 +15,10 @@ public class CastSpellScreen extends TargetBasedScreen {
 	
 	public void selectWorldCoordinate(int x, int y, int screenX, int screenY){
 		player.castSpell(spell, x, y);
+	}
+
+	@Override
+	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
 	}
 }
