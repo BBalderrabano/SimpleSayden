@@ -358,7 +358,9 @@ public class PlayScreen implements Screen {
 	        }else if(colorCheck.equals("06")){
 	        	color = AsciiPanel.brightMagenta;
 	        }else if(colorCheck.equals("07")){
-	        	color = Constants.WOUND_COLOR;
+	        	color = new Color(255,245,0);
+	        }else if(colorCheck.equals("08")){
+	        	color = new Color(212,152,0);
 	        }
 	        
 	        finalText = text.replace(requiredString, formattedString.substring(0, formattedString.length() - 2) );

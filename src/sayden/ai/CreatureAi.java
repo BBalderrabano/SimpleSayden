@@ -125,7 +125,7 @@ public class CreatureAi {
 		String isCrit = "";
 		
 		if(position == weakSpot){
-			isCrit = " (|critico01|)";
+			isCrit = " ("+Constants.COLOR_RED("critico")+")";
 		}else{
 			isCrit = "";
 		}

@@ -67,6 +67,16 @@ public class Constants {
 	public static final Color SPELL_QUE_COLOR = AsciiPanel.brightMagenta;	//El color de la criatura al estar lanzando un spell
 	public static final Color ATTACK_QUE_COLOR = AsciiPanel.brightBlue;	//El color de la criatura al tratar de atacar
 	
+	public static final String COLOR_RED(String text) { return "|"+text+"01|"; }
+	public static final String COLOR_CYAN(String text) { return "|"+text+"02|"; }
+	public static final String COLOR_ORANGE(String text) { return "|"+text+"03|"; }
+	public static final String COLOR_GREEN(String text) { return "|"+text+"04|"; }
+	public static final String COLOR_BRIGHT_BLUE(String text) { return "|"+text+"05|"; }
+	public static final String COLOR_MAGENTA(String text) { return "|"+text+"06|"; }
+	public static final String COLOR_WOUND_1(String text) { return "|"+text+"07|"; }
+	public static final String COLOR_WOUND_2(String text) { return "|"+text+"08|"; }
+
+	
 	//+++++++++++++++++++++++++++SPELLS++++++++++++++++++++++++++++++++++++++++++++++
 	public static final String SPELL_HEAL = "Healed";					//Controla el spell "heal"
 	public static final String SPELL_PAIN = "Pain";						//Controla el spell "provocar dolor"
@@ -74,6 +84,7 @@ public class Constants {
 	
 	
 	public static final String STUN_TEXT = "esta |aturdido03|";			//Que dice al estar aturdida una criatura
+		
 	
 	public static String capitalize(String text){						//Funcion que devuelve el string capitalizado
 		return Character.toUpperCase(text.charAt(0))+""+text.substring(1);
