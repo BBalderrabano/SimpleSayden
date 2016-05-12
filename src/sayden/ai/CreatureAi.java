@@ -124,54 +124,50 @@ public class CreatureAi {
 	public boolean onGetAttacked(String position, Wound wound, Creature attacker, Item object){
 		String isCrit = "";
 		
+		if(!creature.isAlive()){
+			return true;
+		}
+		
 		if(position == weakSpot){
-			isCrit = " "+Constants.COLOR_RED((char)257+"");
-		}else{
-			isCrit = "";
+			isCrit = Constants.COLOR_RED((char)257+"");
 		}
 		
 		if(wound.startFlavorText(attacker, creature)){
 			if(attacker.isPlayer()){
 				if(object != null){
-					attacker.notifyArround("Tu %s inflige %s %s%s", 
+					attacker.notifyArround("Tu %s inflige %s %s.", 
 							object.nameWNoStacks(),
 							wound.nameUnUna(),
-							creature.nameAlALa(),
-							isCrit);
+							creature.nameAlALa()+isCrit);
 				}else{
-					attacker.notifyArround("Provocas %s %s%s", 
+					attacker.notifyArround("Provocas %s %s.", 
 						wound.nameUnUna(),
-						creature.nameAlALa(),
-						isCrit);
+						creature.nameAlALa()+isCrit);
 				}
 				
 			}else if(creature.isPlayer()){
 				if(object != null){
-					attacker.notifyArround("%s te alcanza con su %s inflingiendote %s%s", 
+					attacker.notifyArround("%s te alcanza con su %s inflingiendote %s.", 
 						Constants.capitalize(attacker.nameElLa()),
 						object.nameWNoStacks(),
-						wound.nameUnUna(),
-						isCrit);
+						wound.nameUnUna());
 				}else{
-					attacker.notifyArround("%s te provoca %s%s", 
+					attacker.notifyArround("%s te provoca %s.", 
 						Constants.capitalize(attacker.nameElLa()),
-						wound.nameUnUna(),
-						isCrit);
+						wound.nameUnUna());
 				}
 			}else{
 				if(object != null){
-					attacker.notifyArround("%s impacta %s con su %s inflingiendo %s%s", 
+					attacker.notifyArround("%s impacta %s con su %s inflingiendo %s.", 
 						Constants.capitalize(attacker.nameElLa()),
-						creature.nameAlALa(),
+						creature.nameAlALa()+isCrit,
 						object.nameWNoStacks(),
-						wound.nameUnUna(),
-						isCrit);
+						wound.nameUnUna());
 				}else{
-					attacker.notifyArround("%s le provoca %s %s%s", 
+					attacker.notifyArround("%s le provoca %s %s.", 
 						Constants.capitalize(attacker.nameElLa()),
 						wound.nameUnUna(),
-						creature.nameAlALa(),
-						isCrit);
+						creature.nameAlALa()+isCrit);
 				}
 			}
 		}
