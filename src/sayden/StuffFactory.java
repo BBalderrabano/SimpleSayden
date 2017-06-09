@@ -1282,9 +1282,9 @@ public class StuffFactory {
 					creature.doAction("resiste el veneno");
 					this.duration = 0;
 				}else{
-					creature.doAction(item, "siente |"+ (creature.gender == 'M' ? "enfermo" : "enferma") +"04|");
+					creature.doAction(item, "siente |enfermo04|");
 					
-					creature.inflictWound(new Wound(2, "envenenado", "El veneno en tu cuerpo te hierve sangre", 'M', Wound.LOW_DURATION, Wound.HIGHEST_CHANCE){
+					creature.inflictWound(new Wound(2, "envenenado", "El veneno en tu cuerpo hierve tu sangre", 'M', Wound.LOW_DURATION, Wound.HIGHEST_CHANCE){
 						public boolean startFlavorText(Creature creature, Creature target){ 
 							if(target.isPlayer()){
 								target.notify("Sientes tu piel arder, empapado en un viscoso veneno");
