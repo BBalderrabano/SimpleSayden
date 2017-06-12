@@ -2,6 +2,7 @@ package sayden.ai;
 
 import sayden.Constants;
 import sayden.Creature;
+import sayden.Speed;
 
 public class DogAi extends CreatureAi {
 	Creature player;
@@ -25,14 +26,16 @@ public class DogAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		visitCheckPoint();
 		
 		if(canSee(player.x, player.y) && creature.position().distance(player.position()) <= 4 && creature.position().distance(player.position()) > 2){
 			
 			creature.doAction("gruñe, clavandote su mirada");
-			creature.modifyActionPoints(-creature.getActionPoints());
+			creature.modifyActionPoints(Speed.NORMAL.velocity());
 			
 		}else if(canSee(player.x, player.y) && creature.position().distance(player.position()) <= 2){
 			hunt(player);
@@ -45,11 +48,11 @@ public class DogAi extends CreatureAi {
 			}else if(owner != null && canSee(owner.x, owner.y) && creature.getData(Constants.CHECKPOINT) != null){
 				creature.doAction("llama al " + owner.name() + " con un gemido");
 				owner.setData(Constants.CHECKPOINT, creature.getData(Constants.CHECKPOINT));
-				creature.modifyActionPoints(-creature.getActionPoints());
+				creature.modifyActionPoints(Speed.NORMAL.velocity());
 			}else{
 				creature.doAction("aulla, asustado");
 				player.notify("El aullido de un perro resuena por la cueva");
-				creature.modifyActionPoints(-creature.getActionPoints());
+				creature.modifyActionPoints(Speed.NORMAL.velocity());
 			}
 		}
 		

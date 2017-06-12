@@ -74,7 +74,7 @@ public class Wound extends Thing implements Cloneable {
 				}
 				
 				creature.notifyArround("La contusion "+ (creature.isPlayer() ? "te |aturde03|" : "|aturde03| " + creature.nameAlALa()));
-				creature.modifyStunTime(stuntime);
+				creature.setQueAction(new Action(creature, stuntime));
 			}
 		};
 	}

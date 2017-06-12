@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
@@ -315,7 +316,7 @@ public class DreamScreen implements Screen {
     }
 	
 	@Override
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		if(displayTip){
 			if(key.getKeyCode() == KeyEvent.VK_ENTER){
 				elapsedTurns++;
@@ -332,10 +333,10 @@ public class DreamScreen implements Screen {
 		
 		if (subscreen() != null) {
 			if(player.subscreen != null){
-				player.subscreen = subscreen().respondToUserInput(key);
+				player.subscreen = subscreen().respondToUserInput(key, main);
 				return this;
 			}else{
-				subscreen = subscreen().respondToUserInput(key);
+				subscreen = subscreen().respondToUserInput(key, main);
 			}
 		} else {
 			switch (key.getKeyCode()){

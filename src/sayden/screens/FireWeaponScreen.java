@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Line;
@@ -41,12 +42,12 @@ public class FireWeaponScreen extends TargetBasedScreen {
 		return true;
 	}
 	
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		if(key.getKeyCode() == KeyEvent.VK_F && lastCreature != null && lastCreature.isAlive() && player.canSee(lastCreature.x, lastCreature.y)){
 			player.rangedWeaponAttack(lastCreature);
 			return null;
 		}else{
-			return super.respondToUserInput(key);
+			return super.respondToUserInput(key, main);
 		}
 	}
 	

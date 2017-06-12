@@ -92,12 +92,16 @@ public class ApplicationMain extends JFrame implements KeyListener, MouseListene
 		if(e.getKeyCode() == KeyEvent.VK_ENTER){
 			t.cancel();
 		}
-		//Aqui se setea el intervalo de deteccion de tecla en milisegundos
-		if(System.currentTimeMillis() - lastPressProcessed > 25) {
-			screen = screen.respondToUserInput(e);
-			repaint();
-            lastPressProcessed = System.currentTimeMillis();
-        }    
+		
+		screen = screen.respondToUserInput(e, this);
+		repaint();
+		
+//		//Aqui se setea el intervalo de deteccion de tecla en milisegundos
+//		if(System.currentTimeMillis() - lastPressProcessed > 25) {
+//			screen = screen.respondToUserInput(e, this);
+//			repaint();
+//            lastPressProcessed = System.currentTimeMillis();
+//        }    
 	}
 
 	@Override

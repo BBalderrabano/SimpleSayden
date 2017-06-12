@@ -6,6 +6,7 @@ import sayden.DamageType;
 import sayden.Effect;
 import sayden.Item;
 import sayden.Point;
+import sayden.Speed;
 import sayden.StuffFactory;
 import sayden.Tile;
 import sayden.Wound;
@@ -116,7 +117,9 @@ public class RockBugAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		if (creature.canSee(player.x, player.y) && creature.vigor() <= creature.maxVigor() * .5f){
 			hunt(player);
@@ -129,7 +132,7 @@ public class RockBugAi extends CreatureAi {
 				creature.doAction("regurgita una bilis acida sobre " + rockCheck.nameElLa());
 				creature.doAction("consume la roca ganando fuerzas");
 				
-				creature.modifyActionPoints(-creature.getActionPoints());
+				creature.modifyActionPoints(Speed.NORMAL.velocity());
 				digestRock();
 				
 				return;
@@ -146,12 +149,12 @@ public class RockBugAi extends CreatureAi {
 							rocksEaten++;
 						}
 						
-						creature.modifyActionPoints(-creature.getActionPoints());
+						creature.modifyActionPoints(Speed.NORMAL.velocity());
 						digestRock();
 						
 						return;
 					}else{
-						creature.modifyActionPoints(-creature.getActionPoints());
+						creature.modifyActionPoints(Speed.NORMAL.velocity());
 						return;
 					}
 				}

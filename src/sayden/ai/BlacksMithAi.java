@@ -108,7 +108,9 @@ public class BlacksMithAi extends HumanoidAi {
 	}
 	
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		if(!canSee(player.x, player.y))
 			wander();

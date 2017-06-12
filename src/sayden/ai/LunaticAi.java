@@ -1,5 +1,6 @@
 package sayden.ai;
 
+import sayden.Action;
 import sayden.Creature;
 import sayden.Effect;
 import sayden.Item;
@@ -31,7 +32,7 @@ public class LunaticAi extends CreatureAi {
 						creature.weapon() == null ? "fuerza" : "su "+creature.weapon().name(), 
 						other.isPlayer() ? "tu entrepierna" : "la entrepierna " + other.nameDelDeLa());
 				creature.doAction(Math.random() > 0.5 ? "rechina sus dientes, " : "contorsiona su rostro en una mueca salvaje");
-				other.modifyStunTime(1);
+				other.setQueAction(new Action(other, 3));
 				other.notify("Pierdes el aliento");
 			}
 		}
@@ -68,6 +69,9 @@ public class LunaticAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
+		if(creature.isActive()){
+			return;
+		}
 		if(canSee(player.x, player.y)){
 			if(creature.getBooleanData("IsFeared")){
 				hunt(player);

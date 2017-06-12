@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sayden.Action;
 import sayden.ai.CreatureAi;
 import sayden.screens.Screen;
 
@@ -12,9 +13,22 @@ public class Creature extends Thing{
 
 	private char glyph;	//El char o grafico de la criatura
 	public char glyph() { return glyph; }
+	public char renderGlyph() {
+		if(queAction != null){
+			if(y > queAction._y())
+				return (char)24;
+			if(y < queAction._y())
+				return (char)25;
+			if(x > queAction._x())
+				return (char)27;
+			if(x < queAction._x())
+				return (char)26;
+		}
+		return glyph;
+	}
 	
 	private Color color;
-	public Color color() { return queSpell != null ? Constants.SPELL_QUE_COLOR : queAttack != null ? Constants.ATTACK_QUE_COLOR : color; }
+	public Color color() { return queSpell != null ? Constants.SPELL_QUE_COLOR : queAction != null ? Constants.ATTACK_QUE_COLOR : color; }
 	public void changeColor(Color color) { this.color = color; }
 	
 	//El color de la criatura al instanciarse
@@ -49,9 +63,22 @@ public class Creature extends Thing{
 		public void setQueSpell(Creature c, Spell s) { this.queSpellCreature = c; this.queSpell = s; }
 		
 		//La posicion a donde quiere atacar la criatura
-		private Point queAttack;
-		public Point queAttack(){ return queAttack; }	
-		public void setQueAttack(Point p) { this.queAttack = p; }
+		private Action queAction;
+		public Action queAction(){ return queAction; }	
+		public void setQueAction(Action p) { this.queAction = p; }
+		
+		public boolean isActive(){
+			return actionPoints > 0 || queAction != null;
+		}
+		
+		private int actionPoints;
+		public int getActionPoints() { return actionPoints;	}
+		
+		//Modifica los puntos de accion de las criaturas
+		public void modifyActionPoints(int amount) {
+			this.actionPoints += amount; 
+		}
+		
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
 	private boolean isAlive;
@@ -169,41 +196,7 @@ public class Creature extends Thing{
 		
 		private String stunText = null;
 		public String stunText() { return (stunText == null ? Constants.STUN_TEXT : stunText); }
-		
-		private int stunTime = 0;
-		public int stunTime() { return stunTime; }
-		public void modifyStunTime(int amount) { 
-			this.stunTime += amount; 
-			
-			if(stunTime < 1)
-				stunText = null;
-		}
-		
-		public void modifyStunTime(int amount, String stunText) { 
-			this.stunTime += amount; 
-			
-			if(this.stunText == null)
-				this.stunText = stunText;
-		}
-		
-		private int actionPoints;
-		public int getActionPoints() { return actionPoints;	}
-		
-		//Modifica los puntos de accion de las criaturas
-		public void modifyActionPoints(int amount) {
-			if(isPlayer()){
-				world.modifyActionPoints(Math.abs(amount));	//El player modifica los AP de todas las criaturas
-				return;
-			}
-			
-			this.actionPoints += amount; 
-			
-			//Si estoy substrayendo puntos (tomando una accion) actualizo las heridas/efectos
-			if(amount < 0){		
-				updateEffects();
-				updateWounds();
-			}
-		}
+		public void setStunText(String text) { this.stunText = text; }
 		
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	//Con las velocidades, SIEMPRE toma la velocidad mas "lenta"
@@ -355,17 +348,10 @@ public class Creature extends Thing{
 	}
 		
 	public void moveBy(int mx, int my){
-		if(stunTime() > 0 && isPlayer()){
-			modifyActionPoints(-getMovementSpeed().velocity());
-			doAction(stunText());
-			modifyStunTime(-1);
-			return;
-		}
-		
 		ai.onMoveBy(mx, my);
 		
 		if (mx==0 && my==0){
-			modifyActionPoints(-Math.max(1, movementSpeed.velocity()));
+			modifyActionPoints(movementSpeed.velocity());
 			return;
 		}
 		
@@ -432,7 +418,17 @@ public class Creature extends Thing{
 			}
 			ai.onEnter(x+mx, y+my, tile);
 		}else{
-			ai.onAttack(other);
+			
+			if((!isPlayer() && !isAlly(other)) || 
+				(!isPlayer() && isAlly(other) && (getBooleanData(Constants.FLAG_ANGRY) || other.getBooleanData(Constants.FLAG_ANGRY)))){
+				
+				queAction = new Action(this, x+mx, y+my, (dualStrike() ? 	offWeapon().attackSpeed().velocity() : 
+																			getAttackSpeed().velocity()));
+			}else{
+				ai.onAttack(other);
+				modifyActionPoints(dualStrike() ? 	offWeapon().attackSpeed().velocity() : 
+													getAttackSpeed().velocity());
+			}
 		}
 		
 		if(world.tile(x-mx, y-my) == Tile.DOOR_OPEN){
@@ -472,12 +468,11 @@ public class Creature extends Thing{
 			doAction("arroja %s", thrown.nameUnUnaWNoStacks());
 		}
 		
-		modifyActionPoints(-(thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()));
+		modifyActionPoints((thrown.movementSpeed() != null ? thrown.movementSpeed().velocity() : getMovementSpeed().velocity()));
 		
 		ai.onThrowItem(thrown);
 		
-		world.add(new Projectile(world, new Line(this.x, this.y, x, y), 
-				thrown.movementSpeed() != null ? thrown.movementSpeed().modifySpeed(-1) : Speed.SUPER_FAST, thrown, this));
+		world.add(new Projectile(world, new Line(this.x, this.y, x, y), thrown, this));
 	}
 	
 	public void rangedWeaponAttack(Creature other){
@@ -503,7 +498,7 @@ public class Creature extends Thing{
 		
 		doAction("dispara %s hacia %s", weapon.nameElLaWNoStacks(), other.nameElLa());
 		
-		modifyActionPoints(-(weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()));
+		modifyActionPoints((weapon().attackSpeed() != null ? weapon().attackSpeed().velocity() : getAttackSpeed().velocity()));
 		
 		if(weapon() != null && weapon().canBreak()){
 			weapon().modifyDurability(-1);
@@ -516,7 +511,7 @@ public class Creature extends Thing{
 			}
 		}
 		
-		world.add(new Projectile(world, new Line(this.x, this.y, other.x, other.y), Speed.SUPER_FAST, thrown, this));
+		world.add(new Projectile(world, new Line(this.x, this.y, other.x, other.y), thrown, this));
 	}
 	
 	/**
@@ -744,29 +739,18 @@ public class Creature extends Thing{
 		if(!isAlive())
 			return;
 		
-		if(isPlayer()){
-			updateWounds();
-			updateEffects();
-			ai.onUpdate();
-			return;
+		modifyActionPoints(-1);
+		
+		if(queAction != null){
+			queAction.tick();
+			
+			if(queAction.isDone())
+				queAction = null;
 		}
 		
-		//Creatures use actionPoints until they cannot, effects are updated AFTER their AP is substracted
-		
-		int maxTries = 0;
-		int startPoints = actionPoints;
-		int endPoints = 0;
-		
-		while(actionPoints > 0 && maxTries < 2){
-			startPoints = actionPoints;
-			
-			ai.onUpdate();
-			
-			endPoints = actionPoints;
-			
-			if(startPoints == endPoints)
-				maxTries++;
-		}
+		updateWounds();
+		updateEffects();
+		ai.onUpdate();
 	}
 	
 	private void updateEffects(){

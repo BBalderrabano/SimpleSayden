@@ -41,7 +41,9 @@ public class PaseacuevasLostAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		visitCheckPoint();
 		

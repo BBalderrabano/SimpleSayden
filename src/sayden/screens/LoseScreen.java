@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Creature;
 
 public class LoseScreen implements Screen {
@@ -24,7 +25,7 @@ public class LoseScreen implements Screen {
 	}
 
 	@Override
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		return key.getKeyCode() == KeyEvent.VK_ENTER ? new PlayScreen() : this;
 	}
 

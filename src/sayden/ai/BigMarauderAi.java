@@ -86,7 +86,7 @@ public class BigMarauderAi extends CreatureAi {
 				creature.doAction("siente los brazos fallandole...");
 				creature.makeBleed(40);
 				creature.setData(armBroken, true);
-				creature.setQueAttack(null);
+				creature.setQueAction(null);
 			}
 			
 		}
@@ -96,31 +96,34 @@ public class BigMarauderAi extends CreatureAi {
 	
 	@Override
 	public boolean onAttack(Creature other){
-		if(creature.getBooleanData(armBroken) || creature.queAttack() == null){
+		if(creature.getBooleanData(armBroken) || creature.queAction() == null){
 			return super.onAttack(other);
 		}
 		return false;
 	}
 	
 	public void onUpdate(){
-		if(creature.queAttack() != null && !creature.getBooleanData(armBroken)
-				&& creature.getActionPoints() >= creature.getAttackSpeed().velocity()){
-			
-			creature.doAction("comienza a golpear a su alrededor!");
-			
-			for(Point p : creature.position().neighbors8()){
-				Creature c = world.creature(p.x, p.y);
-				if(c == null || c == creature)
-					continue;
-//TODO:			int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante", true);
-				c.doAction("recibe un golpe por "+ 1 + " de daño");
-			}
-			creature.modifyStunTime(1);
-			creature.setQueAttack(null);
+		if(creature.isActive()){
 			return;
-		}else{
-			super.onUpdate();
 		}
+//		if(creature.queAttack() != null && !creature.getBooleanData(armBroken)
+//				&& creature.getActionPoints() >= creature.getAttackSpeed().velocity()){
+//			
+//			creature.doAction("comienza a golpear a su alrededor!");
+//			
+//			for(Point p : creature.position().neighbors8()){
+//				Creature c = world.creature(p.x, p.y);
+//				if(c == null || c == creature)
+//					continue;
+////TODO:			int damage = c.receiveDamage(creature.attackValue(DamageType.BLUNT) + 5, DamageType.BLUNT, "Molido a golpes por un merodeador gigante", true);
+//				c.doAction("recibe un golpe por "+ 1 + " de daño");
+//			}
+//			creature.modifyStunTime(1);
+//			creature.setQueAttack(null);
+//			return;
+//		}else{
+//			super.onUpdate();
+//		}
 		
 		if(canSee(player.x, player.y)){
 			if(!playerHidden()){

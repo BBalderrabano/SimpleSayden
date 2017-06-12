@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import asciiPanel.AsciiPanel;
 import sayden.ApplicationMain;
@@ -36,6 +38,8 @@ public class PlayScreen implements Screen {
 	private boolean pauseTooltip = true;
 	
 	private int depth = 0;
+	
+	private Timer timer = new Timer();
 	
 	public PlayScreen(){
 		MapLoader ml = new MapLoader();
@@ -262,9 +266,9 @@ public class PlayScreen implements Screen {
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
 		
-		terminal.write(" [", 0, 23);
-		terminal.setCursorX(1);
-		terminal.write('[', AsciiPanel.brightBlack);
+		terminal.write('[', 1, 23, AsciiPanel.brightBlack);
+		
+		int hpBars = 0;
 		
 		for(int i = 0; i < player.vigor(); i++){
 			float p = Math.min(1f, ((player.vigor() * 100.0f) / player.maxVigor()) / 100f);
@@ -277,12 +281,12 @@ public class PlayScreen implements Screen {
             int blue = (int) (color2.getBlue() * p + color1.getBlue() * (1 - p));
 
             terminal.write('|', new Color(red, green, blue));
+            hpBars++;
 		}
 		
-		terminal.setCursorX(terminal.getCursorX() + Math.max(0, player.maxVigor() - player.vigor()));
-		terminal.write(']', AsciiPanel.brightBlack);
+		terminal.write(']', (2 + hpBars) + Math.max(0, player.maxVigor() - player.vigor()), 23, AsciiPanel.brightBlack);
 		
-		terminal.write(" " + player.statusEffects());
+//		terminal.write(" " + player.statusEffects());
 
 		if(pauseTooltip){
 			String tooltip = "-- esc o p ayuda --";
@@ -412,8 +416,8 @@ public class PlayScreen implements Screen {
 		for (int i = 0; i < messages.size(); i++){
 			colorize(terminal, messages.get(i).replaceAll("!!", (char)19+""), top + i);
 		}
-		if (subscreen() == null)
-			messages.clear();
+//		if (subscreen() == null)
+//			messages.clear();
 	}
 	
 	public static ArrayList<String> splitPhraseByLimit(String text, int limit){
@@ -448,18 +452,24 @@ public class PlayScreen implements Screen {
 	}
 	
 	@Override
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, final ApplicationMain main) {
 		if (!player.isAlive())
 			return new LoseScreen(player);
 		
 		if (subscreen() != null) {
 			if(player.subscreen != null){
-				player.subscreen = subscreen().respondToUserInput(key);
+				player.subscreen = subscreen().respondToUserInput(key, main);
 				return this;
 			}else{
-				subscreen = subscreen().respondToUserInput(key);
+				subscreen = subscreen().respondToUserInput(key, main);
 			}
 		} else {
+			if(player.isActive()){
+				return subscreen == null ? this : subscreen;
+			}
+			
+			messages.clear();
+			
 			switch (key.getKeyCode()){
 				case KeyEvent.VK_P:
 				case KeyEvent.VK_ESCAPE:
@@ -509,9 +519,20 @@ public class PlayScreen implements Screen {
 			}
 		}
 
-		if (subscreen() == null){
-			world.updateFloor();
+		if (subscreen == null && player.getActionPoints() > 0){
+			
+			timer.scheduleAtFixedRate(new TimerTask(){
+				@Override
+				public void run(){
+					if(!player.isActive()){ cancel(); }
+					world.updateFloor();
+					main.repaint();
+				}
+			}, 0, Math.max(250 / player.getActionPoints(), 1));
+			
 		}
+		
+		main.repaint();
 		
 		return this;
 	}

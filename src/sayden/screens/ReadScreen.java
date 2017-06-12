@@ -1,7 +1,9 @@
 package sayden.screens;
 
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import sayden.ApplicationMain;
 import sayden.Creature;
 import sayden.Item;
 
@@ -33,6 +35,11 @@ public class ReadScreen extends InventoryBasedScreen {
 
 	@Override
 	public Screen respondToMouseInput(MouseEvent mouse) {
+		return this;
+	}
+
+	@Override
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		return this;
 	}
 }

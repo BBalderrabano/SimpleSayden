@@ -60,7 +60,9 @@ public class PriestAi extends HumanoidAi {
 	}
 	
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		if(!canSee(player.x, player.y))
 			creature.moveBy(0,0);

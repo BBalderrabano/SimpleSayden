@@ -94,19 +94,6 @@ public class World {
 		}
 	}
 
-	public void modifyActionPoints(int amount){
-		amount = Math.abs(amount);
-
-		for(Creature c : creatures){
-			if(c.isPlayer())
-				continue;
-			c.modifyActionPoints(amount);
-		}
-		for(Projectile p : projectiles){
-			p.modifyActionPoints(amount);
-		}
-	}
-	
 	public Projectile projectile(int x, int y){
 		for (Projectile p : projectiles){
 			if (p.x == x && p.y == y)
@@ -178,7 +165,7 @@ public class World {
 			return projectile.projectile().glyph();
 		
 		if (creature != null && !creature.getBooleanData(Constants.FLAG_INVISIBLE))
-			return creature.glyph();
+			return creature.renderGlyph();
 		
 		if (item(x,y) != null)
 			return item(x,y).glyph();

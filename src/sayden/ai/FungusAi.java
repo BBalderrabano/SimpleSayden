@@ -13,6 +13,9 @@ public class FungusAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
+		if(creature.isActive()){
+			return;
+		}
 		if (spreadcount < 5 && Math.random() < 0.01)
 			spread();
 	}

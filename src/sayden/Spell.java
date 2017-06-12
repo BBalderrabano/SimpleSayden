@@ -68,7 +68,7 @@ public class Spell extends Thing{
 	public void onCast(Creature caster, Creature other) {
 		double temp = Math.random();
 		
-		caster.modifyActionPoints(-castSpeed().velocity());
+		caster.modifyActionPoints(castSpeed().velocity());
 		
 		if(negativeEffect != null && caster.getBooleanData(flag) && temp < (chance * 0.01)){
 			

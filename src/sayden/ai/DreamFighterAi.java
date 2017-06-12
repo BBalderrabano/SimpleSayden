@@ -27,7 +27,10 @@ public class DreamFighterAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
+		
 		if(target == null || !target.isAlive() || !canSee(target.x, target.y)){
 			for(Point p : creature.position().neighbors(creature.visionRadius())){
 				Creature c = creature.creature(p.x, p.y);

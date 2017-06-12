@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 
 public class StartScreen implements Screen {
 
@@ -18,7 +19,7 @@ public class StartScreen implements Screen {
 	public void displayOutput(AsciiPanel terminal) { }
 
 	@Override
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		return key.getKeyCode() == KeyEvent.VK_ENTER ? new DreamScreen() : this;
 	}
 	

@@ -22,7 +22,9 @@ public class PaseacuevasAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		if(males.isEmpty()){
 //			if(!creature.getBooleanData(Constants.FLAG_SEEN_PLAYER)){

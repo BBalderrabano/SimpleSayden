@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 
 public class WinScreen implements Screen {
 
@@ -14,7 +15,7 @@ public class WinScreen implements Screen {
 	}
 
 	@Override
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		return key.getKeyCode() == KeyEvent.VK_ENTER ? new PlayScreen() : this;
 	}
 

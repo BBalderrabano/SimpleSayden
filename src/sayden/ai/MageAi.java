@@ -29,7 +29,9 @@ public class MageAi extends CreatureAi {
 	}
 	
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		if(canSee(player.x, player.y)){
 			creature.castSpell(creature.learnedSpells().get(0), player.x, player.y);

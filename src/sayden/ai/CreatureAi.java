@@ -52,7 +52,7 @@ public class CreatureAi {
 		if(!creature.isPlayer() && spell.castSpeed().velocity() >= creature.getActionPoints() && creature.queSpell() == null){
 			if(other != null && other.isPlayer() && 
 					Math.abs(spell.castSpeed().velocity() - other.getMovementSpeed().velocity()) > 1){
-				creature.modifyActionPoints(-creature.getActionPoints());
+//				creature.modifyActionPoints(-creature.getActionPoints());
 				creature.setQueSpell(other,  spell);
 				creature.doAction("comienza a pronunciar " + spell.nameUnUna());
 				return;
@@ -76,18 +76,11 @@ public class CreatureAi {
 	}
 	
 	public void onEnter(int x, int y, Tile tile){
-		if(creature.queAttack() != null || creature.queSpell() != null)
-			return;
-		
-		if(creature.getActionPoints() < creature.getMovementSpeed().velocity() && !creature.isPlayer()){
-			return;	//There are not enough action points to perform a movement action, return
-		}else if(!creature.isPlayer()){
-			creature.modifyActionPoints(-creature.getMovementSpeed().velocity());	//We can move, and we are not a player, substract movement speed
-		}
 		if (tile.isGround()){
 			creature.x = x;
 			creature.y = y;
 		}
+		creature.modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
 	public boolean onAttack(Creature other){
@@ -97,20 +90,6 @@ public class CreatureAi {
 				creature.queSpell() != null)
 			return false;
 
-		if(creature.getActionPoints() < creature.getAttackSpeed().velocity() && !creature.isPlayer()){
-			if(other.isPlayer()){
-				if(Math.abs(creature.getAttackSpeed().velocity() - other.getMovementSpeed().velocity()) > 2
-						&& creature.queAttack() == null){
-					creature.modifyActionPoints(-creature.getActionPoints());
-					creature.setQueAttack(other.position());
-				}
-			}
-			return false;	//There are not enough action points to perform an attack, queue attack
-		}else if(!creature.isPlayer()){
-			creature.modifyActionPoints(-(creature.dualStrike() ?	creature.offWeapon().attackSpeed().velocity() : 
-																	creature.getAttackSpeed().velocity()));
-		}
-		
 		boolean success = creature.meleeAttack(other);
 		
 		if(success){
@@ -178,38 +157,38 @@ public class CreatureAi {
 	}
 	
 	public void onUpdate(){
-		if(creature.stunTime() > 0 && !creature.isPlayer()){
-			creature.modifyActionPoints(-creature.getActionPoints());
-			creature.doAction(creature.stunText());
-			creature.modifyStunTime(-1);
-			return;
-		}
-		if(!creature.isPlayer() && creature.queSpell() != null &&
-				creature.getActionPoints() >= creature.queSpell().castSpeed().velocity()){
-			
-			if(creature.queSpellCreature() != null && canSee(creature.queSpellCreature().x, creature.queSpellCreature().y)){
-				creature.castSpell(creature.queSpell(), creature.queSpellCreature().x, creature.queSpellCreature().y);
-			}else{
-				creature.queSpellCreature().notify(Constants.capitalize(creature.nameElLa()) + " |falla06| el conjuro!");
-			}
-			creature.setQueSpell(null, null);
-		}
+//		if(creature.stunTime() > 0 && !creature.isPlayer()){
+//			creature.modifyActionPoints(-creature.getActionPoints());
+//			creature.doAction(creature.stunText());
+//			creature.modifyStunTime(-1);
+//			return;
+//		}
+//		if(!creature.isPlayer() && creature.queSpell() != null &&
+//				creature.getActionPoints() >= creature.queSpell().castSpeed().velocity()){
+//			
+//			if(creature.queSpellCreature() != null && canSee(creature.queSpellCreature().x, creature.queSpellCreature().y)){
+//				creature.castSpell(creature.queSpell(), creature.queSpellCreature().x, creature.queSpellCreature().y);
+//			}else{
+//				creature.queSpellCreature().notify(Constants.capitalize(creature.nameElLa()) + " |falla06| el conjuro!");
+//			}
+//			creature.setQueSpell(null, null);
+//		}
 		
-		if(creature.queAttack() != null && 
-				creature.getActionPoints() >= creature.getAttackSpeed().velocity()){
-			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
-			
-			Creature c = creature.world().creature(creature.queAttack().x, creature.queAttack().y);
-			
-			if(c == null){
-				creature.x = creature.queAttack().x;
-				creature.y = creature.queAttack().y;
-				creature.doAction("|falla05| el ataque!");
-			}else{
-				creature.meleeAttack(c);
-			}			
-			creature.setQueAttack(null);
-		}
+//		if(creature.queAttack() != null && 
+//				creature.getActionPoints() >= creature.getAttackSpeed().velocity()){
+//			creature.modifyActionPoints(-creature.getAttackSpeed().velocity());
+//			
+//			Creature c = creature.world().creature(creature.queAttack().x, creature.queAttack().y);
+//			
+//			if(c == null){
+//				creature.x = creature.queAttack().x;
+//				creature.y = creature.queAttack().y;
+//				creature.doAction("|falla05| el ataque!");
+//			}else{
+//				creature.meleeAttack(c);
+//			}			
+//			creature.setQueAttack(null);
+//		}
 	}
 	
 	public void onMoveBy(int mx, int my){ }

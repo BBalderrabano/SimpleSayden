@@ -62,7 +62,6 @@ public class PlayerAi extends CreatureAi {
 			creature.open(x, y);
 		}
 		
-//		creature.addTime(creature.getMovementSpeed().velocity());
 		creature.modifyActionPoints(creature.getMovementSpeed().velocity());
 	}
 	
@@ -82,7 +81,6 @@ public class PlayerAi extends CreatureAi {
 		if(success){
 			if(other.isAlive() && other.queSpell() != null){
 				other.stopCasting();
-				other.modifyActionPoints(-other.getActionPoints());
 			}
 			if(creature.weapon() != null && !creature.weapon().getBooleanData(Constants.CHECK_RANGED) && 
 					!creature.weapon().getBooleanData(Constants.CHECK_UNAUGMENTABLE)){

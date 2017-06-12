@@ -10,34 +10,24 @@ public class Projectile {
 	protected World world;
 	protected Point start;
 	protected Line path;
-	protected Speed speed;
 	
 	private Item projectile;
 	public Item projectile() { return projectile; }
 	
 	private Creature origin;
 	
-	private int actionPoints;
-	public int actionPoints() { return actionPoints; }
-	public void modifyActionPoints(int amount) { this.actionPoints += amount; }
-	
 	private boolean interrupted = false;
 	public boolean isInterrupted() { return interrupted; }
 	
 	private boolean isDone = false;
 	public boolean isDone() { 
-		return isDone || this.step >= path.getPoints().size()
-				|| (speed == Speed.NORMAL && this.step >= 6)
-				|| (speed == Speed.SLOW && this.step >= 4)
-				|| ((speed == Speed.VERY_SLOW || speed == Speed.SUPER_SLOW) && this.step >= 2); 
+		return isDone || this.step >= path.getPoints().size(); 
 	}
 	
-	public Projectile(World world, Line line, Speed velocity, Item projectile, Creature origin){
+	public Projectile(World world, Line line, Item projectile, Creature origin){
 		this.world = world;
 		this.path = line;
-		this.speed = velocity;
 		this.projectile = projectile;
-		this.actionPoints += speed.velocity();
 		this.origin = origin;
 		this.start = origin.position();
 
@@ -45,25 +35,21 @@ public class Projectile {
 	}
 	
 	public void update(){
-		while(actionPoints >= speed.velocity()){
-			List<Point> points = path.getPoints();
-			
-			int mx = points.get(Math.min(step, points.size() - 1)).x - x;
-			int my = points.get(Math.min(step, points.size() - 1)).y - y;
-			Creature c = world.creature(x, y);
-			
-			if(c != null && c != origin && !isDone)
-				end();
-			
-			moveBy(mx, my);
-			step++;
-		}
+		List<Point> points = path.getPoints();
+		
+		int mx = points.get(Math.min(step, points.size() - 1)).x - x;
+		int my = points.get(Math.min(step, points.size() - 1)).y - y;
+		Creature c = world.creature(x, y);
+		
+		if(c != null && c != origin && !isDone)
+			end();
+		
+		moveBy(mx, my);
+		step++;
 	}
 	
 	public void moveBy(int mx, int my){
 		Tile tile = world.tile(x+mx, y+my);		
-		
-		modifyActionPoints(-speed.velocity());
 		
 		if (tile.isGround()){
 			this.x = mx+x;
@@ -137,7 +123,6 @@ public class Projectile {
 		
 		if(target.isAlive() && target.queSpell() != null){
 			target.stopCasting();
-			target.modifyActionPoints(-target.getActionPoints());
 		}
 	}
 }

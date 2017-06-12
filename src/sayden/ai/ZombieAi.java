@@ -11,6 +11,9 @@ public class ZombieAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
+		if(creature.isActive()){
+			return;
+		}
 		if (Math.random() < 0.2)
 			return;
 		

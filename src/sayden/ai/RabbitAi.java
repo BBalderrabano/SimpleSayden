@@ -3,6 +3,7 @@ package sayden.ai;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Item;
+import sayden.Speed;
 
 public class RabbitAi extends CreatureAi {
 	Creature player;
@@ -16,10 +17,13 @@ public class RabbitAi extends CreatureAi {
 		
 		this.player = player;
 		creature.setData(Constants.RACE, "conejo");
+		creature.modifyMovementSpeed(Speed.SUPER_FAST);
 	}
 
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		if(canSee(player.x, player.y))
 			hunt(player);

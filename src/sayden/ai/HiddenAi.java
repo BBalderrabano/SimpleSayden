@@ -42,7 +42,9 @@ public class HiddenAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
-		super.onUpdate();
+		if(creature.isActive()){
+			return;
+		}
 		
 		if(creature.position().distance(player.position()) <= 2){
 			creature.unsetData(Constants.FLAG_INVISIBLE);

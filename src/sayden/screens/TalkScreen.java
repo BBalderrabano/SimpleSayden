@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Item;
@@ -176,7 +177,7 @@ public class TalkScreen extends InventoryBasedScreen {
 		terminal.write((char)187, realWidth, offset_y);
 	}
 	
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		if(key.getKeyCode() == KeyEvent.VK_TAB){
 			startAggression = !startAggression;
 			return this;

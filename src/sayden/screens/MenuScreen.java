@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.DamageType;
@@ -534,7 +535,7 @@ public class MenuScreen extends InventoryBasedScreen {
 	    return longest_word;
 	}
 	
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		if(key.getKeyCode() == KeyEvent.VK_ENTER || key.getKeyCode() == KeyEvent.VK_E
 				|| key.getKeyCode() == KeyEvent.VK_SPACE
 				|| (key.getKeyCode() == KeyEvent.VK_RIGHT || key.getKeyCode() == KeyEvent.VK_D) && interactWithItem){

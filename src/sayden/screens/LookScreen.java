@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Item;
@@ -72,11 +73,11 @@ public class LookScreen extends TargetBasedScreen {
 		caption = tile.glyph() + " " + tile.details();
 	}
 	
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		if(key.getKeyCode() == KeyEvent.VK_R){
 			return null;
 		}else{
-			return super.respondToUserInput(key);
+			return super.respondToUserInput(key, main);
 		}
 	}
 

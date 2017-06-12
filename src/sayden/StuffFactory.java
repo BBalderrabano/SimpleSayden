@@ -773,7 +773,8 @@ public class StuffFactory {
 			public boolean startFlavorText(Creature creature, Creature target){
 				creature.doAction("golpea con terrible fuerza el costado " + (target.isPlayer() ? "de tu cuerpo" : target.nameDelDeLa()));
 				target.notify("Sientes un terrible crujido en tus costillas");
-				target.modifyStunTime(1, "esta sin |aliento03|");
+				creature.setQueAction(new Action(creature, 10));
+				target.setStunText("esta sin |aliento03|");
 				return false;
 			}
 		});
@@ -1298,11 +1299,11 @@ public class StuffFactory {
 							
 							if(Math.random() < 0.15f){
 								if(!creature.isPlayer()){
-									creature.modifyActionPoints(-creature.getActionPoints());
+									creature.modifyActionPoints(Speed.NORMAL.velocity());
 								}
 								
 								creature.doAction("vomita bilis con sangre");
-								creature.modifyStunTime(1, "esta |mareado03|");
+								creature.setQueAction(new Action(creature, 10));
 								creature.makeBleed((float) (Math.random() * 100f));
 							}
 						}

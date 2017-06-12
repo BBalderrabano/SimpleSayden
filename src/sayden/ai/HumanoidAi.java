@@ -12,6 +12,9 @@ public class HumanoidAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
+		if(creature.isActive()){
+			return;
+		}
 		if(creature.getBooleanData(Constants.FLAG_ANGRY)){
 			if (canUseBetterEquipment())
 				useBetterEquipment();

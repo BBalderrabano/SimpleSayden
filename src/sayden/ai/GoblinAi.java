@@ -11,6 +11,9 @@ public class GoblinAi extends CreatureAi {
 	}
 
 	public void onUpdate(){
+		if(creature.isActive()){
+			return;
+		}
 		if (canUseBetterEquipment())
 			useBetterEquipment();
 		else if (canRangedWeaponAttack(player))

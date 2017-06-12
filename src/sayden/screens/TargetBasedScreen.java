@@ -3,6 +3,7 @@ package sayden.screens;
 import java.awt.event.KeyEvent;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Creature;
 import sayden.Line;
 import sayden.Point;
@@ -37,7 +38,7 @@ public abstract class TargetBasedScreen implements Screen {
 	}
 
 	@Override
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		int px = x;
 		int py = y;
 

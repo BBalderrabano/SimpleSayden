@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import asciiPanel.AsciiPanel;
+import sayden.ApplicationMain;
 import sayden.Constants;
 import sayden.Creature;
 import sayden.Item;
@@ -127,7 +128,7 @@ public class ReadSpellScreen implements Screen {
 		return false;
 	}
 
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key, ApplicationMain main) {
 		ArrayList<String> lines = getList();
 		
 		if(key.getKeyCode() == KeyEvent.VK_Q){
